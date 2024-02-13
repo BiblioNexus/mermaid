@@ -10,7 +10,7 @@ import {
   setAccDescription,
   clear as commonClear,
 } from '../common/commonDb.js';
-import type { PieFields, PieDB, Sections } from './pieTypes.js';
+import type { PieFields, PieDB, Sections } from './simpleGrammarTypes.js';
 import type { RequiredDeep } from 'type-fest';
 import type { PieDiagramConfig } from '../../config.type.js';
 import DEFAULT_CONFIG from '../../defaultConfig.js';
