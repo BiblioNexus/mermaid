@@ -1,0 +1,31 @@
+import { isFragment } from '../utils.js';
+import { ErrorType, GrammarError } from '../error.js';
+import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+
+import { isWord } from '../utils.js';
+import { drawRelativeParticle } from '../svgDrawer/drawRelativeParticle.js';
+
+export function parseRelativeParticle(node: GrammarNode): GraphicalNode {
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'RelativeParticle') {
+    throw new GrammarError(
+      ErrorType.InvalidParser,
+      'RelativeParticle parser requires RelativeParticle Node'
+    );
+  }
+
+  if (node.children.length !== 1) {
+    throw new GrammarError(ErrorType.InvalidStructure, 'RelativeClause has invalid children');
+  }
+
+  if (
+    isWord(node.children[0].content!) &&
+    (node.children[0].content.pos === 'particle' || node.children[0].content.pos === 'pronoun')
+  ) {
+    return {
+      ...node,
+      drawUnit: drawRelativeParticle(node.children[0], 50),
+    };
+  }
+
+  throw new GrammarError(ErrorType.InvalidStructure, 'Nominal has unexpected structure');
+}

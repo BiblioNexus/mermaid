@@ -1,0 +1,39 @@
+import { isFragment } from '../utils.js';
+import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+
+import { ErrorType, GrammarError } from '../error.js';
+
+import { drawConstructChainConnector } from '../svgDrawer/drawConstructChainConnector.js';
+
+export function parseConstructChain(node: GrammarNode): GraphicalNode {
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'ConstructChain') {
+    throw new GrammarError(
+      ErrorType.InvalidParser,
+      'ConstructChain parser requires ConstructChain Node'
+    );
+  }
+
+  if (node.children.length === 0) {
+    throw new GrammarError(
+      ErrorType.InvalidStructure,
+      'ConstructChain has invalid length of children'
+    );
+  }
+
+  node.children.forEach((child) => {
+    if (
+      isFragment(child.content!) &&
+      child.content.fragment !== 'Nominal' &&
+      child.content.fragment !== 'ConstructChain'
+    ) {
+      throw new GrammarError(ErrorType.InvalidStructure, 'ConstructChain has invalid children');
+    }
+  });
+
+  return {
+    ...node,
+    drawUnit: drawConstructChainConnector(
+      node.children.map((child) => (child as GraphicalNode).drawUnit)
+    ),
+  };
+}
