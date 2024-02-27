@@ -266,6 +266,9 @@ importers:
       '@types/d3':
         specifier: ^7.4.0
         version: 7.4.0
+      '@types/d3-path':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@types/d3-sankey':
         specifier: ^0.12.1
         version: 0.12.1
@@ -4673,8 +4676,8 @@ packages:
     resolution: {integrity: sha512-NaIeSIBiFgSC6IGUBjZWcscUJEq7vpVu7KthHN8eieTV9d9MqkSOZLH4chq1PmcKy06PNe3axLeKmRIyxJ+PZQ==}
     dev: true
 
-  /@types/d3-path@3.0.0:
-    resolution: {integrity: sha512-0g/A+mZXgFkQxN3HniRDbXMN79K3CdTpLsevj+PXiTcb2hVyvkZUBg37StmgCQkaD84cUJ4uaDAWq7UJOQy2Tg==}
+  /@types/d3-path@3.1.0:
+    resolution: {integrity: sha512-P2dlU/q51fkOc/Gfl3Ul9kicV7l+ra934qBFXCFhrZMOL6du1TM0pm1ThYvENukyOn5h9v+yMJ9Fn5JK4QozrQ==}
     dev: true
 
   /@types/d3-polygon@3.0.0:
@@ -4716,7 +4719,7 @@ packages:
   /@types/d3-shape@3.1.1:
     resolution: {integrity: sha512-6Uh86YFF7LGg4PQkuO2oG6EMBRLuW9cbavUW46zkIO5kuS2PfTqo2o9SkgtQzguBHbLgNnU90UNsITpsX1My+A==}
     dependencies:
-      '@types/d3-path': 3.0.0
+      '@types/d3-path': 3.1.0
     dev: true
 
   /@types/d3-time-format@4.0.0:
@@ -4763,7 +4766,7 @@ packages:
       '@types/d3-geo': 3.0.3
       '@types/d3-hierarchy': 3.1.2
       '@types/d3-interpolate': 3.0.1
-      '@types/d3-path': 3.0.0
+      '@types/d3-path': 3.1.0
       '@types/d3-polygon': 3.0.0
       '@types/d3-quadtree': 3.0.2
       '@types/d3-random': 3.0.1

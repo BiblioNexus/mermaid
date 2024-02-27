@@ -15,13 +15,169 @@
   <body>
     <h1>Simple Grammar demos</h1>
     <pre class="mermaid">
-      SimpleGrammar 
-        title Default text position: Animal adoption
-        accTitle: simple pie char demo
-        accDescr: pie chart with 3 sections: dogs, cats, rats. Most are dogs.
-        "Dogs": 386
-        "Cats": 85
-        "Rats": 15
+      SimpleGrammar
+        DiscourseUnit [Visual Dictionary]
+          Fragment [Simple noun phrase]
+            noun: דָּ֘בָ֤ר theme
+          Fragment [nominal phrase with adjective]
+            Nominal
+              noun: דָּ֘בָ֤ר theme
+              adjective: ט֗וֹב noble
+          Fragment [nominal phrase with article]
+            Nominal
+              article: הַ the
+              noun: דָּ֘בָ֤ר theme [simple noun]
+
+          Fragment [nominal phrase with article and adjective]
+            Nominal
+              article: הַ the
+              adjective: ט֗וֹב good
+              noun: דָּ֘בָ֤ר theme
+          Fragment [noun phrase (substantival adjective) with article]
+            Nominal
+              article: הַ the
+              Nominal
+                adjective: ט֗וֹב good [substantival adjective]
+          Fragment [nominal phrase (substantival adjective) with adjective]
+            Nominal
+              Nominal
+                adjective: ט֗וֹב good [substantival adjective]
+              adjective: ט֗וֹב noble
+          Fragment [nominal phrase (substantival adjective) with article and adjective]
+            Nominal
+              article: הַ the
+              Nominal
+                adjective: ט֗וֹב good [substantival adjective]
+              adjective: ט֗וֹב noble
+          Fragment [quantifier with a simple noun]
+            Nominal
+              quantifier: כָּל all
+              noun: עֲבָדִים servants
+          Fragment [quantifier with a construct chain]
+            Nominal
+              quantifier: כָּל all
+              ConstructChain
+                noun: עַבְדֵּי servants
+                noun: יהוה YHWH
+          Fragment [quantifier with a construct chain with modifier]
+            Nominal
+              quantifier: כָּל all
+              ConstructChain
+                Nominal
+                  noun: עַבְדֵּי servants
+                  Adjectival
+                    verb-participle: עֹמְדִים stand
+                noun: יהוה YHWH
+          Fragment [quantifier with a construct chain with modifier with article]
+            Nominal
+              quantifier: כָּל all
+              ConstructChain
+                Nominal
+                  noun: עַבְדֵּי servants
+                  Adjectival
+                    Nominal
+                      verb-participle: עֹמְדִים stand
+                      article: הָ the
+                noun: יהוה YHWH
+          Fragment [quantifier with a construct chain with modifier with modifiers]
+            Nominal
+              quantifier: כָּל all
+              ConstructChain
+                Nominal
+                  noun: עַבְדֵּי servants
+                  Adjectival
+                    Nominal
+                      verb-participle: עֹמְדִים stand
+                      article: הָ the
+                      Adjectival
+                        PrepositionalPhrase
+                          Preposition
+                            preposition: בְּ in
+                          Object
+                            ConstructChain
+                              noun: בֵית house
+                              noun: יְהוָה LORD
+                noun: יהוה YHWH
+          Fragment [substantival participle as noun phrase]
+            Nominal
+              verb-participle: מְנַצֵּ֣חַ director [substantival participle]
+          Fragment [substantival participle with adjective]
+            Nominal
+              Nominal
+                verb-participle: מְנַצֵּ֣חַ director [substantival participle]
+              adjective: ט֗וֹב noble
+          Fragment [substantival participle with article]
+            Nominal
+              article: הַ the
+              verb-participle: מְנַצֵּ֣חַ director [substantival participle]
+          Fragment [substantival participle with article and adjective]
+            Nominal
+              article: הַ the
+              verb-participle: מְנַצֵּ֣חַ director [substantival participle]
+              adjective: ט֗וֹב noble
+          Fragment [substantival participle with infinitive]
+            Clause
+              Subject
+                verb-participle: מרעים evil-doers [substantival participle]
+              Predicate
+                verb-infinitive: קרב
+          Fragment [substantival participle as complement]
+            Clause
+              Predicate
+                verb: הָיוּ they were
+                Complement
+                  verb-participle: מרעים evil-doers [substantival participle]
+          Fragment [substantival participle within a prepositional phrase]
+            PrepositionalPhrase
+              Preposition
+                preposition: לָ to
+              Object
+                article:  the
+                Nominal
+                  verb-participle: רֹכֵב rides
+                  Adjectival
+                    PrepositionalPhrase
+                      Preposition
+                        preposition: בִּ in
+                      Object
+                        ConstructChain
+                          noun: שְׁמֵי heavens
+                          ConstructChain
+                            noun: שְׁמֵי heavens
+                            noun: קֶדֶם ancient
+          Fragment [participle with object in construct]
+            Clause
+              Predicate
+                verb: יִשְׁלָיוּ prosper
+              Subject
+                Clause
+                  Predicate
+                    ConstructChain
+                      verb-participle: אֹהֲבָיִ love
+                      suffix-pronoun: ךְ you
+                    Object located = "after participle"
+          Fragment [lone adjective]
+            adjective: רְשָׁעִ֑ים wicked
+          Fragment [embedded clause as adjectival]
+            Adjectival
+              Clause
+                Predicate
+                  verb: שָׁת֪וּל planted
+          Fragment [adverb modifying an adjectival complement]
+            Clause
+              Predicate
+                Complement
+                  adjective: רָחוֹק far
+                  Adverbial
+                    PrepositionalPhrase
+                      Preposition
+                        preposition: מִֽ from
+                      Object
+                        ConstructChain
+                          noun: ישׁוּעָתִ helping
+                          suffix-pronoun: י me
+
+
     </pre>
 
     <script type="module">
