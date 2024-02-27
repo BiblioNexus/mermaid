@@ -11,7 +11,7 @@ const detector: DiagramDetector = (txt) => {
 };
 
 const loader: DiagramLoader = async () => {
-  const { diagram } = await import('./pieDiagram.js');
+  const { diagram } = await import('./simpleGrammarDiagram.js');
   return { id, diagram };
 };
 
