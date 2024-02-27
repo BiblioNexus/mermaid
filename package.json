@@ -1,6 +1,5 @@
 {
-  "name": "mermaid-monorepo",
-  "private": true,
+  "name": "@eten-lab/mermaid-monorepo",
   "version": "10.2.4",
   "description": "Markdownish syntax for generating flowcharts, sequence diagrams, class diagrams, gantt charts and git graphs.",
   "type": "module",

@@ -1,4 +1,4 @@
-# Math Configuration (v<MERMAID_RELEASE_VERSION>+)
+# Math Configuration (v0.0.1+)
 
 Mermaid supports rendering mathematical expressions through the [KaTeX](https://katex.org/) typesetter.
 
