@@ -1,6 +1,6 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { adjectiveKey, adverbialKey, constructchainKey, verbparticipleKey } from './keys.js';
 
@@ -15,11 +15,11 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [adjectiveKey, adverbialKey, constructchainKey, verbparticipleKey];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Complement') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Complement parser requires Complement Node');
+    throw new GrammarError('InvalidParser', 'Complement parser requires Complement Node');
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Complement has no children');
+    throw new GrammarError('InvalidStructure', 'Complement has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -80,26 +80,24 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
     }
   }
 
-  if (keysLen === 2) {
-    if (childMap[adjectiveKey] && childMap[adverbialKey]) {
-      const adjectiveDrawUnit = (childMap[adjectiveKey] as GraphicalNode).drawUnit;
-      return {
-        ...node,
-        drawUnit: herizontalMerge(
-          [
-            verticalMerge([adjectiveDrawUnit, (childMap[adverbialKey] as GraphicalNode).drawUnit], {
-              align: 'end',
-              verticalCenter: adjectiveDrawUnit.height,
-            }),
-            drawComplementDecorator(),
-          ],
-          {
-            align: 'center',
-          }
-        ),
-      };
-    }
+  if (keysLen === 2 && childMap[adjectiveKey] && childMap[adverbialKey]) {
+    const adjectiveDrawUnit = (childMap[adjectiveKey] as GraphicalNode).drawUnit;
+    return {
+      ...node,
+      drawUnit: herizontalMerge(
+        [
+          verticalMerge([adjectiveDrawUnit, (childMap[adverbialKey] as GraphicalNode).drawUnit], {
+            align: 'end',
+            verticalCenter: adjectiveDrawUnit.height,
+          }),
+          drawComplementDecorator(),
+        ],
+        {
+          align: 'center',
+        }
+      ),
+    };
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Complement has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Complement has unexpected structure');
 }

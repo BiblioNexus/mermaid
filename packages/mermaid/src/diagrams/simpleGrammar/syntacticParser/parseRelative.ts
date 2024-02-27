@@ -1,12 +1,12 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { drawEmpty } from '../svgDrawer/drawEmpty.js';
 
 export function parseRelative(node: GrammarNode): GraphicalNode {
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Relative') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Relative parser requires Relative Node');
+    throw new GrammarError('InvalidParser', 'Relative parser requires Relative Node');
   }
 
   if (node.children.length === 0) {
@@ -16,5 +16,5 @@ export function parseRelative(node: GrammarNode): GraphicalNode {
     };
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Nominal has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
 }

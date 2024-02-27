@@ -1,6 +1,6 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { clauseKey, nounKey, relativeKey, verbparticipleKey, vocativeKey } from './keys.js';
 
@@ -18,7 +18,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [verbparticipleKey, clauseKey, nounKey, vocativeKey, relativeKey];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Subject') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Subject parser requires Subject Node');
+    throw new GrammarError('InvalidParser', 'Subject parser requires Subject Node');
   }
 
   if (node.children.length === 0) {
@@ -94,5 +94,5 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Subject has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Subject has unexpected structure');
 }

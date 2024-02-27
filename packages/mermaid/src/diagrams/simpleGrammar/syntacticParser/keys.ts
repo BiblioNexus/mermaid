@@ -45,9 +45,7 @@ export const predicateKey = generateFragmentKey('Predicate');
 export const complementKey = generateFragmentKey('Complement');
 export const conjunctionFragmentKey = generateFragmentKey('Conjunction');
 export const complementClauseKey = generateFragmentKey('ComplementClause');
-export const prepositionalPhraseKey = generateFragmentKey(
-  'PrepositionalPhrase',
-);
+export const prepositionalPhraseKey = generateFragmentKey('PrepositionalPhrase');
 export const objectKey = generateFragmentKey('Object');
 export const relativeClauseKey = generateFragmentKey('RelativeClause');
 export const relativeParticleKey = generateFragmentKey('RelativeParticle');

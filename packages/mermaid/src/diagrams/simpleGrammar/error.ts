@@ -1,8 +1,4 @@
-export enum ErrorType {
-  InvalidStructure = 'InvalidStructure',
-  InvalidChildren = 'InvalidChildren',
-  InvalidParser = 'InvalidParser',
-}
+export type ErrorType = 'InvalidStructure' | 'InvalidChildren' | 'InvalidParser';
 
 export class GrammarError extends Error {
   constructor(errorType: ErrorType, msg: string) {

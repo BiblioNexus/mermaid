@@ -35,9 +35,7 @@ export function drawSubjectClauseDecorator(moreHight: number): DrawUnit {
     .x((d) => d[0])
     .y((d) => d[1]);
 
-  for (let i = 0; i < data.length; i++) {
-    const lineData = data[i];
-
+  for (const lineData of data) {
     d3Elem
       .append('path')
       .attr('d', lineGenerator(lineData))

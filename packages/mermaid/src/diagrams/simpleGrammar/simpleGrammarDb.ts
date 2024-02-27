@@ -144,21 +144,6 @@ const getSimpleGrammar = () => {
   return rootNode;
 };
 
-(window as any).getSimpleGrammar = () => {
-  function dfs(node: GrammarNode) {
-    delete node.parent;
-
-    node.children.forEach((child) => dfs(child));
-  }
-
-  dfs(rootNode);
-
-  console.log(rootNode);
-
-  window.console.log('fragments', Object.keys(fragments));
-  window.console.log('words', Object.keys(words));
-};
-
 export const db: SimpleGrammarDB = {
   getLogger,
   addWord,

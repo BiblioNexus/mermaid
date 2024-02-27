@@ -1,6 +1,6 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
   adverbialKey,
@@ -35,11 +35,11 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
   ];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Predicate') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Predicate parser requires Predicate Node');
+    throw new GrammarError('InvalidParser', 'Predicate parser requires Predicate Node');
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Predicate has no children');
+    throw new GrammarError('InvalidStructure', 'Predicate has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -235,5 +235,5 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Predicate has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Predicate has unexpected structure');
 }

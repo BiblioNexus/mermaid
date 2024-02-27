@@ -13,8 +13,6 @@ export function drawContainer(node: GrammarNode, title: string, titleColor: stri
   const word = title;
   const rect = ruler(word);
 
-  console.log(title, rect);
-
   const textWidth = rect.width || 0;
   const textHeight = rect.height || 0;
 
@@ -44,7 +42,7 @@ export function drawContainer(node: GrammarNode, title: string, titleColor: stri
 
   const childrenContainer = d3Elem.append('g');
 
-  let xOrigin = width;
+  const xOrigin = width;
   let yOrigin = textHeight + settings.padding;
 
   for (const child of node.children) {

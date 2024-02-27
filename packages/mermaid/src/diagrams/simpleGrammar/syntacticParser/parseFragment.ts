@@ -1,6 +1,6 @@
 import { isFragment, isGraphicalNode } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
@@ -9,11 +9,11 @@ import { settings } from '../settings.js';
 
 export function parseFragment(node: GrammarNode): GraphicalNode {
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Fragment') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Fragment parser requires Fragment Node');
+    throw new GrammarError('InvalidParser', 'Fragment parser requires Fragment Node');
   }
 
   if (node.children.length !== 1) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Fragment has invalid children');
+    throw new GrammarError('InvalidStructure', 'Fragment has invalid children');
   }
 
   if (isGraphicalNode(node.children[0])) {
@@ -32,5 +32,5 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
     };
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Fragment has invalid structure');
+  throw new GrammarError('InvalidStructure', 'Fragment has invalid structure');
 }

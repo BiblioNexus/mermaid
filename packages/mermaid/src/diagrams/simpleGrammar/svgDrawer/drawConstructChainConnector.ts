@@ -11,16 +11,14 @@ export function drawConstructChainConnector(drawUnits: DrawUnit[]): DrawUnit {
   let maxTopHeight = 0;
   let maxBottomHeight = 0;
 
-  for (let i = 0; i < drawUnits.length; i++) {
-    const unit = drawUnits[i];
-
+  drawUnits.forEach((unit, i) => {
     totalWidth += unit.width;
     maxTopHeight = Math.max(maxTopHeight, unit.verticalCenter - settings.height * i);
     maxBottomHeight = Math.max(
       maxBottomHeight,
       unit.height - unit.verticalCenter + settings.height * i
     );
-  }
+  });
 
   const width = totalWidth + settings.padding * (drawUnits.length - 1);
   const height = maxBottomHeight + maxTopHeight;

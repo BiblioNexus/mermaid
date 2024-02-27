@@ -1,7 +1,7 @@
 import { isFragment, isWord } from '../utils.js';
-import { GrammarNode } from '../simpleGrammarTypes.js';
+import type { GrammarNode } from '../simpleGrammarTypes.js';
 
-import { ErrorType, GrammarError } from '../error.js';
+import { GrammarError } from '../error.js';
 
 export function getChildMap(nodes: GrammarNode[], validKeys: string[]) {
   const childMap: Record<string, GrammarNode> = {};
@@ -30,13 +30,13 @@ export function getChildMap(nodes: GrammarNode[], validKeys: string[]) {
     }
 
     if (validMap[key!] === undefined) {
-      throw new GrammarError(ErrorType.InvalidChildren, `Node has invalid children`);
+      throw new GrammarError('InvalidChildren', `Node has invalid children`);
     }
 
     const exists = childMap[key!];
 
     if (exists) {
-      throw new GrammarError(ErrorType.InvalidStructure, `Node has invalid children`);
+      throw new GrammarError('InvalidStructure', `Node has invalid children`);
     } else {
       childMap[key!] = node;
     }

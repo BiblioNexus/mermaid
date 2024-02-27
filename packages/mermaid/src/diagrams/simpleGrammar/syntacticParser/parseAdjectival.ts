@@ -1,5 +1,5 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
+import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { clauseKey, nominalKey, prepositionalPhraseKey, verbparticipleKey } from './keys.js';
@@ -14,11 +14,11 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [verbparticipleKey, nominalKey, clauseKey, prepositionalPhraseKey];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Adjectival') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Adjectival parser requires Adjectival Node');
+    throw new GrammarError('InvalidParser', 'Adjectival parser requires Adjectival Node');
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Adjectival has no children');
+    throw new GrammarError('InvalidStructure', 'Adjectival has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -64,5 +64,5 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Adjectival has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Adjectival has unexpected structure');
 }

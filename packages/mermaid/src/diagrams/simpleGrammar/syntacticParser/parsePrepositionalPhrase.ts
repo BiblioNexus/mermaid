@@ -1,6 +1,6 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { objectKey, prepositionFragmentKey } from './keys.js';
 
@@ -28,31 +28,26 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
 
   const keysLen = Object.keys(childMap).length;
 
-  if (keysLen === 2) {
-    if (childMap[prepositionFragmentKey] && childMap[objectKey]) {
-      const objectDrawUnit = (childMap[objectKey] as GraphicalNode).drawUnit;
+  if (keysLen === 2 && childMap[prepositionFragmentKey] && childMap[objectKey]) {
+    const objectDrawUnit = (childMap[objectKey] as GraphicalNode).drawUnit;
 
-      const height = objectDrawUnit.verticalEnd - objectDrawUnit.verticalStart;
+    const height = objectDrawUnit.verticalEnd - objectDrawUnit.verticalStart;
 
-      const prepositionDrawUnit = drawPreposition(
-        childMap[prepositionFragmentKey].children[0],
-        height
-      );
+    const prepositionDrawUnit = drawPreposition(
+      childMap[prepositionFragmentKey].children[0],
+      height
+    );
 
-      return {
-        ...node,
-        drawUnit: herizontalMerge([objectDrawUnit, prepositionDrawUnit], {
-          align: ['center', 'end'],
-          herizontalStart: objectDrawUnit.herizontalEnd,
-          herizontalCenter: objectDrawUnit.herizontalEnd,
-          herizontalEnd: objectDrawUnit.herizontalEnd + prepositionDrawUnit.herizontalEnd,
-        }),
-      };
-    }
+    return {
+      ...node,
+      drawUnit: herizontalMerge([objectDrawUnit, prepositionDrawUnit], {
+        align: ['center', 'end'],
+        herizontalStart: objectDrawUnit.herizontalEnd,
+        herizontalCenter: objectDrawUnit.herizontalEnd,
+        herizontalEnd: objectDrawUnit.herizontalEnd + prepositionDrawUnit.herizontalEnd,
+      }),
+    };
   }
 
-  throw new GrammarError(
-    ErrorType.InvalidStructure,
-    'PrepositionalPhrase has unexpected structure'
-  );
+  throw new GrammarError('InvalidStructure', 'PrepositionalPhrase has unexpected structure');
 }

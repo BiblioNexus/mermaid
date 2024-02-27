@@ -1,6 +1,6 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { clauseKey, conjunctionFragmentKey } from './keys.js';
 
@@ -14,36 +14,34 @@ export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'ComplementClause') {
     throw new GrammarError(
-      ErrorType.InvalidParser,
+      'InvalidParser',
       'ComplementClause parser requires ComplementClause Node'
     );
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'ComplementClause has no children');
+    throw new GrammarError('InvalidStructure', 'ComplementClause has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
 
   const keysLen = Object.keys(childMap).length;
 
-  if (keysLen === 2) {
-    if (childMap[conjunctionFragmentKey] && childMap[clauseKey]) {
-      return {
-        ...node,
-        drawUnit: herizontalMerge(
-          [
-            verticalMerge(
-              [(childMap[clauseKey] as GraphicalNode).drawUnit, drawObjectClauseDecorator()],
-              { align: 'end' }
-            ),
-            (childMap[conjunctionFragmentKey] as GraphicalNode).drawUnit,
-          ],
-          { align: 'end' }
-        ),
-      };
-    }
+  if (keysLen === 2 && childMap[conjunctionFragmentKey] && childMap[clauseKey]) {
+    return {
+      ...node,
+      drawUnit: herizontalMerge(
+        [
+          verticalMerge(
+            [(childMap[clauseKey] as GraphicalNode).drawUnit, drawObjectClauseDecorator()],
+            { align: 'end' }
+          ),
+          (childMap[conjunctionFragmentKey] as GraphicalNode).drawUnit,
+        ],
+        { align: 'end' }
+      ),
+    };
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'ComplementClause has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'ComplementClause has unexpected structure');
 }

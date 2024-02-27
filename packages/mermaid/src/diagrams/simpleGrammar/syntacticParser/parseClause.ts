@@ -1,6 +1,6 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { subjectKey, predicateKey, vocativeKey, subordinateClauseKey } from './keys.js';
 
@@ -14,29 +14,27 @@ export function parseClause(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [subjectKey, predicateKey, vocativeKey, subordinateClauseKey];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Clause') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Clause parser requires Clause Node');
+    throw new GrammarError('InvalidParser', 'Clause parser requires Clause Node');
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Clause has no children');
+    throw new GrammarError('InvalidStructure', 'Clause has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
 
   const keysLen = Object.keys(childMap).length;
 
-  if (keysLen === 1) {
-    if (childMap[predicateKey]) {
-      const drawUnit = (childMap[predicateKey] as GraphicalNode).drawUnit;
-      return {
-        ...node,
-        drawUnit: herizontalMerge([drawUnit, drawClauseDecorator()], {
-          align: 'center',
-          verticalCenter: drawUnit.height,
-          verticalEnd: drawUnit.height,
-        }),
-      };
-    }
+  if (keysLen === 1 && childMap[predicateKey]) {
+    const drawUnit = (childMap[predicateKey] as GraphicalNode).drawUnit;
+    return {
+      ...node,
+      drawUnit: herizontalMerge([drawUnit, drawClauseDecorator()], {
+        align: 'center',
+        verticalCenter: drawUnit.height,
+        verticalEnd: drawUnit.height,
+      }),
+    };
   }
 
   if (keysLen === 2) {
@@ -87,5 +85,5 @@ export function parseClause(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Nominal has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
 }

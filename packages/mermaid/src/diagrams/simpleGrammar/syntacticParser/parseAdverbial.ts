@@ -1,5 +1,5 @@
 import { isFragment } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
+import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { nounKey, particleKey, prepositionalPhraseKey, verbKey } from './keys.js';
@@ -14,11 +14,11 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [nounKey, verbKey, particleKey, prepositionalPhraseKey];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Adverbial') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Adverbial parser requires Adverbial Node');
+    throw new GrammarError('InvalidParser', 'Adverbial parser requires Adverbial Node');
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Adverbial has no children');
+    throw new GrammarError('InvalidStructure', 'Adverbial has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -61,5 +61,5 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Adverbial has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Adverbial has unexpected structure');
 }

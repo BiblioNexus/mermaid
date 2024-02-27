@@ -1,5 +1,5 @@
 import { isFragment } from '../utils.js';
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { drawContainer } from '../svgDrawer/drawContainer.js';
 import { settings } from '../settings.js';

@@ -1,6 +1,6 @@
 import { isFragment, isWord } from '../utils.js';
-import { ErrorType, GrammarError } from '../error.js';
-import { GrammarNode, GraphicalNode, Word } from '../simpleGrammarTypes.js';
+import { GrammarError } from '../error.js';
+import type { GrammarNode, GraphicalNode, Word } from '../simpleGrammarTypes.js';
 
 import {
   nounKey,
@@ -39,11 +39,11 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
   ];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Nominal') {
-    throw new GrammarError(ErrorType.InvalidParser, 'Nominal parser requires Nominal Node');
+    throw new GrammarError('InvalidParser', 'Nominal parser requires Nominal Node');
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(ErrorType.InvalidStructure, 'Nominal has no children');
+    throw new GrammarError('InvalidStructure', 'Nominal has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -421,5 +421,5 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Nominal has unexpected structure');
+  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
 }

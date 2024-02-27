@@ -1,8 +1,8 @@
 import { isFragment, isWord } from '../utils.js';
 
-import { ErrorType, GrammarError } from '../error.js';
+import { GrammarError } from '../error.js';
 
-import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { drawWord } from '../svgDrawer/drawWord.js';
 import { drawContainer } from '../svgDrawer/drawContainer.js';
@@ -94,7 +94,7 @@ export function parse(node: GrammarNode): GraphicalNode {
     if (parserMap[key]) {
       return parserMap[key](node);
     } else {
-      throw new GrammarError(ErrorType.InvalidStructure, 'Invalid structure, not defined parser');
+      throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
     }
   }
 
@@ -105,5 +105,5 @@ export function parse(node: GrammarNode): GraphicalNode {
     };
   }
 
-  throw new GrammarError(ErrorType.InvalidStructure, 'Invalid structure, not defined parser');
+  throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
 }
