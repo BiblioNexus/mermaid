@@ -6,7 +6,7 @@ import { objectKey, prepositionFragmentKey } from './keys.js';
 
 import { getChildMap } from './utils.js';
 
-import { herizontalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge } from '../svgDrawer/utils.js';
 import { drawPreposition } from '../svgDrawer/drawPreposition.js';
 
 export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
@@ -17,37 +17,49 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
     !isFragment(node.content) ||
     node.content.fragment !== 'PrepositionalPhrase'
   ) {
-    throw new Error('PrepositionalPhrase parser requires PrepositionPhrase Node');
+    throw new Error(
+      'PrepositionalPhrase parser requires PrepositionPhrase Node',
+    );
   }
 
   if (node.children.length !== 2) {
-    throw new Error('Invalid Preposition Node: Preposition Node hast invalid children');
+    throw new Error(
+      'Invalid Preposition Node: Preposition Node hast invalid children',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
 
   const keysLen = Object.keys(childMap).length;
 
-  if (keysLen === 2 && childMap[prepositionFragmentKey] && childMap[objectKey]) {
+  if (
+    keysLen === 2 &&
+    childMap[prepositionFragmentKey] &&
+    childMap[objectKey]
+  ) {
     const objectDrawUnit = (childMap[objectKey] as GraphicalNode).drawUnit;
 
     const height = objectDrawUnit.verticalEnd - objectDrawUnit.verticalStart;
 
     const prepositionDrawUnit = drawPreposition(
       childMap[prepositionFragmentKey].children[0],
-      height
+      height,
     );
 
     return {
       ...node,
-      drawUnit: herizontalMerge([objectDrawUnit, prepositionDrawUnit], {
+      drawUnit: horizontalMerge([objectDrawUnit, prepositionDrawUnit], {
         align: ['center', 'end'],
-        herizontalStart: objectDrawUnit.herizontalEnd,
-        herizontalCenter: objectDrawUnit.herizontalEnd,
-        herizontalEnd: objectDrawUnit.herizontalEnd + prepositionDrawUnit.herizontalEnd,
+        horizontalStart: objectDrawUnit.horizontalEnd,
+        horizontalCenter: objectDrawUnit.horizontalEnd,
+        horizontalEnd:
+          objectDrawUnit.horizontalEnd + prepositionDrawUnit.horizontalEnd,
       }),
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'PrepositionalPhrase has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'PrepositionalPhrase has unexpected structure',
+  );
 }

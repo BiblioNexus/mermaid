@@ -1,8 +1,31 @@
+import { GrammarNode, GraphicalNode } from '../simpleGrammarTypes';
+import { isFragment, isWord } from '../utils.js';
+
+import { GrammarError } from '../error.js';
+
 export function generateKey(type: string, value: string) {
   return JSON.stringify({
     type,
     value,
   });
+}
+
+export function getKeyFromNode(node: GrammarNode | GraphicalNode): string {
+  if (isFragment(node.content!)) {
+    return JSON.stringify({
+      type: 'fragment',
+      value: node.content.fragment,
+    });
+  }
+
+  if (isWord(node.content!)) {
+    return JSON.stringify({
+      type: 'word',
+      value: node.content.pos,
+    });
+  }
+
+  throw new GrammarError('InvalidNode', 'Invalid Node');
 }
 
 export function generateWordKey(value: string) {
@@ -45,7 +68,9 @@ export const predicateKey = generateFragmentKey('Predicate');
 export const complementKey = generateFragmentKey('Complement');
 export const conjunctionFragmentKey = generateFragmentKey('Conjunction');
 export const complementClauseKey = generateFragmentKey('ComplementClause');
-export const prepositionalPhraseKey = generateFragmentKey('PrepositionalPhrase');
+export const prepositionalPhraseKey = generateFragmentKey(
+  'PrepositionalPhrase',
+);
 export const objectKey = generateFragmentKey('Object');
 export const relativeClauseKey = generateFragmentKey('RelativeClause');
 export const relativeParticleKey = generateFragmentKey('RelativeParticle');
@@ -54,3 +79,16 @@ export const subordinateClauseKey = generateFragmentKey('SubordinateClause');
 export const clauseClusterKey = generateFragmentKey('ClauseCluster');
 export const relativeKey = generateFragmentKey('Relative');
 export const secondObjectKey = generateFragmentKey('SecondObject');
+
+export const adjectiveCompoundKey = generateFragmentKey('AdjectiveCompound');
+export const adverbCompoundKey = generateFragmentKey('AdverbCompound');
+export const adverbialCompoundKey = generateFragmentKey('AdverbialCompound');
+export const constructChainCompoundKey = generateFragmentKey(
+  'ConstructChainCompound',
+);
+export const nominalCompoundKey = generateFragmentKey('NominalCompound');
+export const predicateCompoundKey = generateFragmentKey('PredicateCompound');
+export const clauseCompoundKey = generateFragmentKey('ClauseCompound');
+
+export const adverbialGroupKey = generateFragmentKey('AdverbialGroup');
+export const predicateGroupKey = generateFragmentKey('PredicateGroup');

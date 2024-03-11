@@ -1,7 +1,8 @@
-import { isFragment, isWord } from '../utils.js';
 import type { GrammarNode } from '../simpleGrammarTypes.js';
 
 import { GrammarError } from '../error.js';
+
+import { getKeyFromNode } from './keys.js';
 
 export function getChildMap(nodes: GrammarNode[], validKeys: string[]) {
   const childMap: Record<string, GrammarNode> = {};
@@ -13,23 +14,9 @@ export function getChildMap(nodes: GrammarNode[], validKeys: string[]) {
   });
 
   nodes.forEach((node) => {
-    let key;
+    const key = getKeyFromNode(node);
 
-    if (isFragment(node.content!)) {
-      key = JSON.stringify({
-        type: 'fragment',
-        value: node.content.fragment,
-      });
-    }
-
-    if (isWord(node.content!)) {
-      key = JSON.stringify({
-        type: 'word',
-        value: node.content.pos,
-      });
-    }
-
-    if (validMap[key!] === undefined) {
+    if (validMap[key] === undefined) {
       throw new GrammarError('InvalidChildren', `Node has invalid children`);
     }
 

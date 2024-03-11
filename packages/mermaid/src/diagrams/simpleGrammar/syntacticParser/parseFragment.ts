@@ -28,7 +28,12 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
 
     return {
       ...node,
-      drawUnit: drawContainer(node, node.content.description, settings.descriptionColor),
+      drawUnit: drawContainer(
+        node,
+        node.content.description,
+        settings.descriptionColor,
+        settings.wordStrokeColor
+      ),
     };
   }
 

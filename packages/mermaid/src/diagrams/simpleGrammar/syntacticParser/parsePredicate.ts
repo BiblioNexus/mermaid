@@ -11,16 +11,19 @@ import {
   adverbKey,
   verbinfinitiveKey,
   constructchainKey,
+  predicateCompoundKey,
+  adverbialGroupKey,
+  predicateGroupKey,
 } from './keys.js';
 
 import { getChildMap } from './utils.js';
 
-import { herizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawVerticalLine } from '../svgDrawer/drawVerticalLine.js';
 import { drawEmpty } from '../svgDrawer/drawEmpty.js';
 import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
 import { drawModifier } from '../svgDrawer/drawModifier.js';
-import { drawVerbInifinitiveDecorator } from '../svgDrawer/drawVerbInifinitiveDecorator.js';
+import { drawObjectPredicateCompoundDecorator } from '../svgDrawer/drawObjectPredicateCompoundDecorator.js';
 
 export function parsePredicate(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
@@ -32,6 +35,9 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
     objectKey,
     secondObjectKey,
     constructchainKey,
+    predicateCompoundKey,
+    predicateGroupKey,
+    adverbialGroupKey,
   ];
 
   if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Predicate') {
@@ -46,24 +52,19 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
 
   const keysLen = Object.keys(childMap).length;
 
-  if (keysLen === 1) {
-    if (childMap[verbKey] || childMap[complementKey] || childMap[constructchainKey]) {
-      return {
-        ...node,
-        drawUnit: (node.children[0] as GraphicalNode).drawUnit,
-      };
-    }
-
-    if (childMap[verbinfinitiveKey]) {
-      const drawUnit = (childMap[verbinfinitiveKey] as GraphicalNode).drawUnit;
-      return {
-        ...node,
-        drawUnit: herizontalMerge([drawUnit, drawVerbInifinitiveDecorator()], {
-          align: ['end', 'center'],
-          verticalCenter: drawUnit.verticalCenter,
-        }),
-      };
-    }
+  if (
+    keysLen === 1 &&
+    (childMap[verbKey] ||
+      childMap[complementKey] ||
+      childMap[constructchainKey] ||
+      childMap[predicateCompoundKey] ||
+      childMap[predicateGroupKey] ||
+      childMap[verbinfinitiveKey])
+  ) {
+    return {
+      ...node,
+      drawUnit: (node.children[0] as GraphicalNode).drawUnit,
+    };
   }
 
   if (keysLen === 2) {
@@ -73,7 +74,7 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
       if (childMap[complementKey]) {
         return {
           ...node,
-          drawUnit: herizontalMerge(
+          drawUnit: horizontalMerge(
             [(childMap[complementKey] as GraphicalNode).drawUnit, verbDrawUnit],
             { align: 'end' }
           ),
@@ -88,7 +89,19 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
             {
               align: 'end',
               verticalCenter: verbDrawUnit.height,
-              verticalEnd: verbDrawUnit.height,
+            }
+          ),
+        };
+      }
+
+      if (childMap[adverbialGroupKey]) {
+        return {
+          ...node,
+          drawUnit: verticalMerge(
+            [verbDrawUnit, (childMap[adverbialGroupKey] as GraphicalNode).drawUnit],
+            {
+              align: 'end',
+              verticalCenter: verbDrawUnit.height,
             }
           ),
         };
@@ -97,7 +110,7 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
       if (childMap[objectKey]) {
         return {
           ...node,
-          drawUnit: herizontalMerge(
+          drawUnit: horizontalMerge(
             [(childMap[objectKey] as GraphicalNode).drawUnit, drawVerticalLine(), verbDrawUnit],
             { align: ['center', 'end', 'end'] }
           ),
@@ -108,7 +121,7 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
     if (childMap[complementKey] && childMap[adverbialKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[complementKey] as GraphicalNode).drawUnit,
             verticalMerge([drawEmpty(), (childMap[adverbialKey] as GraphicalNode).drawUnit], {
@@ -120,10 +133,25 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
       };
     }
 
+    if (childMap[complementKey] && childMap[adverbialGroupKey]) {
+      return {
+        ...node,
+        drawUnit: horizontalMerge(
+          [
+            (childMap[complementKey] as GraphicalNode).drawUnit,
+            verticalMerge([drawEmpty(), (childMap[adverbialGroupKey] as GraphicalNode).drawUnit], {
+              align: 'center',
+            }),
+          ],
+          { align: ['end', 'start'] }
+        ),
+      };
+    }
+
     if (childMap[complementKey] && childMap[objectKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[complementKey] as GraphicalNode).drawUnit,
             (childMap[objectKey] as GraphicalNode).drawUnit,
@@ -138,15 +166,14 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
     if (childMap[verbinfinitiveKey] && childMap[objectKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[objectKey] as GraphicalNode).drawUnit,
             drawVerticalLine(),
             (childMap[verbinfinitiveKey] as GraphicalNode).drawUnit,
-            drawVerbInifinitiveDecorator(),
           ],
           {
-            align: ['end', 'end', 'end', 'center'],
+            align: ['end', 'end', 'center'],
           }
         ),
       };
@@ -158,7 +185,7 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
 
       return {
         ...node,
-        drawUnit: herizontalMerge([objectDrawUnit, drawVerticalLine(), constructchainDrawUnit], {
+        drawUnit: horizontalMerge([objectDrawUnit, drawVerticalLine(), constructchainDrawUnit], {
           align: ['start', 'end', 'center'],
           verticalCenter: Math.max(
             objectDrawUnit.verticalCenter,
@@ -171,6 +198,24 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
         }),
       };
     }
+
+    if (childMap[predicateCompoundKey] && childMap[objectKey]) {
+      const predicateCompoundDrawUnit = childMap[predicateCompoundKey] as GraphicalNode;
+
+      return {
+        ...node,
+        drawUnit: horizontalMerge(
+          [
+            (childMap[objectKey] as GraphicalNode).drawUnit,
+            drawObjectPredicateCompoundDecorator(predicateCompoundDrawUnit),
+            predicateCompoundDrawUnit.drawUnit,
+          ],
+          {
+            align: 'center',
+          }
+        ),
+      };
+    }
   }
 
   if (keysLen === 3) {
@@ -178,7 +223,7 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
       const verbDrawUnit = (childMap[verbKey] as GraphicalNode).drawUnit;
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[objectKey] as GraphicalNode).drawUnit,
             drawVerticalLine(),
@@ -202,15 +247,15 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
 
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[objectKey] as GraphicalNode).drawUnit,
             drawVerticalLine(),
             verticalMerge([verbDrawUnit, adverbialDrawUnit], {
               align: 'start',
               verticalCenter: verbDrawUnit.height,
-              herizontalStart: verticalDrawUnit.width - verbDrawUnit.width,
-              herizontalEnd: verticalDrawUnit.width,
+              horizontalStart: verticalDrawUnit.width - verbDrawUnit.width,
+              horizontalEnd: verticalDrawUnit.width,
             }),
           ],
           { align: ['end', 'end', 'center'] }
@@ -221,7 +266,7 @@ export function parsePredicate(node: GrammarNode): GraphicalNode {
     if (childMap[secondObjectKey] && childMap[verbKey] && childMap[objectKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[secondObjectKey] as GraphicalNode).drawUnit,
             drawVerticalLine(),

@@ -1,6 +1,10 @@
 import { isFragment, isWord } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { GrammarNode, GraphicalNode, Word } from '../simpleGrammarTypes.js';
+import type {
+  GrammarNode,
+  GraphicalNode,
+  Word,
+} from '../simpleGrammarTypes.js';
 
 import {
   nounKey,
@@ -13,13 +17,15 @@ import {
   adjectivalKey,
   relativeClauseKey,
   suffixPronounKey,
+  constructChainCompoundKey,
+  nominalCompoundKey,
 } from './keys.js';
 
 import { getChildMap } from './utils.js';
 
 import { parse } from './parse.js';
 
-import { herizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
 import { drawModifier } from '../svgDrawer/drawModifier.js';
 import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
@@ -36,10 +42,19 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
     adjectivalKey,
     relativeClauseKey,
     suffixPronounKey,
+    constructChainCompoundKey,
+    nominalCompoundKey,
   ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Nominal') {
-    throw new GrammarError('InvalidParser', 'Nominal parser requires Nominal Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Nominal'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Nominal parser requires Nominal Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -56,16 +71,23 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       childMap[nominalKey].children.length === 1 &&
       childMap[nominalKey].children[0].content !== null &&
       isWord(childMap[nominalKey].children[0].content!) &&
-      (childMap[nominalKey].children[0].content as Word).pos === 'verb-participle'
+      (childMap[nominalKey].children[0].content as Word).pos ===
+        'verb-participle'
     ) {
       return {
         ...node,
         drawUnit: verticalMerge(
-          [(childMap[nominalKey] as GraphicalNode).drawUnit, drawModifier(childMap[adjectiveKey])],
+          [
+            (childMap[nominalKey] as GraphicalNode).drawUnit,
+            drawModifier(childMap[adjectiveKey]),
+          ],
           {
             align: 'center',
-            verticalCenter: (childMap[nominalKey] as GraphicalNode).drawUnit.verticalCenter,
-          }
+            verticalCenter: (childMap[nominalKey] as GraphicalNode).drawUnit
+              .verticalCenter,
+            verticalStart: (childMap[nominalKey] as GraphicalNode).drawUnit
+              .verticalCenter,
+          },
         ),
       };
     }
@@ -94,32 +116,56 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
     if (childMap[adjectiveKey]) {
       return {
         ...node,
-        drawUnit: verticalMerge([drawEmptyWord(), drawModifier(childMap[adjectiveKey])], {
-          align: 'center',
-          verticalCenter: drawEmptyWord().height,
-        }),
+        drawUnit: verticalMerge(
+          [drawEmptyWord(), drawModifier(childMap[adjectiveKey])],
+          {
+            align: 'center',
+            verticalCenter: drawEmptyWord().height,
+          },
+        ),
       };
     }
 
     if (childMap[adjectivalKey]) {
       return {
         ...node,
-        drawUnit: verticalMerge([drawEmptyWord(), drawModifier(childMap[adjectivalKey])], {
-          align: 'center',
-          verticalCenter: drawEmptyWord().height,
-        }),
+        drawUnit: verticalMerge(
+          [drawEmptyWord(), drawModifier(childMap[adjectivalKey])],
+          {
+            align: 'center',
+            verticalCenter: drawEmptyWord().height,
+          },
+        ),
+      };
+    }
+
+    if (childMap[constructChainCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: (childMap[constructChainCompoundKey] as GraphicalNode)
+          .drawUnit,
       };
     }
 
     if (childMap[verbparticipleKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
-          [(childMap[verbparticipleKey] as GraphicalNode).drawUnit, drawVerbparticipleDecorator()],
+        drawUnit: horizontalMerge(
+          [
+            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+            drawVerbparticipleDecorator(),
+          ],
           {
             align: 'end',
-          }
+          },
         ),
+      };
+    }
+
+    if (childMap[nominalCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: (childMap[nominalCompoundKey] as GraphicalNode).drawUnit,
       };
     }
   }
@@ -131,31 +177,40 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       if (childMap[adjectiveKey]) {
         return {
           ...node,
-          drawUnit: verticalMerge([nounDrawUnit, drawModifier(childMap[adjectiveKey])], {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-          }),
+          drawUnit: verticalMerge(
+            [nounDrawUnit, drawModifier(childMap[adjectiveKey])],
+            {
+              align: 'center',
+              verticalCenter: nounDrawUnit.height,
+            },
+          ),
         };
       }
 
       if (childMap[articleKey]) {
         return {
           ...node,
-          drawUnit: verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-            verticalEnd: nounDrawUnit.height,
-          }),
+          drawUnit: verticalMerge(
+            [nounDrawUnit, drawModifier(childMap[articleKey])],
+            {
+              align: 'center',
+              verticalCenter: nounDrawUnit.height,
+              verticalEnd: nounDrawUnit.height,
+            },
+          ),
         };
       }
 
       if (childMap[quantifierKey]) {
         return {
           ...node,
-          drawUnit: verticalMerge([nounDrawUnit, drawModifier(childMap[quantifierKey])], {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-          }),
+          drawUnit: verticalMerge(
+            [nounDrawUnit, drawModifier(childMap[quantifierKey])],
+            {
+              align: 'center',
+              verticalCenter: nounDrawUnit.height,
+            },
+          ),
         };
       }
 
@@ -169,7 +224,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
               verticalCenter: nounDrawUnit.height,
               verticalStart: 0,
               verticalEnd: nounDrawUnit.height,
-            }
+            },
           ),
         };
       }
@@ -184,12 +239,15 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       if (childMap[relativeClauseKey]) {
         return {
           ...node,
-          drawUnit: herizontalMerge(
-            [(childMap[relativeClauseKey] as GraphicalNode).drawUnit, nounDrawUnit],
+          drawUnit: horizontalMerge(
+            [
+              (childMap[relativeClauseKey] as GraphicalNode).drawUnit,
+              nounDrawUnit,
+            ],
             {
               align: ['start', 'end'],
               verticalCenter: nounDrawUnit.height,
-            }
+            },
           ),
         };
       }
@@ -199,18 +257,18 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       if (childMap[adjectiveKey]) {
         return {
           ...node,
-          drawUnit: herizontalMerge(
+          drawUnit: horizontalMerge(
             [
               verticalMerge(
                 [
                   (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
                   drawModifier(childMap[adjectiveKey]),
                 ],
-                { align: 'center' }
+                { align: 'center' },
               ),
               drawVerbparticipleDecorator(),
             ],
-            { align: 'start' }
+            { align: 'start' },
           ),
         };
       }
@@ -220,16 +278,16 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           ...node,
           drawUnit: verticalMerge(
             [
-              herizontalMerge(
+              horizontalMerge(
                 [
                   (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
                   drawVerbparticipleDecorator(),
                 ],
-                { align: 'end' }
+                { align: 'end' },
               ),
               drawModifier(childMap[articleKey]),
             ],
-            { align: 'center' }
+            { align: 'center' },
           ),
         };
       }
@@ -237,18 +295,18 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       if (childMap[quantifierKey]) {
         return {
           ...node,
-          drawUnit: herizontalMerge(
+          drawUnit: horizontalMerge(
             [
               verticalMerge(
                 [
                   (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
                   drawModifier(childMap[quantifierKey]),
                 ],
-                { align: 'center' }
+                { align: 'center' },
               ),
               drawVerbparticipleDecorator(),
             ],
-            { align: 'end' }
+            { align: 'end' },
           ),
         };
       }
@@ -258,29 +316,35 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           ...node,
           drawUnit: verticalMerge(
             [
-              herizontalMerge(
+              horizontalMerge(
                 [
                   (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
                   drawVerbparticipleDecorator(),
                 ],
-                { align: 'end' }
+                { align: 'end' },
               ),
               (childMap[adjectivalKey] as GraphicalNode).drawUnit,
             ],
             {
               align: 'end',
               verticalStart: 0,
-              verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-              verticalEnd: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-            }
+              verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
+                .drawUnit.height,
+              verticalEnd: (childMap[verbparticipleKey] as GraphicalNode)
+                .drawUnit.height,
+            },
           ),
         };
       }
     }
 
     if (childMap[constructchainKey] && childMap[quantifierKey]) {
-      const constructchainNode = JSON.parse(JSON.stringify(childMap[constructchainKey]));
-      const quantifierNode = JSON.parse(JSON.stringify(childMap[quantifierKey]));
+      const constructchainNode = JSON.parse(
+        JSON.stringify(childMap[constructchainKey]),
+      );
+      const quantifierNode = JSON.parse(
+        JSON.stringify(childMap[quantifierKey]),
+      );
 
       const firstNode = constructchainNode.children[0];
 
@@ -314,98 +378,122 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
         drawUnit: verticalMerge(
           [
             (childMap[nounKey] as GraphicalNode).drawUnit,
-            herizontalMerge(
-              [childMap[adjectiveKey], childMap[articleKey]].map((child) => drawModifier(child)),
-              { align: 'start' }
+            horizontalMerge(
+              [childMap[adjectiveKey], childMap[articleKey]].map((child) =>
+                drawModifier(child),
+              ),
+              { align: 'start' },
             ),
           ],
-          { align: 'center' }
+          { align: 'center' },
         ),
       };
     }
 
-    if (childMap[quantifierKey] && childMap[nounKey] && childMap[adjectivalKey]) {
+    if (
+      childMap[quantifierKey] &&
+      childMap[nounKey] &&
+      childMap[adjectivalKey]
+    ) {
       return {
         ...node,
         drawUnit: verticalMerge(
           [
             (childMap[nounKey] as GraphicalNode).drawUnit,
-            herizontalMerge(
+            horizontalMerge(
               [
                 (childMap[adjectivalKey] as GraphicalNode).drawUnit,
                 drawModifier(childMap[quantifierKey]),
               ],
-              { align: 'start' }
+              { align: 'start' },
             ),
           ],
           {
             align: 'center',
-            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit.height,
-          }
+            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
+              .height,
+          },
         ),
       };
     }
 
-    if (childMap[articleKey] && childMap[verbparticipleKey] && childMap[adjectivalKey]) {
+    if (
+      childMap[articleKey] &&
+      childMap[verbparticipleKey] &&
+      childMap[adjectivalKey]
+    ) {
       return {
         ...node,
         drawUnit: verticalMerge(
           [
-            herizontalMerge(
+            horizontalMerge(
               [
                 (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
                 drawVerbparticipleDecorator(),
               ],
-              { align: 'end' }
+              { align: 'end' },
             ),
-            herizontalMerge(
+            horizontalMerge(
               [
                 (childMap[adjectivalKey] as GraphicalNode).drawUnit,
                 drawModifier(childMap[articleKey]),
               ],
-              { align: 'start' }
+              { align: 'start' },
             ),
           ],
           {
             align: 'center',
-            verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-          }
+            verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
+              .drawUnit.height,
+          },
         ),
       };
     }
 
-    if (childMap[articleKey] && childMap[verbparticipleKey] && childMap[adjectiveKey]) {
+    if (
+      childMap[articleKey] &&
+      childMap[verbparticipleKey] &&
+      childMap[adjectiveKey]
+    ) {
       return {
         ...node,
         drawUnit: verticalMerge(
           [
-            herizontalMerge(
+            horizontalMerge(
               [
                 (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
                 drawVerbparticipleDecorator(),
               ],
               {
                 align: 'end',
-              }
+              },
             ),
-            herizontalMerge(
-              [drawModifier(childMap[adjectiveKey]), drawModifier(childMap[articleKey])],
-              { align: 'start' }
+            horizontalMerge(
+              [
+                drawModifier(childMap[adjectiveKey]),
+                drawModifier(childMap[articleKey]),
+              ],
+              { align: 'start' },
             ),
           ],
           {
             align: 'center',
-            verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-          }
+            verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
+              .drawUnit.height,
+          },
         ),
       };
     }
 
-    if (childMap[nounKey] && childMap[articleKey] && childMap[relativeClauseKey]) {
+    if (
+      childMap[nounKey] &&
+      childMap[articleKey] &&
+      childMap[relativeClauseKey]
+    ) {
       const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[relativeClauseKey] as GraphicalNode).drawUnit,
             verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
@@ -415,11 +503,14 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           ],
           {
             align: ['start', 'center'],
-          }
+          },
         ),
       };
     }
   }
 
-  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'Nominal has unexpected structure',
+  );
 }

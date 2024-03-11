@@ -16,7 +16,7 @@ import {
 
 import { getChildMap } from './utils.js';
 
-import { herizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawObjectClauseDecorator } from '../svgDrawer/drawObjectClauseDecorator.js';
 import { drawModifier } from '../svgDrawer/drawModifier.js';
 import { drawEmpty } from '../svgDrawer/drawEmpty.js';
@@ -37,7 +37,8 @@ export function parseObject(node: GrammarNode): GraphicalNode {
   if (
     !node.content ||
     !isFragment(node.content) ||
-    (node.content.fragment !== 'Object' && node.content.fragment !== 'SecondObject')
+    (node.content.fragment !== 'Object' &&
+      node.content.fragment !== 'SecondObject')
   ) {
     throw new Error('Object parser requires Object Node');
   }
@@ -75,7 +76,8 @@ export function parseObject(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: verticalMerge([clauseDrawUnit, decoratorDrawUnit], {
           align: 'end',
-          verticalCenter: decoratorDrawUnit.height + clauseDrawUnit.verticalCenter,
+          verticalCenter:
+            decoratorDrawUnit.height + clauseDrawUnit.verticalCenter,
         }),
       };
     }
@@ -85,12 +87,12 @@ export function parseObject(node: GrammarNode): GraphicalNode {
     if (childMap[particleKey] && childMap[nounKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[nounKey] as GraphicalNode).drawUnit,
             (childMap[particleKey] as GraphicalNode).drawUnit,
           ],
-          { align: 'end' }
+          { align: 'end' },
         ),
       };
     }
@@ -109,7 +111,7 @@ export function parseObject(node: GrammarNode): GraphicalNode {
 
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
               align: 'center',
@@ -117,17 +119,21 @@ export function parseObject(node: GrammarNode): GraphicalNode {
             }),
             (childMap[particleKey] as GraphicalNode).drawUnit,
           ],
-          { align: ['center', 'end'] }
+          { align: ['center', 'end'] },
         ),
       };
     }
 
-    if (childMap[relativeClauseKey] && childMap[nounKey] && childMap[articleKey]) {
+    if (
+      childMap[relativeClauseKey] &&
+      childMap[nounKey] &&
+      childMap[articleKey]
+    ) {
       const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
 
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[relativeClauseKey] as GraphicalNode).drawUnit,
             verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
@@ -135,11 +141,14 @@ export function parseObject(node: GrammarNode): GraphicalNode {
               verticalCenter: nounDrawUnit.height,
             }),
           ],
-          { align: ['start', 'center'] }
+          { align: ['start', 'center'] },
         ),
       };
     }
   }
 
-  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'Nominal has unexpected structure',
+  );
 }

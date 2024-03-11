@@ -14,7 +14,8 @@ export function parseDiscourseUnit(node: GrammarNode): GraphicalNode {
     drawUnit: drawContainer(
       node,
       `${node.content.fragment} - ${node.content.description}`,
-      settings.discourseUnitColor
+      settings.discourseUnitColor,
+      settings.wordStrokeColor
     ),
   };
 }

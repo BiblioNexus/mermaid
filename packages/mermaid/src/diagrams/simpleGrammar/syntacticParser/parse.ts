@@ -5,7 +5,10 @@ import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { drawWord } from '../svgDrawer/drawWord.js';
+import { drawVerbInifinitiveDecorator } from '../svgDrawer/drawVerbInifinitiveDecorator.js';
 import { drawContainer } from '../svgDrawer/drawContainer.js';
+
+import { horizontalMerge } from '../svgDrawer/utils.js';
 
 import {
   adjectivalKey,
@@ -29,6 +32,19 @@ import {
   subordinateClauseKey,
   secondObjectKey,
   vocativeKey,
+  adjectiveCompoundKey,
+  adverbCompoundKey,
+  adverbialCompoundKey,
+  adverbialGroupKey,
+  clauseCompoundKey,
+  constructChainCompoundKey,
+  nominalCompoundKey,
+  predicateCompoundKey,
+  predicateGroupKey,
+  conjunctionFragmentKey,
+  clauseClusterKey,
+  getKeyFromNode,
+  verbinfinitiveKey,
 } from './keys.js';
 
 import { settings } from '../settings.js';
@@ -46,12 +62,23 @@ import { parseComplement } from './parseComplement.js';
 import { parseComplementClauseClause } from './parseComplementClause.js';
 import { parseObject } from './parseObject.js';
 import { parseRelativeClause } from './parseRelativeClause.js';
-import { parseSubordinateSubordinateClause } from './parseSubordinateClause.js';
+import { parseSubordinateClause } from './parseSubordinateClause.js';
 import { parseRelative } from './parseRelative.js';
 import { parseDiscourseUnit } from './parseDiscourseUnit.js';
 import { parseRelativeParticle } from './parseRelativeParticle.js';
 import { parsePreposition } from './parsePreposition.js';
 import { parseVocative } from './parseVocative.js';
+import { parseAdjectiveCompound } from './parseAdjectiveCompound.js';
+import { parseAdverbCompound } from './parseAdverbCompound.js';
+import { parseAdverbialCompound } from './parseAdverbialCompound.js';
+import { parseAdverbialGroup } from './parseAdverbialGroup.js';
+import { parseClauseCompound } from './parseClauseCompound.js';
+import { parseConstructChainCompound } from './parseConstructChainCompound.js';
+import { parseNominalCompound } from './parseNominalCompound.js';
+import { parsePredicateCompound } from './parsePredicateCompound.js';
+import { parsePredicateGroup } from './parsePredicateGroup.js';
+import { parseConjunction } from './parseConjunction.js';
+import { parseClauseCluster } from './parseClauseCluster.js';
 
 const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [discourseunitKey]: parseDiscourseUnit,
@@ -62,6 +89,7 @@ const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [adjectivalKey]: parseAdjectival,
   [adverbialKey]: parseAdverbial,
   [clauseKey]: parseClause,
+  [clauseClusterKey]: parseClauseCluster,
   [subjectKey]: parseSubject,
   [predicateKey]: parsePredicate,
   [complementKey]: parseComplement,
@@ -72,8 +100,18 @@ const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [relativeClauseKey]: parseRelativeClause,
   [relativeParticleKey]: parseRelativeParticle,
   [relativeKey]: parseRelative,
-  [subordinateClauseKey]: parseSubordinateSubordinateClause,
+  [subordinateClauseKey]: parseSubordinateClause,
   [vocativeKey]: parseVocative,
+  [conjunctionFragmentKey]: parseConjunction,
+  [adjectiveCompoundKey]: parseAdjectiveCompound,
+  [adverbCompoundKey]: parseAdverbCompound,
+  [adverbialCompoundKey]: parseAdverbialCompound,
+  [adverbialGroupKey]: parseAdverbialGroup,
+  [clauseCompoundKey]: parseClauseCompound,
+  [constructChainCompoundKey]: parseConstructChainCompound,
+  [nominalCompoundKey]: parseNominalCompound,
+  [predicateCompoundKey]: parsePredicateCompound,
+  [predicateGroupKey]: parsePredicateGroup,
 };
 
 export function parse(node: GrammarNode): GraphicalNode {
@@ -84,7 +122,12 @@ export function parse(node: GrammarNode): GraphicalNode {
   if (node.content === null) {
     return {
       ...node,
-      drawUnit: drawContainer(node, 'Simple Grammar', settings.titleColor),
+      drawUnit: drawContainer(
+        node,
+        'Simple Grammar',
+        settings.titleColor,
+        settings.wordStrokeColor
+      ),
     };
   }
 
@@ -99,6 +142,20 @@ export function parse(node: GrammarNode): GraphicalNode {
   }
 
   if (isWord(node.content)) {
+    if (getKeyFromNode(node) === verbinfinitiveKey) {
+      const drawUnit = drawWord(node);
+
+      return {
+        ...node,
+        drawUnit: horizontalMerge([drawUnit, drawVerbInifinitiveDecorator()], {
+          align: ['end', 'center'],
+          verticalStart: drawUnit.verticalStart,
+          verticalCenter: drawUnit.verticalCenter,
+          verticalEnd: drawUnit.verticalEnd,
+        }),
+      };
+    }
+
     return {
       ...node,
       drawUnit: drawWord(node),

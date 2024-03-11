@@ -2,19 +2,36 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import { subjectKey, predicateKey, vocativeKey, subordinateClauseKey } from './keys.js';
+import {
+  subjectKey,
+  predicateKey,
+  vocativeKey,
+  subordinateClauseKey,
+} from './keys.js';
 
 import { getChildMap } from './utils.js';
 
-import { herizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawClauseDecorator } from '../svgDrawer/drawClauseDecorator.js';
 import { drawWhitespaceDecorator } from '../svgDrawer/drawWhitespaceDecorator.js';
 
 export function parseClause(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [subjectKey, predicateKey, vocativeKey, subordinateClauseKey];
+  const validKeys: string[] = [
+    subjectKey,
+    predicateKey,
+    vocativeKey,
+    subordinateClauseKey,
+  ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Clause') {
-    throw new GrammarError('InvalidParser', 'Clause parser requires Clause Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Clause'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Clause parser requires Clause Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -29,10 +46,10 @@ export function parseClause(node: GrammarNode): GraphicalNode {
     const drawUnit = (childMap[predicateKey] as GraphicalNode).drawUnit;
     return {
       ...node,
-      drawUnit: herizontalMerge([drawUnit, drawClauseDecorator()], {
+      drawUnit: horizontalMerge([drawUnit, drawClauseDecorator()], {
         align: 'center',
-        verticalCenter: drawUnit.height,
-        verticalEnd: drawUnit.height,
+        verticalCenter: drawUnit.verticalCenter,
+        verticalEnd: drawUnit.verticalEnd,
       }),
     };
   }
@@ -45,10 +62,16 @@ export function parseClause(node: GrammarNode): GraphicalNode {
 
       return {
         ...node,
-        drawUnit: herizontalMerge([predicateUnit, decorator, subjectUnit], {
+        drawUnit: horizontalMerge([predicateUnit, decorator, subjectUnit], {
           align: ['center', 'center', 'center'],
-          verticalCenter: Math.max(subjectUnit.verticalCenter, predicateUnit.verticalCenter),
-          verticalEnd: Math.max(subjectUnit.verticalCenter, predicateUnit.verticalCenter),
+          verticalCenter: Math.max(
+            subjectUnit.verticalCenter,
+            predicateUnit.verticalCenter,
+          ),
+          verticalEnd: Math.max(
+            subjectUnit.verticalCenter,
+            predicateUnit.verticalCenter,
+          ),
         }),
       };
     }
@@ -56,34 +79,49 @@ export function parseClause(node: GrammarNode): GraphicalNode {
     if (childMap[vocativeKey] && childMap[predicateKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[predicateKey] as GraphicalNode).drawUnit,
             drawClauseDecorator(),
             drawWhitespaceDecorator(),
             (childMap[vocativeKey] as GraphicalNode).drawUnit,
           ],
-          { align: ['end', 'center', 'center', 'end'] }
+          { align: ['end', 'center', 'center', 'end'] },
         ),
       };
     }
 
     if (childMap[predicateKey] && childMap[subordinateClauseKey]) {
+      const decoratorDrawUnit = drawClauseDecorator();
+      const subordinateClauseDrawUnit = (
+        childMap[subordinateClauseKey] as GraphicalNode
+      ).drawUnit;
+
       return {
         ...node,
-        drawUnit: herizontalMerge(
+        drawUnit: horizontalMerge(
           [
             (childMap[predicateKey] as GraphicalNode).drawUnit,
-            verticalMerge(
-              [drawClauseDecorator(), (childMap[subordinateClauseKey] as GraphicalNode).drawUnit],
-              { align: 'end' }
-            ),
+            verticalMerge([decoratorDrawUnit, subordinateClauseDrawUnit], {
+              align: 'center',
+              horizontalStart:
+                subordinateClauseDrawUnit.horizontalCenter -
+                decoratorDrawUnit.horizontalCenter,
+              horizontalCenter: decoratorDrawUnit.horizontalCenter,
+              horizontalEnd: decoratorDrawUnit.horizontalEnd,
+              verticalStart: decoratorDrawUnit.verticalStart,
+              verticalCenter: decoratorDrawUnit.verticalCenter,
+              verticalEnd: decoratorDrawUnit.verticalEnd,
+            }),
           ],
-          { align: ['start', 'center'] }
+          { align: 'center' },
         ),
       };
     }
   }
 
-  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'Nominal has unexpected structure',
+  );
 }

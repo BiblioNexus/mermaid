@@ -2,19 +2,38 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import { clauseKey, nominalKey, prepositionalPhraseKey, verbparticipleKey } from './keys.js';
+import {
+  adjectiveCompoundKey,
+  clauseKey,
+  nominalKey,
+  prepositionalPhraseKey,
+  verbparticipleKey,
+} from './keys.js';
 
 import { getChildMap } from './utils.js';
 
-import { herizontalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge } from '../svgDrawer/utils.js';
 import { drawAdjectivalDecorator } from '../svgDrawer/drawAdjectivalDecorator.js';
 import { drawAdjectivalClauseDecorator } from '../svgDrawer/drawAdjectivalClauseDecorator.js';
 
 export function parseAdjectival(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [verbparticipleKey, nominalKey, clauseKey, prepositionalPhraseKey];
+  const validKeys: string[] = [
+    verbparticipleKey,
+    nominalKey,
+    clauseKey,
+    prepositionalPhraseKey,
+    adjectiveCompoundKey,
+  ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Adjectival') {
-    throw new GrammarError('InvalidParser', 'Adjectival parser requires Adjectival Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Adjectival'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Adjectival parser requires Adjectival Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -29,9 +48,12 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
     if (childMap[verbparticipleKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
-          [(childMap[verbparticipleKey] as GraphicalNode).drawUnit, drawAdjectivalDecorator()],
-          { align: 'end' }
+        drawUnit: horizontalMerge(
+          [
+            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+            drawAdjectivalDecorator(),
+          ],
+          { align: 'end' },
         ),
       };
     }
@@ -39,9 +61,12 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
     if (childMap[nominalKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
-          [(childMap[nominalKey] as GraphicalNode).drawUnit, drawAdjectivalDecorator()],
-          { align: 'start' }
+        drawUnit: horizontalMerge(
+          [
+            (childMap[nominalKey] as GraphicalNode).drawUnit,
+            drawAdjectivalDecorator(),
+          ],
+          { align: 'start' },
         ),
       };
     }
@@ -53,16 +78,29 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
       };
     }
 
+    if (childMap[adjectiveCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: (childMap[adjectiveCompoundKey] as GraphicalNode).drawUnit,
+      };
+    }
+
     if (childMap[clauseKey]) {
       return {
         ...node,
-        drawUnit: herizontalMerge(
-          [(childMap[clauseKey] as GraphicalNode).drawUnit, drawAdjectivalClauseDecorator()],
-          { align: 'center' }
+        drawUnit: horizontalMerge(
+          [
+            (childMap[clauseKey] as GraphicalNode).drawUnit,
+            drawAdjectivalClauseDecorator(),
+          ],
+          { align: 'center' },
         ),
       };
     }
   }
 
-  throw new GrammarError('InvalidStructure', 'Adjectival has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'Adjectival has unexpected structure',
+  );
 }
