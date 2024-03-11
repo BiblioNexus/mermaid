@@ -20,7 +20,7 @@ export const drawEqualDecorator = (): DrawUnit => {
     .append('text')
     .attr('x', 0)
     .attr('y', 0)
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
     .attr('transform', `translate(${(width - rect.width) / 2}, ${height / 2 + rect.height})`)
     .text(word);
@@ -32,8 +32,8 @@ export const drawEqualDecorator = (): DrawUnit => {
     verticalStart: 0,
     verticalCenter: height / 2,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 };

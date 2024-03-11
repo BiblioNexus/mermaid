@@ -33,7 +33,7 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .append('path')
     .attr('d', lineGenerator(slashData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   const lineData: [number, number][] = [
@@ -45,7 +45,7 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .append('path')
     .attr('d', lineGenerator(lineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   d3Elem
@@ -56,7 +56,7 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
       'transform',
       `translate(${settings.padding}, ${(rect1.height + settings.wordPadding) / 2})`
     )
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
     .text(node.content.word);
 
@@ -79,10 +79,10 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
     height,
     element: d3Elem,
     verticalStart: 0,
-    verticalCenter: height / 2,
+    verticalCenter: height,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: settings.padding + rect1.width,
+    horizontalEnd: width,
   };
 };

@@ -33,14 +33,14 @@ export const drawWord = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .append('path')
     .attr('d', lineGenerator(data))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   d3Elem
     .append('text')
     .attr('x', 0)
     .attr('y', 0)
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
     .attr('transform', `translate(${(width - rect1.width) / 2}, ${height - settings.wordPadding})`)
     .text(node.content.word);
@@ -64,8 +64,8 @@ export const drawWord = (node: GrammarNode | GraphicalNode): DrawUnit => {
     verticalStart: 0,
     verticalCenter: height,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 };

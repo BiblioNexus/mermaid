@@ -41,7 +41,7 @@ export function drawAdjectivalClauseDecorator(): DrawUnit {
       .append('path')
       .attr('d', lineGenerator(lineData))
       .attr('fill', 'none')
-      .attr('stroke', settings.wordColor)
+      .attr('stroke', settings.strokeColor)
       .attr('stroke-width', settings.lineStrokeWidth);
   }
 
@@ -52,8 +52,8 @@ export function drawAdjectivalClauseDecorator(): DrawUnit {
     verticalStart: 0,
     verticalCenter: settings.height,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: 2 * settings.padding,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: 2 * settings.padding,
+    horizontalEnd: width,
   };
 }

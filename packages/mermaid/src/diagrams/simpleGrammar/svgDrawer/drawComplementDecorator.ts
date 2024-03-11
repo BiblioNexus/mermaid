@@ -15,7 +15,7 @@ export const drawComplementDecorator = (): DrawUnit => {
     [(width * 2) / 3, 0],
   ];
 
-  const herizontalLineData: [number, number][] = [
+  const horizontalLineData: [number, number][] = [
     [0, height],
     [width, height],
   ];
@@ -27,16 +27,16 @@ export const drawComplementDecorator = (): DrawUnit => {
 
   d3Elem
     .append('path')
-    .attr('d', lineGenerator(herizontalLineData))
+    .attr('d', lineGenerator(horizontalLineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   d3Elem
     .append('path')
     .attr('d', lineGenerator(slashLineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -46,8 +46,8 @@ export const drawComplementDecorator = (): DrawUnit => {
     verticalStart: 0,
     verticalCenter: height,
     verticalEnd: height,
-    herizontalStart: settings.padding,
-    herizontalCenter: width,
-    herizontalEnd: width,
+    horizontalStart: settings.padding,
+    horizontalCenter: width,
+    horizontalEnd: width,
   };
 };

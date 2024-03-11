@@ -7,7 +7,12 @@ import { isGraphicalNode } from '../utils.js';
 
 import { ruler } from '../utils.js';
 
-export function drawContainer(node: GrammarNode, title: string, titleColor: string): DrawUnit {
+export function drawContainer(
+  node: GrammarNode,
+  title: string,
+  color: string,
+  strokeColor: string
+): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const word = title;
@@ -33,8 +38,8 @@ export function drawContainer(node: GrammarNode, title: string, titleColor: stri
     .append('text')
     .attr('x', 0)
     .attr('y', settings.padding + textHeight / 2)
-    .attr('stroke', titleColor)
-    .attr('fill', titleColor)
+    .attr('stroke', strokeColor)
+    .attr('fill', color)
     .attr('font-family', settings.fontFamily)
     .attr('font-size', settings.fontSize)
     .attr('transform', `translate(${width - rect.width}, 0)`)
@@ -61,8 +66,8 @@ export function drawContainer(node: GrammarNode, title: string, titleColor: stri
     verticalStart: 0,
     verticalCenter: height / 2,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 }

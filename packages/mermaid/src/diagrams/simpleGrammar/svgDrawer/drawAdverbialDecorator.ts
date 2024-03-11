@@ -29,7 +29,7 @@ export function drawAdverbialDecorator(): DrawUnit {
     .append('path')
     .attr('d', lineGenerator(lineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   d3Elem
@@ -37,7 +37,7 @@ export function drawAdverbialDecorator(): DrawUnit {
     .attr('d', lineGenerator(slashData))
     .attr('fill', 'none')
     .attr('stroke-dasharray', '3,3')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -47,8 +47,8 @@ export function drawAdverbialDecorator(): DrawUnit {
     verticalStart: 0,
     verticalCenter: height / 2,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 }

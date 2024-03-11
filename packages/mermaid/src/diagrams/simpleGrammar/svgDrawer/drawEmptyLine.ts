@@ -24,7 +24,7 @@ export const drawEmptyLine = (): DrawUnit => {
     .append('path')
     .attr('d', lineGenerator(data))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -34,8 +34,8 @@ export const drawEmptyLine = (): DrawUnit => {
     verticalStart: 0,
     verticalCenter: 0,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 };

@@ -23,7 +23,7 @@ export function drawVerbparticipleDecorator(): DrawUnit {
     .append('path')
     .attr('d', drawHalfCircle(d3.path()).toString())
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -33,8 +33,8 @@ export function drawVerbparticipleDecorator(): DrawUnit {
     verticalStart: 0,
     verticalCenter: height,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: height,
-    herizontalEnd: height,
+    horizontalStart: 0,
+    horizontalCenter: height,
+    horizontalEnd: height,
   };
 }

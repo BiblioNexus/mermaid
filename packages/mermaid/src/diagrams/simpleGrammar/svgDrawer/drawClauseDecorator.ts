@@ -15,7 +15,7 @@ export const drawClauseDecorator = (): DrawUnit => {
     [width / 2, height],
   ];
 
-  const herizontalLineData: [number, number][] = [
+  const horizontalLineData: [number, number][] = [
     [0, (height * 2) / 3],
     [width, (height * 2) / 3],
   ];
@@ -27,16 +27,16 @@ export const drawClauseDecorator = (): DrawUnit => {
 
   d3Elem
     .append('path')
-    .attr('d', lineGenerator(herizontalLineData))
+    .attr('d', lineGenerator(horizontalLineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   d3Elem
     .append('path')
     .attr('d', lineGenerator(verticalLineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -46,8 +46,8 @@ export const drawClauseDecorator = (): DrawUnit => {
     verticalStart: 0,
     verticalCenter: (height * 2) / 3,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 };

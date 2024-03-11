@@ -54,7 +54,7 @@ export function drawConstructChainConnector(drawUnits: DrawUnit[]): DrawUnit {
         .append('path')
         .attr('d', lineGenerator(data))
         .attr('fill', 'none')
-        .attr('stroke', settings.wordColor)
+        .attr('stroke', settings.strokeColor)
         .attr('stroke-width', settings.lineStrokeWidth);
     }
   }
@@ -64,10 +64,10 @@ export function drawConstructChainConnector(drawUnits: DrawUnit[]): DrawUnit {
     height,
     element: d3Elem,
     verticalStart: 0,
-    verticalCenter: drawUnits[0].height,
-    verticalEnd: drawUnits[0].height,
-    herizontalStart: width - drawUnits[0].width - settings.padding,
-    herizontalCenter: width - drawUnits[0].width,
-    herizontalEnd: width,
+    verticalCenter: drawUnits[0].verticalCenter,
+    verticalEnd: drawUnits[0].verticalEnd,
+    horizontalStart: width - drawUnits[0].width - settings.padding,
+    horizontalCenter: width - drawUnits[0].width,
+    horizontalEnd: width,
   };
 }

@@ -11,12 +11,15 @@ type MergeOptions = {
   verticalCenter?: number;
   verticalStart?: number;
   verticalEnd?: number;
-  herizontalStart?: number;
-  herizontalEnd?: number;
-  herizontalCenter?: number;
+  horizontalStart?: number;
+  horizontalEnd?: number;
+  horizontalCenter?: number;
 };
 
-export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): DrawUnit {
+export function verticalMerge(
+  drawUnits: DrawUnit[],
+  options?: MergeOptions,
+): DrawUnit {
   if (
     options?.align &&
     Array.isArray(options?.align) &&
@@ -31,18 +34,20 @@ export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): Dr
 
   const innerHeight = drawUnits.reduce(
     (acc, item) => acc + (item.verticalEnd - item.verticalStart),
-    0
+    0,
   );
-  const topOuter = n > 0 && drawUnits[0].verticalStart > 0 ? drawUnits[0].verticalStart : 0;
+  const topOuter =
+    n > 0 && drawUnits[0].verticalStart > 0 ? drawUnits[0].verticalStart : 0;
   const bottomOuter =
-    n > 0 && drawUnits[n - 1].herizontalEnd < drawUnits[n - 1].height
-      ? drawUnits[n - 1].height - drawUnits[n - 1].herizontalEnd
+    n > 0 && drawUnits[n - 1].horizontalEnd < drawUnits[n - 1].height
+      ? drawUnits[n - 1].height - drawUnits[n - 1].horizontalEnd
       : 0;
 
   let maxLeftOuter = 0;
   let maxRightOuter = 0;
 
-  const baseline: Alignment[] = options && Array.isArray(options?.align) ? options.align : [];
+  const baseline: Alignment[] =
+    options && Array.isArray(options?.align) ? options.align : [];
 
   if (!Array.isArray(options?.align)) {
     for (let i = 0; i < n; i++) {
@@ -56,18 +61,27 @@ export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): Dr
 
     switch (align) {
       case 'start': {
-        maxLeftOuter = Math.max(maxLeftOuter, unit.herizontalStart);
-        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.herizontalStart);
+        maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalStart);
+        maxRightOuter = Math.max(
+          maxRightOuter,
+          unit.width - unit.horizontalStart,
+        );
         break;
       }
       case 'center': {
-        maxLeftOuter = Math.max(maxLeftOuter, unit.herizontalCenter);
-        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.herizontalCenter);
+        maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalCenter);
+        maxRightOuter = Math.max(
+          maxRightOuter,
+          unit.width - unit.horizontalCenter,
+        );
         break;
       }
       case 'end': {
-        maxLeftOuter = Math.max(maxLeftOuter, unit.herizontalEnd);
-        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.herizontalEnd);
+        maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalEnd);
+        maxRightOuter = Math.max(
+          maxRightOuter,
+          unit.width - unit.horizontalEnd,
+        );
         break;
       }
       default: {
@@ -91,15 +105,15 @@ export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): Dr
 
     switch (align) {
       case 'start': {
-        xMovementAmount = unit.herizontalStart;
+        xMovementAmount = unit.horizontalStart;
         break;
       }
       case 'center': {
-        xMovementAmount = unit.herizontalCenter;
+        xMovementAmount = unit.horizontalCenter;
         break;
       }
       case 'end': {
-        xMovementAmount = unit.herizontalEnd;
+        xMovementAmount = unit.horizontalEnd;
         break;
       }
       default: {
@@ -111,7 +125,7 @@ export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): Dr
       .append(() => unit.element.node())
       .attr(
         'transform',
-        `translate(${maxLeftOuter - xMovementAmount}, ${yStack - unit.verticalStart})`
+        `translate(${maxLeftOuter - xMovementAmount}, ${yStack - unit.verticalStart})`,
       );
 
     yStack += unit.verticalEnd - unit.verticalStart;
@@ -121,26 +135,35 @@ export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): Dr
     width: options?.width !== undefined ? options.width : width,
     height: options?.height !== undefined ? options.height : height,
     element: d3Elem,
-    verticalStart: options?.verticalStart !== undefined ? options.verticalStart : topOuter,
+    verticalStart:
+      options?.verticalStart !== undefined ? options.verticalStart : topOuter,
     verticalCenter:
       options?.verticalCenter !== undefined
         ? options.verticalCenter
         : topOuter + (height - topOuter) / 2,
-    verticalEnd: options?.verticalEnd !== undefined ? options.verticalEnd : height,
-    herizontalStart: options?.herizontalStart !== undefined ? options.herizontalStart : 0,
-    herizontalCenter:
-      options?.herizontalCenter !== undefined ? options.herizontalCenter : maxLeftOuter,
-    herizontalEnd: options?.herizontalEnd !== undefined ? options.herizontalEnd : width,
+    verticalEnd:
+      options?.verticalEnd !== undefined ? options.verticalEnd : height,
+    horizontalStart:
+      options?.horizontalStart !== undefined ? options.horizontalStart : 0,
+    horizontalCenter:
+      options?.horizontalCenter !== undefined
+        ? options.horizontalCenter
+        : maxLeftOuter,
+    horizontalEnd:
+      options?.horizontalEnd !== undefined ? options.horizontalEnd : width,
   };
 }
 
-export function herizontalMerge(drawUnits: DrawUnit[], options?: MergeOptions): DrawUnit {
+export function horizontalMerge(
+  drawUnits: DrawUnit[],
+  options?: MergeOptions,
+): DrawUnit {
   if (
     options?.align &&
     Array.isArray(options?.align) &&
     options.align.length !== drawUnits.length
   ) {
-    throw new Error('invalid align parameter in herizontal merge');
+    throw new Error('invalid align parameter in horizontal merge');
   }
 
   const d3Elem = d3.create('svg:g');
@@ -148,19 +171,23 @@ export function herizontalMerge(drawUnits: DrawUnit[], options?: MergeOptions): 
   const n = drawUnits.length;
 
   const innerWidth = drawUnits.reduce(
-    (acc, item) => acc + (item.herizontalEnd - item.herizontalStart),
-    0
+    (acc, item) => acc + (item.horizontalEnd - item.horizontalStart),
+    0,
   );
-  const leftOuter = n > 0 && drawUnits[0].herizontalStart > 0 ? drawUnits[0].herizontalStart : 0;
+  const leftOuter =
+    n > 0 && drawUnits[0].horizontalStart > 0
+      ? drawUnits[0].horizontalStart
+      : 0;
   const rightOuter =
-    n > 0 && drawUnits[n - 1].herizontalEnd < drawUnits[n - 1].width
-      ? drawUnits[n - 1].width - drawUnits[n - 1].herizontalEnd
+    n > 0 && drawUnits[n - 1].horizontalEnd < drawUnits[n - 1].width
+      ? drawUnits[n - 1].width - drawUnits[n - 1].horizontalEnd
       : 0;
 
   let maxTopOuter = 0;
   let maxBottomOuter = 0;
 
-  const baseline: Alignment[] = options && Array.isArray(options?.align) ? options.align : [];
+  const baseline: Alignment[] =
+    options && Array.isArray(options?.align) ? options.align : [];
 
   if (!Array.isArray(options?.align)) {
     for (let i = 0; i < n; i++) {
@@ -175,17 +202,26 @@ export function herizontalMerge(drawUnits: DrawUnit[], options?: MergeOptions): 
     switch (align) {
       case 'start': {
         maxTopOuter = Math.max(maxTopOuter, unit.verticalStart);
-        maxBottomOuter = Math.max(maxBottomOuter, unit.height - unit.verticalStart);
+        maxBottomOuter = Math.max(
+          maxBottomOuter,
+          unit.height - unit.verticalStart,
+        );
         break;
       }
       case 'center': {
         maxTopOuter = Math.max(maxTopOuter, unit.verticalCenter);
-        maxBottomOuter = Math.max(maxBottomOuter, unit.height - unit.verticalCenter);
+        maxBottomOuter = Math.max(
+          maxBottomOuter,
+          unit.height - unit.verticalCenter,
+        );
         break;
       }
       case 'end': {
         maxTopOuter = Math.max(maxTopOuter, unit.verticalEnd);
-        maxBottomOuter = Math.max(maxBottomOuter, unit.height - unit.verticalEnd);
+        maxBottomOuter = Math.max(
+          maxBottomOuter,
+          unit.height - unit.verticalEnd,
+        );
         break;
       }
       default: {
@@ -229,24 +265,32 @@ export function herizontalMerge(drawUnits: DrawUnit[], options?: MergeOptions): 
       .append(() => unit.element.node())
       .attr(
         'transform',
-        `translate(${xStack - unit.herizontalStart}, ${maxTopOuter - yMovementAmount})`
+        `translate(${xStack - unit.horizontalStart}, ${maxTopOuter - yMovementAmount})`,
       );
 
-    xStack += unit.herizontalEnd - unit.herizontalStart;
+    xStack += unit.horizontalEnd - unit.horizontalStart;
   }
 
   return {
     width,
     height,
     element: d3Elem,
-    verticalStart: options?.verticalStart !== undefined ? options.verticalStart : 0,
-    verticalCenter: options?.verticalCenter !== undefined ? options.verticalCenter : maxTopOuter,
-    verticalEnd: options?.verticalEnd !== undefined ? options.verticalEnd : height,
-    herizontalStart: options?.herizontalStart !== undefined ? options.herizontalStart : leftOuter,
-    herizontalCenter:
-      options?.herizontalCenter !== undefined
-        ? options.herizontalCenter
+    verticalStart:
+      options?.verticalStart !== undefined ? options.verticalStart : 0,
+    verticalCenter:
+      options?.verticalCenter !== undefined
+        ? options.verticalCenter
+        : maxTopOuter,
+    verticalEnd:
+      options?.verticalEnd !== undefined ? options.verticalEnd : height,
+    horizontalStart:
+      options?.horizontalStart !== undefined
+        ? options.horizontalStart
+        : leftOuter,
+    horizontalCenter:
+      options?.horizontalCenter !== undefined
+        ? options.horizontalCenter
         : leftOuter + (width - leftOuter) / 2,
-    herizontalEnd: options?.herizontalEnd ? options.herizontalEnd : width,
+    horizontalEnd: options?.horizontalEnd ? options.horizontalEnd : width,
   };
 }

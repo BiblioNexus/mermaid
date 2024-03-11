@@ -40,7 +40,7 @@ export function drawObjectClauseDecorator(): DrawUnit {
       .append('path')
       .attr('d', lineGenerator(lineData))
       .attr('fill', 'none')
-      .attr('stroke', settings.wordColor)
+      .attr('stroke', settings.strokeColor)
       .attr('stroke-width', settings.lineStrokeWidth);
   }
 
@@ -51,8 +51,8 @@ export function drawObjectClauseDecorator(): DrawUnit {
     verticalStart: 0,
     verticalCenter: height / 2,
     verticalEnd: height,
-    herizontalStart: 2 * settings.padding,
-    herizontalCenter: 2 * settings.padding,
-    herizontalEnd: width,
+    horizontalStart: 2 * settings.padding,
+    horizontalCenter: 2 * settings.padding,
+    horizontalEnd: width,
   };
 }

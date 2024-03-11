@@ -42,7 +42,7 @@ export function drawPreposition(
     .append('path')
     .attr('d', lineGenerator(slashData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   const lineData: [number, number][] = [
@@ -54,7 +54,7 @@ export function drawPreposition(
     .append('path')
     .attr('d', lineGenerator(lineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
   d3Elem
@@ -67,7 +67,7 @@ export function drawPreposition(
         (height + rect1.height) / 2
       })`
     )
-    .attr('stroke', settings.wordColor)
+    .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
     .text(node.content.word);
 
@@ -90,8 +90,8 @@ export function drawPreposition(
     verticalStart: 0,
     verticalCenter: height / 2,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 }

@@ -34,8 +34,8 @@ export const drawWhitespaceDecorator = (): DrawUnit => {
     verticalStart: 0,
     verticalCenter: 0,
     verticalEnd: height,
-    herizontalStart: 0,
-    herizontalCenter: width / 2,
-    herizontalEnd: width,
+    horizontalStart: 0,
+    horizontalCenter: width / 2,
+    horizontalEnd: width,
   };
 };
