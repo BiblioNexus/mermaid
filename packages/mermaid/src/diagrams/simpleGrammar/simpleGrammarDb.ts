@@ -1,4 +1,3 @@
-import type { D3Element } from '../../mermaidAPI.js';
 import { log } from '../../logger.js';
 
 import type { SimpleGrammarDB, Fragment, Word, GrammarNode } from './simpleGrammarTypes.js';

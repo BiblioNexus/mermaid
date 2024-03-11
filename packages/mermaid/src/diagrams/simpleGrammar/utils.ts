@@ -25,6 +25,7 @@ export function ruler(textContent: string) {
   text.textContent = textContent;
   text.setAttribute('font-size', `${settings.fontSize}px`);
   text.setAttribute('font-family', settings.fontFamily);
+  text.setAttribute('stroke', settings.wordStrokeColor);
 
   svg.appendChild(text);
 

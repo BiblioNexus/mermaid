@@ -9,9 +9,9 @@ export type DrawUnit = {
   verticalStart: number;
   verticalCenter: number;
   verticalEnd: number;
-  herizontalStart: number;
-  herizontalCenter: number;
-  herizontalEnd: number;
+  horizontalStart: number;
+  horizontalCenter: number;
+  horizontalEnd: number;
 };
 
 export type Word = {

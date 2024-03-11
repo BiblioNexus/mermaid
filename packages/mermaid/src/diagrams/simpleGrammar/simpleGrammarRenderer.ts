@@ -1,5 +1,3 @@
-import * as d3 from 'd3';
-
 import { configureSvgSize } from '../../setupGraphViewbox.js';
 
 import type { DrawDefinition, SVG } from '../../diagram-api/types.js';
@@ -8,6 +6,7 @@ import type { GrammarNode, SimpleGrammarDB } from './simpleGrammarTypes.js';
 import { selectSvgElement } from '../../rendering-util/selectSvgElement.js';
 
 import { parse } from './syntacticParser/parse.js';
+import { shakingTree } from './syntacticParser/shakingTree.js';
 import { settings } from './settings.js';
 
 /**
@@ -31,7 +30,7 @@ export const draw: DrawDefinition = (text, id, _version, diagObj) => {
 
   dfs(rootNode);
 
-  const graphicalNode = parse(rootNode);
+  const graphicalNode = parse(shakingTree(JSON.parse(JSON.stringify(rootNode))));
 
   const svg: SVG = selectSvgElement(id);
 

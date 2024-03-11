@@ -17,6 +17,17 @@
     <pre class="mermaid">
       SimpleGrammar
         DiscourseUnit [Visual Dictionary]
+          Fragment [participle with object in construct]
+            Clause
+              Predicate
+                verb: יִשְׁלָיוּ prosper
+              Subject
+                Clause
+                  Predicate
+                    ConstructChain
+                      verb-participle: אֹהֲבָיִ love
+                      suffix-pronoun: ךְ you
+                    Object located = "after participle"
           Fragment [Simple noun phrase]
             noun: דָּ֘בָ֤ר theme
           Fragment [nominal phrase with adjective]
@@ -158,6 +169,12 @@
                     Object located = "after participle"
           Fragment [lone adjective]
             adjective: רְשָׁעִ֑ים wicked
+          Fragment [compound adjective]
+            Adjectival
+              adjective: רְשָׁעִ֑ים wicked
+              Conjunction
+                conjunction: וָ and
+              adjective: רְשָׁעִ֑ים wicked
           Fragment [embedded clause as adjectival]
             Adjectival
               Clause
@@ -176,7 +193,650 @@
                         ConstructChain
                           noun: ישׁוּעָתִ helping
                           suffix-pronoun: י me
-
+          Fragment [lone adverb]
+            adverb: יוֹמָ֥ם day
+          Fragment [noun as adverbial = adverbial accusative]
+            Adverbial
+              noun: לָֽיְלָה night
+          Fragment [compound adverb]
+            Adverbial
+              adverb: יוֹמָ֥ם day
+              Conjunction
+                conjunction: וָ and
+              adverb: יוֹמָ֥ם day
+          Fragment [compound adverbial]
+            Adverbial
+              adverb: יוֹמָ֥ם day
+              Conjunction
+                conjunction: וָ and
+              Adverbial
+                noun: לָֽיְלָה night
+          Fragment [verb as adverb]
+            Clause
+              Predicate
+                Adverbial
+                  verb: צְלַ֬ח victoriously
+                verb: רְכַ֗ב ride
+          Fragment [lone conjunction]
+            Conjunction
+              conjunction: וּ or
+          Fragment [grouped conjunctions]
+            Conjunction
+              Conjunction
+                conjunction: כִּ֤י but
+              Conjunction
+                conjunction: אִ֥ם rather
+          Fragment [Simplest construct chain]
+            ConstructChain
+              noun: בְנֵי sons
+              noun: קֹרַח Korah
+          Fragment [État construit le plus simple]
+            ConstructChain
+              noun: בְנֵי fils
+              noun: קֹרַח Korah
+          Fragment [construct chain with participle]
+            ConstructChain
+              Nominal
+                verb-participle: בְזוּי despised
+              noun: עָֽם people
+          Fragment [Definite construct chain]
+            ConstructChain
+              noun: בְנֵי sons
+              Nominal
+                article: הַ the
+                noun: דָּ֘בָ֤ר theme [simple noun]
+          Fragment [Construct chain with suffix-pronoun]
+            ConstructChain
+              noun: חֶ֫פְצ֥ delight
+              suffix-pronoun: וֹ him
+          Fragment [Construct chain with substantival adjective and suffix-pronoun]
+            ConstructChain
+              Nominal
+                adjective: יִקְּרוֹתֶ֑י honoured
+              suffix-pronoun: ךָ you
+          Fragment [Construct chain with substantival adjective and noun]
+            ConstructChain
+              Nominal
+                adjective: אַבִּירֵי strong
+              noun: בָשָׁן Bashan
+          Fragment [Construct chain with relative clause]
+            ConstructChain
+              noun: אַ֥שְֽׁרֵי blessed
+              Nominal
+                article: הָ the
+                noun: אִ֗ישׁ man
+                RelativeClause
+                  RelativeParticle
+                    particle: אֲשֶׁ֤ר who
+                  Clause
+                    Subject
+                      Relative
+                    Predicate
+                      verb: הָלַךְ֮ walk
+          Fragment [Construct chain as sole predicate]
+            Clause
+              Predicate
+                Complement
+                  ConstructChain
+                    noun: שִׁ֣יר song
+                    noun: יְדִידֹֽת love
+          Fragment [compound construct chains]
+            Nominal
+              ConstructChain
+                noun: ה֝וֹדְ splendor
+                suffix-pronoun: ךָ֗ your
+              Conjunction
+                conjunction: וַ and
+              ConstructChain
+                noun: הֲדָרֶֽ majesty
+                suffix-pronoun: ךָ your
+          Fragment [Simplest prepositional phrase]
+            PrepositionalPhrase
+              Preposition
+                preposition: לְ of
+              Object
+                noun: שִׁ֣יר song
+          Fragment [Adjectival prepositional phrase]
+            Nominal
+              noun: שִׁ֣יר song
+              Adjectival
+                PrepositionalPhrase
+                  Preposition
+                    preposition: לְ of
+                  Object
+                    noun: שִׁ֣יר song
+          Fragment [noun in construct in apposition to another noun]
+            Nominal
+              ConstructChain
+                noun: דְּבַר cause
+                Nominal
+                  noun: אֱ֭מֶת truth
+                  Conjunction
+                    conjunction: וְ and
+                  Nominal
+                    noun: עַנְוָה humility
+              noun: צֶ֑דֶק righteousness
+          Fragment [construct chain in apposition to another noun]
+            ConstructChain
+              noun: דְּבַר cause
+              Nominal
+                Nominal
+                  noun: אֱ֭מֶת truth
+                  Conjunction
+                    conjunction: וְ and
+                  Nominal
+                    noun: עַנְוָה humility
+                noun: צֶ֑דֶק righteousness
+          Fragment [Subject - Verb]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                verb: הָלַךְ֮ walk
+          Fragment [Subject - Verb - Adverb]
+            Clause
+              Predicate
+                adverb: לָמָה why
+                verb: עֲזַבְתָּ forsaken
+                Object
+                  suffix-pronoun: נִי me
+          Fragment [Subject - compound verbs]
+            Clause
+              Predicate
+                Predicate
+                  verb: צְלַ֬ח be victorious
+                Predicate
+                  verb: רְכַ֗ב ride
+          Fragment [Subject - compound verbs - shared object with complement clause]
+            Clause
+              Predicate
+                Predicate
+                  verb: טַעֲמוּ taste > perceive
+                Conjunction
+                  conjunction: וּ and
+                Predicate
+                  verb: רְאוּ see
+                Object
+                  ComplementClause
+                    Conjunction
+                      conjunction: כִּי that
+                    Clause
+                      Predicate
+                      Predicate
+                        Complement
+                          adjective: טוֹב good
+                      Subject
+                        noun: יְהוָה YHWH
+          Fragment [Subject - compound verbs with a conjunction]
+            Clause
+              Predicate
+                Predicate
+                  verb: צְלַ֬ח be victorious
+                Conjunction
+                  conjunction: ו and
+                Predicate
+                  verb: רְכַ֗ב ride
+          Fragment [Subject - Verb - particle as Adverb]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                verb: הָלַךְ֮ walk
+                Adverbial
+                  particle: לֹ֥א not
+          Fragment [Subject - Verb - Prepositional phrase]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                verb: הָלַךְ֮ walk
+                Adverbial
+                  PrepositionalPhrase
+                    Preposition
+                      preposition: בַּ in
+                    Object
+                      noun: דֶ֣רֶךְ way
+          Fragment [Subject - Verb - Adverb - Prepositional phrase]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                verb: הָלַךְ֮ walk
+                Adverbial
+                  particle: לֹ֥א not
+                Adverbial
+                  PrepositionalPhrase
+                    Preposition
+                      preposition: בַּ in
+                    Object
+                      noun: דֶ֣רֶךְ way
+          Fragment [Subject - Verb - Adverb - Prepositional phrase (with construct chain)]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                verb: יָשָֽׁב sit
+                Adverbial
+                  particle: לֹ֥א not
+                Adverbial
+                  PrepositionalPhrase
+                    Preposition
+                      preposition: בְ in
+                    Object
+                      ConstructChain
+                        noun: מוֹשַׁ֥ב seat
+                        noun: לֵ֝צִ֗ים mockers
+          Fragment [Subject - Complement - Adverb]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                Complement
+                  adjective: רְשָׁעִ֑ים wicked
+                Adverbial
+                  particle: לֹ֥א not
+          Fragment [Subject - Complement - multiple Adverbials]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                Complement
+                  adjective: רְשָׁעִ֑ים wicked
+                Adverbial
+                  particle: לֹ֥א not
+                Adverbial
+                  PrepositionalPhrase
+                    Preposition
+                      preposition: בְ in
+                    Object
+                      ConstructChain
+                        noun: מוֹשַׁ֥ב seat
+                        noun: לֵ֝צִ֗ים mockers
+          Fragment [Subject - Object - Complement]
+            Clause
+              Subject
+                noun: אִ֗ישׁ man
+              Predicate
+                Object
+                  noun: object
+                Complement
+                  adjective: רְשָׁעִ֑ים wicked
+          Fragment [Subject - DOM Object]
+            Clause
+              Subject
+                noun: יְה֣וֹנָתָ֔ן Jonathan
+              Predicate
+                verb: עָנָה
+                Object
+                  particle: אֶת [d.o.m.]
+                  noun: שָׁאוּל Saul
+          Fragment [Subject - DOM Object with article]
+            Clause
+              Subject
+                noun: יְה֣וֹנָתָ֔ן Jonathan
+              Predicate
+                verb: עָנָה
+                Object
+                  particle: אֶת [d.o.m.]
+                  article: הָ the
+                  noun: אִישׁ man
+          Fragment [Simple infinitival clause with subject]
+            Clause
+              Subject located = "after infinitive construct"
+              Predicate
+                ConstructChain
+                  verb-infinitive: הִנְדֹּף driven away
+                  noun: עָשָׁן smoke
+          Fragment [Simple infinitival clause with object]
+            Clause
+              Predicate
+                Object located = "after infinitive construct"
+                ConstructChain
+                  verb-infinitive: הִנְדֹּף driven away
+                  noun: עָשָׁן smoke
+          Fragment [Clause embedded in subject]
+            Clause
+              Subject
+                Clause
+                  Predicate
+                    verb-infinitive: תְּנָה bestowing
+                    Object
+                      ConstructChain
+                        noun: הוֹדְ glory
+                        suffix-pronoun: ךָ you
+              Predicate
+                Complement
+                  Adverbial
+                    PrepositionalPhrase
+                      Preposition
+                        preposition: עַל on
+                      Object
+                        Nominal
+                          article: הַ the
+                          noun: שָּׁמָֽיִם heavens
+          Fragment [Clause double embedded]
+            Nominal
+              noun: יְהוָה YHWH
+              RelativeClause
+                RelativeParticle
+                  particle: אֲשֶׁר who
+                Clause
+                  Subject
+                    Clause
+                      Predicate
+                        verb-infinitive: תְּנָה bestowing
+                        Object
+                          ConstructChain
+                            noun: הוֹדְ glory
+                            suffix-pronoun: ךָ you
+                  Predicate
+                    Complement
+                      Adverbial
+                        PrepositionalPhrase
+                          Preposition
+                            preposition: עַל on
+                          Object
+                            Nominal
+                              article: הַ the
+                              noun: שָּׁמָֽיִם heavens
+          Fragment [Clause embedded in prepositional phrase]
+            Clause
+              Predicate
+                Adverbial
+                  PrepositionalPhrase
+                    Preposition
+                      preposition: כְּ as
+                    Object
+                      Clause
+                        Predicate
+                          verb: הִנְדֹּף driven away
+                        Subject
+                          noun: עָשָׁן smoke
+                verb: תִּנְדֹּף drive ~ away
+          Fragment [vocative with clause]
+            Clause
+              Vocative
+                noun: אל God
+              Predicate
+                verb: עֲזַבְתָּ forsaken
+                Object
+                  suffix-pronoun: נִי me
+          Fragment [vocative in apposition to subject ]
+            Clause
+              Subject
+                Vocative
+                  noun: אל God
+              Predicate
+                verb: עֲזַבְתָּ forsaken
+                Object
+                  suffix-pronoun: נִי me
+          Fragment [clause with subordinate clause]
+            Clause
+              Predicate
+                verb: יַצִּילֵ rescue
+                Object
+                  suffix-pronoun: הוּ him
+              SubordinateClause
+                Conjunction
+                  conjunction: כִּי since
+                Clause
+                  Predicate
+                    verb: חָפֵֽץ delights
+                    Adverbial
+                      PrepositionalPhrase
+                        Preposition
+                          preposition: בּֽ in
+                        Object
+                          Nominal
+                            suffix-pronoun: וֹ him
+          Fragment [clause cluster with conjunctions]
+            ClauseCluster
+              Clause
+                Predicate
+                  Adverbial
+                    particle: לֹ֥א not
+                  verb: הָלַךְ֮ walk
+              Conjunction
+                conjunction: וּ or
+              Clause
+                Predicate
+                  Adverbial
+                    particle: לֹ֥א nor
+                  verb: עָמָ֑ד stand
+              Conjunction
+                conjunction: וּ or
+              Clause
+                Predicate
+                  Adverbial
+                    particle: לֹ֣א nor
+                  verb: יָשָֽׁב sit
+          Fragment [clause cluster with opening conjunction]
+            ClauseCluster
+              Conjunction
+                conjunction: וּ or
+              Clause
+                Predicate
+                  Adverbial
+                    particle: לֹ֥א nor
+                  verb: עָמָ֑ד stand
+              Conjunction
+                conjunction: וּ or
+              Clause
+                Predicate
+                  Adverbial
+                    particle: לֹ֣א nor
+                  verb: יָשָֽׁב sit
+          Fragment [simple complement clause]
+            Clause
+              Predicate
+                verb: רְאוּ see
+                Object
+                  ComplementClause
+                    Conjunction
+                      conjunction: כִּי that
+                    Clause
+                      Predicate
+                        Complement
+                          adjective: ט֣וֹב good
+                      Subject
+                        noun: יְהוָ֑ה LORD
+          Fragment [single gloss]
+            noun: אִ֗ישׁ man
+          Fragment [metaphorical transfer]
+            noun: אִ֗ישׁ man >> person
+          Fragment [metaphorical transfer with literal gloss preserved]
+            noun: אִ֗ישׁ man >> person
+          Fragment [Keeping 'sing praise' short]
+            Clause
+              Predicate
+                verb: זַמְּרוּ sing praise
+                Object
+                  ConstructChain
+                    noun: אֲדֹנָ Lord
+                    suffix-pronoun: י me
+                Adverbial
+                  PrepositionalPhrase
+                    Preposition
+                      preposition: לָ to
+                    Object
+                      article: (ה) the
+                      Nominal
+                        verb-participle: רֹכֵב rider
+                        Adjectival
+                          PrepositionalPhrase
+                            Preposition
+                              preposition: בִּ on
+                            Object
+                              ConstructChain
+                                noun: שְׁמֵי heavens
+                                noun: שְׁמֵי heavens
+                                noun: קֶדֶם ancient times
+          Fragment [simple relative clause]
+            Nominal
+              noun: אִ֗ישׁ man
+              RelativeClause
+                RelativeParticle
+                  particle: אֲשֶׁ֤ר who
+                Clause
+                  Subject
+                    Relative
+                  Predicate
+                    verb: הָלַךְ֮ walk
+          Fragment [definite relative clause]
+            Nominal
+              noun: אִ֗ישׁ man
+              article: הָ the
+              RelativeClause
+                RelativeParticle
+                  particle: אֲשֶׁ֤ר who
+                Clause
+                  Subject
+                    Relative
+                  Predicate
+                    verb: הָלַךְ֮ walk
+          Fragment [relative clause with clause cluster]
+            Nominal
+              noun: אִ֗ישׁ man
+              RelativeClause
+                RelativeParticle
+                  particle: אֲשֶׁ֤ר who
+                ClauseCluster
+                  Clause
+                    Predicate
+                      Adverbial
+                        particle: לֹ֥א not
+                      verb: הָלַךְ֮ walk
+                  Conjunction
+                    conjunction: וּ or
+                  Clause
+                    Predicate
+                      Adverbial
+                        particle: לֹ֥א nor
+                      verb: עָמָ֑ד stand
+                  Conjunction
+                    conjunction: וּ or
+                  Clause
+                    Predicate
+                      Adverbial
+                        particle: לֹ֣א nor
+                      verb: יָשָֽׁב sit
+          Fragment [relative clause connecting to subject]
+            ConstructChain
+              noun: אַֽשְׁרֵ֥י happiness
+              Nominal
+                noun: גֶּ֗בֶר man
+                RelativeClause
+                  RelativeParticle
+                    particle: אֲשֶׁ֤ר who
+                  Clause
+                    Subject located = "relative clause head"
+                    Predicate
+                      verb: יֶחֱסֶה takes refuge
+                      Adverbial
+                        PrepositionalPhrase
+                          Preposition
+                            preposition: בּֽ in
+                          Object
+                            Nominal
+                              suffix-pronoun: וֹ him
+                article: הַ֝ the
+          Fragment [relative clause connecting to object]
+            PrepositionalPhrase
+              Preposition
+                preposition: כַּ֝ like
+              Object
+                article:  the
+                noun: מֹּ֗ץ chaff
+                RelativeClause
+                  RelativeParticle
+                    particle: אֲֽשֶׁר that
+                  Clause
+                    Predicate
+                      verb: תִּדְּפֶ֥ drives away
+                      Object located = "relative clause head"
+                        suffix-pronoun: נּוּ it
+                    Subject
+                      noun: רֽוּחַ wind
+          Fragment [relative clause connecting to second object]
+            ConstructChain
+              Nominal
+                noun: עֵדֹתִ֥ decrees
+                RelativeClause
+                  RelativeParticle
+                    pronoun: ז֗וֹ that
+                  Clause
+                    Predicate
+                      verb: אֲלַ֫מְּדֵ֥ teach
+                      Object
+                        suffix-pronoun: ם them
+                      SecondObject located = "relative clause head"
+              suffix-pronoun: י me
+          Fragment [infinitival suffix-pronoun connecting to subject]
+            PrepositionalPhrase
+              Preposition
+                preposition: לְ for
+              Object
+                Clause
+                  Predicate
+                    ConstructChain
+                      verb-infinitive: שִׁבְתּ dwelling
+                      suffix-pronoun: וֹ him
+                  Subject located = "after infinitive construct"
+          Fragment [Psalm 1:1]
+            ConstructChain
+              noun: אַ֥שְֽׁרֵי blessed
+              Nominal
+                noun: אִ֗ישׁ man
+                article: הָ the
+                RelativeClause
+                  RelativeParticle
+                    particle: אֲשֶׁ֤ר who
+                  ClauseCluster
+                    Clause
+                      Predicate
+                        Adverbial
+                          particle: לֹ֥א not
+                        verb: הָלַךְ֮ walk
+                        Adverbial
+                          PrepositionalPhrase
+                            Preposition
+                              preposition: בַּ in
+                            Object
+                              ConstructChain
+                                noun: עֲצַ֪ת advice
+                                Nominal
+                                  adjective: רְשָׁ֫עִ֥ים wicked
+                    Conjunction
+                      conjunction: וּ or
+                    Clause
+                      Predicate
+                        Adverbial
+                          particle: לֹ֥א nor
+                        verb: עָמָ֑ד stand
+                        Adverbial
+                          PrepositionalPhrase
+                            Preposition
+                              preposition: בְ in
+                            Object
+                              ConstructChain
+                                noun: דֶ֣רֶךְ way
+                                Nominal
+                                  adjective: חַ֭טָּאִים sinners
+                    Conjunction
+                      conjunction: וּ or
+                    Clause
+                      Predicate
+                        Adverbial
+                          particle: לֹ֣א nor
+                        verb: יָשָֽׁב sit
+                        Adverbial
+                          PrepositionalPhrase
+                            Preposition
+                              preposition: בְ in
+                            Object
+                              ConstructChain
+                                noun: מוֹשַׁ֥ב seat
+                                noun: לֵ֝צִ֗ים mockers
 
     </pre>
 
