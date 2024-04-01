@@ -8,7 +8,7 @@ export function drawAdverbialDecorator(): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const width = settings.height / 2;
-  const height = settings.height;
+  const height = (3 / 2) * settings.height;
 
   const lineData: [number, number][] = [
     [0, 0],

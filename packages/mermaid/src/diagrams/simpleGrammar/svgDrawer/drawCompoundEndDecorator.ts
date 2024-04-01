@@ -4,7 +4,7 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit, GraphicalNode } from '../simpleGrammarTypes.js';
 
-export const drawObjectPredicateCompoundDecorator = (node: GraphicalNode): DrawUnit => {
+export const drawCompoundEndDecorator = (node: GraphicalNode): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
   const width = node.drawUnit.width;

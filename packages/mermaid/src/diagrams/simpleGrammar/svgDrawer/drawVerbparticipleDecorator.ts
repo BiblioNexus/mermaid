@@ -34,7 +34,7 @@ export function drawVerbparticipleDecorator(): DrawUnit {
     verticalCenter: height,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter: height,
-    horizontalEnd: height,
+    horizontalCenter: width,
+    horizontalEnd: width,
   };
 }
