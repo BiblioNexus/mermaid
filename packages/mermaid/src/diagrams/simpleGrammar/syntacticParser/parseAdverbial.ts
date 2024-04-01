@@ -35,15 +35,8 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
     constructchainKey,
   ];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Adverbial'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Adverbial parser requires Adverbial Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Adverbial') {
+    throw new GrammarError('InvalidParser', 'Adverbial parser requires Adverbial Node');
   }
 
   if (node.children.length === 0) {
@@ -91,25 +84,17 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
     }
   }
 
-  if (keysLen === 2) {
-    if (childMap[adverbKey] && childMap[adverbialKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            drawModifier(childMap[adverbKey]),
-            (childMap[adverbialKey] as GraphicalNode).drawUnit,
-          ],
-          {
-            align: 'center',
-          },
-        ),
-      };
-    }
+  if (childMap[adverbKey] && childMap[adverbialKey]) {
+    return {
+      ...node,
+      drawUnit: verticalMerge(
+        [drawModifier(childMap[adverbKey]), (childMap[adverbialKey] as GraphicalNode).drawUnit],
+        {
+          align: 'center',
+        }
+      ),
+    };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'Adverbial has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'Adverbial has unexpected structure');
 }

@@ -35,15 +35,8 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
     adjectivalKey,
   ];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Complement'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Complement parser requires Complement Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Complement') {
+    throw new GrammarError('InvalidParser', 'Complement parser requires Complement Node');
   }
 
   if (node.children.length === 0) {
@@ -67,11 +60,8 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
       return {
         ...node,
         drawUnit: horizontalMerge(
-          [
-            (node.children[0] as GraphicalNode).drawUnit,
-            drawComplementDecorator(),
-          ],
-          { align: 'end' },
+          [(node.children[0] as GraphicalNode).drawUnit, drawComplementDecorator()],
+          { align: 'end' }
         ),
       };
     }
@@ -83,43 +73,33 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: horizontalMerge(
           [
-            verticalMerge(
-              [drawUnit, (node.children[0] as GraphicalNode).drawUnit],
-              {
-                align: 'center',
-                verticalCenter: drawUnit.height,
-              },
-            ),
+            verticalMerge([drawUnit, (node.children[0] as GraphicalNode).drawUnit], {
+              align: 'center',
+              verticalCenter: drawUnit.height,
+            }),
             drawComplementDecorator(),
           ],
-          { align: ['center', 'end'] },
+          { align: ['center', 'end'] }
         ),
       };
     }
   }
 
   if (childMap[adjectiveKey] && childMap[adverbialKey]) {
-    const adjectiveDrawUnit = (childMap[adjectiveKey] as GraphicalNode)
-      .drawUnit;
+    const adjectiveDrawUnit = (childMap[adjectiveKey] as GraphicalNode).drawUnit;
     return {
       ...node,
       drawUnit: horizontalMerge(
         [
-          verticalMerge(
-            [
-              adjectiveDrawUnit,
-              (childMap[adverbialKey] as GraphicalNode).drawUnit,
-            ],
-            {
-              align: 'end',
-              verticalCenter: adjectiveDrawUnit.height,
-            },
-          ),
+          verticalMerge([adjectiveDrawUnit, (childMap[adverbialKey] as GraphicalNode).drawUnit], {
+            align: 'end',
+            verticalCenter: adjectiveDrawUnit.height,
+          }),
           drawComplementDecorator(),
         ],
         {
           align: 'center',
-        },
+        }
       ),
     };
   }
@@ -134,9 +114,8 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         ],
         {
           align: 'end',
-          verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
-            .drawUnit.height,
-        },
+          verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
+        }
       ),
     };
   }
@@ -151,17 +130,11 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         ],
         {
           align: 'end',
-          verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
-            .drawUnit.height,
-        },
+          verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
+        }
       ),
     };
   }
 
-  console.log(node);
-
-  throw new GrammarError(
-    'InvalidStructure',
-    'Complement has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'Complement has unexpected structure');
 }

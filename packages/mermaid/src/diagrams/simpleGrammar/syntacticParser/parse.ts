@@ -7,6 +7,8 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 import { drawWord } from '../svgDrawer/drawWord.js';
 import { drawVerbInifinitiveDecorator } from '../svgDrawer/drawVerbInifinitiveDecorator.js';
 import { drawContainer } from '../svgDrawer/drawContainer.js';
+import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
+import { drawModifier } from '../svgDrawer/drawModifier.js';
 
 import { horizontalMerge } from '../svgDrawer/utils.js';
 
@@ -84,8 +86,6 @@ import { parsePredicateGroup } from './parsePredicateGroup.js';
 import { parseConjunction } from './parseConjunction.js';
 import { parseClauseCluster } from './parseClauseCluster.js';
 import { parseApposition } from './parseApposition.js';
-import { drawVerbparticipleDecorator } from '~/svgDrawer/drawVerbparticipleDecorator.js';
-import { drawModifier } from '~/svgDrawer/drawModifier.js';
 import { parseCasusPendens } from './parseCasusPendens.js';
 
 const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
@@ -136,7 +136,7 @@ export function parse(node: GrammarNode): GraphicalNode {
         node,
         'Simple Grammar',
         settings.titleColor,
-        settings.wordStrokeColor,
+        settings.wordStrokeColor
       ),
     };
   }
@@ -147,12 +147,7 @@ export function parse(node: GrammarNode): GraphicalNode {
     if (parserMap[key]) {
       return parserMap[key](node);
     } else {
-      console.log(key);
-      console.log(node);
-      throw new GrammarError(
-        'InvalidStructure',
-        'Invalid structure, not defined parser',
-      );
+      throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
     }
   }
 
@@ -198,8 +193,5 @@ export function parse(node: GrammarNode): GraphicalNode {
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'Invalid structure, not defined parser',
-  );
+  throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
 }

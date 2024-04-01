@@ -38,11 +38,7 @@ export type CompoundType =
 
 export type GroupType = 'AdverbialGroup' | 'PredicateGroup';
 
-function isCompound(
-  compoundType: CompoundType,
-  leftKey: string | null,
-  rightKey: string | null,
-) {
+function isCompound(compoundType: CompoundType, leftKey: string | null, rightKey: string | null) {
   const requiredKeys: Record<CompoundType, (string | null)[]> = {
     AdjectiveCompound: [adjectiveKey, adjectiveCompoundKey],
     AdverbCompound: [adverbKey, adverbCompoundKey],
@@ -62,17 +58,12 @@ function isCompound(
     ClauseCompound: [null],
   };
 
-  const validKeys = [
-    ...requiredKeys[compoundType],
-    ...additionalKeys[compoundType],
-  ];
+  const validKeys = [...requiredKeys[compoundType], ...additionalKeys[compoundType]];
 
   const hasRequiredKeys =
-    requiredKeys[compoundType].includes(leftKey) ||
-    requiredKeys[compoundType].includes(rightKey);
+    requiredKeys[compoundType].includes(leftKey) || requiredKeys[compoundType].includes(rightKey);
 
-  const hasValidKey =
-    validKeys.includes(leftKey) && validKeys.includes(rightKey);
+  const hasValidKey = validKeys.includes(leftKey) && validKeys.includes(rightKey);
 
   if (compoundType === 'AdverbialCompound') {
     return (
@@ -87,7 +78,7 @@ function isCompound(
 export function generateNewCompoundFragment(
   conjunction: GrammarNode,
   leftNode: GrammarNode | null,
-  rightNode: GrammarNode | null,
+  rightNode: GrammarNode | null
 ): GrammarNode {
   const leftKey = leftNode ? getKeyFromNode(leftNode) : null;
   const rightKey = rightNode ? getKeyFromNode(rightNode) : null;
@@ -96,9 +87,7 @@ export function generateNewCompoundFragment(
     return conjunction;
   }
 
-  const children = [conjunction, leftNode, rightNode].filter(
-    (node) => !!node,
-  ) as GrammarNode[];
+  const children = [conjunction, leftNode, rightNode].filter((node) => !!node) as GrammarNode[];
 
   const compoundTypes: CompoundType[] = [
     'AdjectiveCompound',
@@ -135,11 +124,7 @@ export function shakingTreeForConjunction(node: GrammarNode): GrammarNode {
     return node;
   }
 
-  const skipKeys = [
-    conjunctionFragmentKey,
-    subordinateClauseKey,
-    complementClauseKey,
-  ];
+  const skipKeys = [conjunctionFragmentKey, subordinateClauseKey, complementClauseKey];
 
   if (skipKeys.includes(getKeyFromNode(node))) {
     return node;
@@ -172,25 +157,21 @@ export function shakingTreeForConjunction(node: GrammarNode): GrammarNode {
             }
           : conjunctions[0];
 
-      const leftNode =
-        newChildren.length > 0 ? newChildren[newChildren.length - 1] : null;
+      const leftNode = newChildren.length > 0 ? newChildren[newChildren.length - 1] : null;
       const rightNode = i < node.children.length ? node.children[i] : null;
 
       if (newChildren.length > 0) {
         newChildren[newChildren.length - 1] = generateNewCompoundFragment(
           conjunction,
           leftNode,
-          rightNode,
+          rightNode
         );
       } else {
-        newChildren.push(
-          generateNewCompoundFragment(conjunction, leftNode, rightNode),
-        );
+        newChildren.push(generateNewCompoundFragment(conjunction, leftNode, rightNode));
       }
     } else if (conjunctions.length === 0) {
       newChildren.push(node.children[i]);
     } else {
-      console.log(node);
       throw new GrammarError('InvalidStructure', `Node has invalid children`);
     }
   }
@@ -232,18 +213,15 @@ export function shakingTreeForDuplication(node: GrammarNode): GrammarNode {
     ClauseCluster: [clauseKey, clauseCompoundKey],
   };
 
-  const duplicatibleKeys = Object.values(keyMap).reduce(
-    (acc, item) => [...acc, ...item],
-    [],
-  );
+  const duplicatibleKeys = Object.values(keyMap).reduce((acc, item) => [...acc, ...item], []);
 
   const newChildren: GrammarNode[] = node.children.filter(
-    (child) => !duplicatibleKeys.includes(getKeyFromNode(child)),
+    (child) => !duplicatibleKeys.includes(getKeyFromNode(child))
   );
 
   Object.keys(keyMap).forEach((groupType) => {
     const children = node.children.filter((child) =>
-      keyMap[groupType as keyof typeof keyMap].includes(getKeyFromNode(child)),
+      keyMap[groupType as keyof typeof keyMap].includes(getKeyFromNode(child))
     );
 
     if (children.length > 1) {
@@ -288,7 +266,5 @@ export function shakingTreeForEmptyFragment(node: GrammarNode): GrammarNode {
 }
 
 export function shakingTree(node: GrammarNode): GrammarNode {
-  return shakingTreeForDuplication(
-    shakingTreeForConjunction(shakingTreeForEmptyFragment(node)),
-  );
+  return shakingTreeForDuplication(shakingTreeForConjunction(shakingTreeForEmptyFragment(node)));
 }

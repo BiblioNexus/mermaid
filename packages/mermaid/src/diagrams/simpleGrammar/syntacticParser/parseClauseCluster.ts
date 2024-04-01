@@ -3,19 +3,12 @@ import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { clauseKey, getKeyFromNode } from './keys.js';
-import { horizontalMerge, verticalMerge } from '~/svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmptyClauseConjunction } from '../svgDrawer/drawEmptyClauseConjunction.js';
 
 export function parseClauseCluster(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'ClauseCluster'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'ClauseCluster parser requires ClauseCluster Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'ClauseCluster') {
+    throw new GrammarError('InvalidParser', 'ClauseCluster parser requires ClauseCluster Node');
   }
 
   if (node.children.length === 0) {
@@ -30,7 +23,7 @@ export function parseClauseCluster(node: GrammarNode): GraphicalNode {
   }
 
   const clauseNodes = node.children.filter(
-    (child): child is GraphicalNode => getKeyFromNode(child) === clauseKey,
+    (child): child is GraphicalNode => getKeyFromNode(child) === clauseKey
   );
 
   let firstNodeDrawUnit = clauseNodes[0].drawUnit;
@@ -38,7 +31,7 @@ export function parseClauseCluster(node: GrammarNode): GraphicalNode {
   for (let i = 1; i < clauseNodes.length; i++) {
     const clauseNode = clauseNodes[i];
 
-    let secondNodeDrawUnit = clauseNode.drawUnit;
+    const secondNodeDrawUnit = clauseNode.drawUnit;
 
     const height =
       firstNodeDrawUnit.height -
@@ -58,7 +51,7 @@ export function parseClauseCluster(node: GrammarNode): GraphicalNode {
       {
         align: 'start',
         verticalCenter: firstNodeDrawUnit.verticalCenter + height,
-      },
+      }
     );
   }
 

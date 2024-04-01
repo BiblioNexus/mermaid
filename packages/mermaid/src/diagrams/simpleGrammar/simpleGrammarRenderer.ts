@@ -18,26 +18,26 @@ import { settings } from './settings.js';
  * @param diagObj - A standard diagram containing the DB and the text and type etc of the diagram.
  */
 export const draw: DrawDefinition = (text, id, _version, diagObj) => {
-  // const db = diagObj.db as SimpleGrammarDB;
-  // const rootNode = db.getSimpleGrammar();
-  // function dfs(node: GrammarNode) {
-  //   delete node.parent;
-  //   node.children.forEach((child) => dfs(child));
-  // }
-  // dfs(rootNode);
-  // const graphicalNode = parse(shakingTree(JSON.parse(JSON.stringify(rootNode))));
-  // const svg: SVG = selectSvgElement(id);
-  // const nodesElem = svg.append('g');
-  // if (graphicalNode.drawUnit.element) {
-  //   nodesElem.append(() => graphicalNode.drawUnit.element.node());
-  // }
-  // svg.attr('transform', `translate(${settings.padding}, ${0})`);
-  // configureSvgSize(
-  //   svg,
-  //   graphicalNode.drawUnit.height,
-  //   graphicalNode.drawUnit.width + 2 * settings.padding,
-  //   false
-  // );
+  const db = diagObj.db as SimpleGrammarDB;
+  const rootNode = db.getSimpleGrammar();
+  function dfs(node: GrammarNode) {
+    delete node.parent;
+    node.children.forEach((child) => dfs(child));
+  }
+  dfs(rootNode);
+  const graphicalNode = parse(shakingTree(JSON.parse(JSON.stringify(rootNode))));
+  const svg: SVG = selectSvgElement(id);
+  const nodesElem = svg.append('g');
+  if (graphicalNode.drawUnit.element) {
+    nodesElem.append(() => graphicalNode.drawUnit.element.node());
+  }
+  svg.attr('transform', `translate(${settings.padding}, ${0})`);
+  configureSvgSize(
+    svg,
+    graphicalNode.drawUnit.height,
+    graphicalNode.drawUnit.width + 2 * settings.padding,
+    false
+  );
 };
 
 export const renderer = { draw };

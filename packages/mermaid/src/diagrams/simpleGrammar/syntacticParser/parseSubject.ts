@@ -45,15 +45,8 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     casusPendensKey,
   ];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Subject'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Subject parser requires Subject Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Subject') {
+    throw new GrammarError('InvalidParser', 'Subject parser requires Subject Node');
   }
 
   if (node.children.length === 0) {
@@ -98,7 +91,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           ],
           {
             align: 'center',
-          },
+          }
         ),
       };
     }
@@ -127,13 +120,10 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
       return {
         ...node,
         drawUnit: horizontalMerge(
-          [
-            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-            drawVerbparticipleDecorator(),
-          ],
+          [(childMap[verbparticipleKey] as GraphicalNode).drawUnit, drawVerbparticipleDecorator()],
           {
             align: ['end', 'center'],
-          },
+          }
         ),
       };
     }
@@ -147,32 +137,24 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
             drawEqualDecorator(),
             (childMap[vocativeKey] as GraphicalNode).drawUnit,
           ],
-          { align: 'center' },
+          { align: 'center' }
         ),
       };
     }
   }
 
-  if (keysLen === 2) {
-    if (childMap[articleKey] && childMap[nounKey]) {
-      const drawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
+  if (childMap[articleKey] && childMap[nounKey]) {
+    const drawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
 
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [drawUnit, drawModifier(childMap[articleKey])],
-          {
-            align: 'center',
-            verticalCenter: drawUnit.height,
-            verticalEnd: drawUnit.height,
-          },
-        ),
-      };
-    }
+    return {
+      ...node,
+      drawUnit: verticalMerge([drawUnit, drawModifier(childMap[articleKey])], {
+        align: 'center',
+        verticalCenter: drawUnit.height,
+        verticalEnd: drawUnit.height,
+      }),
+    };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'Subject has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'Subject has unexpected structure');
 }

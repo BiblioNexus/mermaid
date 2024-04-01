@@ -7,20 +7,13 @@ import { nounKey, pronounKey } from './keys.js';
 import { getChildMap } from './utils.js';
 
 import { horizontalMerge } from '../svgDrawer/utils.js';
-import { drawEmpty } from '~/svgDrawer/drawEmpty.js';
+import { drawEmpty } from '../svgDrawer/drawEmpty.js';
 
 export function parseCasusPendens(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [nounKey, pronounKey];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'CasusPendens'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'CasusPendens parser requires CasusPendens Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'CasusPendens') {
+    throw new GrammarError('InvalidParser', 'CasusPendens parser requires CasusPendens Node');
   }
 
   if (node.children.length === 0) {
@@ -42,15 +35,11 @@ export function parseCasusPendens(node: GrammarNode): GraphicalNode {
         ],
         {
           align: 'center',
-          horizontalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
-            .verticalCenter,
-        },
+          horizontalCenter: (childMap[nounKey] as GraphicalNode).drawUnit.verticalCenter,
+        }
       ),
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'CasusPendas has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'CasusPendas has unexpected structure');
 }
