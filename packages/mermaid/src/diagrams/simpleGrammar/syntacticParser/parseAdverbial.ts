@@ -4,7 +4,11 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
   adverbCompoundKey,
+  adverbKey,
   adverbialCompoundKey,
+  adverbialKey,
+  constructchainKey,
+  nominalKey,
   nounKey,
   particleKey,
   prepositionalPhraseKey,
@@ -13,18 +17,22 @@ import {
 
 import { getChildMap } from './utils.js';
 
-import { horizontalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawAdverbialDecorator } from '../svgDrawer/drawAdverbialDecorator.js';
 import { drawModifier } from '../svgDrawer/drawModifier.js';
 
 export function parseAdverbial(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
+    nominalKey,
     nounKey,
     verbKey,
     particleKey,
     prepositionalPhraseKey,
+    adverbKey,
+    adverbialKey,
     adverbCompoundKey,
     adverbialCompoundKey,
+    constructchainKey,
   ];
 
   if (
@@ -47,56 +55,55 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
   const keysLen = Object.keys(childMap).length;
 
   if (keysLen === 1) {
-    if (childMap[nounKey]) {
-      const noun = childMap[nounKey] as GraphicalNode;
+    if (
+      childMap[nounKey] ||
+      childMap[verbKey] ||
+      childMap[nominalKey] ||
+      childMap[constructchainKey]
+    ) {
+      const child = node.children[0] as GraphicalNode;
 
       return {
         ...node,
-        drawUnit: horizontalMerge([noun.drawUnit, drawAdverbialDecorator()], {
+        drawUnit: horizontalMerge([child.drawUnit, drawAdverbialDecorator()], {
           align: 'end',
-          horizontalCenter: noun.drawUnit.width,
+          horizontalCenter: child.drawUnit.width,
         }),
       };
     }
 
-    if (childMap[verbKey]) {
+    if (childMap[particleKey] || childMap[adverbKey]) {
       return {
         ...node,
-        drawUnit: horizontalMerge(
+        drawUnit: drawModifier(node.children[0]),
+      };
+    }
+
+    if (
+      childMap[prepositionalPhraseKey] ||
+      childMap[adverbCompoundKey] ||
+      childMap[adverbialCompoundKey]
+    ) {
+      return {
+        ...node,
+        drawUnit: (node.children[0] as GraphicalNode).drawUnit,
+      };
+    }
+  }
+
+  if (keysLen === 2) {
+    if (childMap[adverbKey] && childMap[adverbialKey]) {
+      return {
+        ...node,
+        drawUnit: verticalMerge(
           [
-            (childMap[verbKey] as GraphicalNode).drawUnit,
-            drawAdverbialDecorator(),
+            drawModifier(childMap[adverbKey]),
+            (childMap[adverbialKey] as GraphicalNode).drawUnit,
           ],
-          { align: 'end' },
+          {
+            align: 'center',
+          },
         ),
-      };
-    }
-
-    if (childMap[particleKey]) {
-      return {
-        ...node,
-        drawUnit: drawModifier(childMap[particleKey]),
-      };
-    }
-
-    if (childMap[prepositionalPhraseKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[prepositionalPhraseKey] as GraphicalNode).drawUnit,
-      };
-    }
-
-    if (childMap[adverbCompoundKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[adverbCompoundKey] as GraphicalNode).drawUnit,
-      };
-    }
-
-    if (childMap[adverbialCompoundKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[adverbialCompoundKey] as GraphicalNode).drawUnit,
       };
     }
   }

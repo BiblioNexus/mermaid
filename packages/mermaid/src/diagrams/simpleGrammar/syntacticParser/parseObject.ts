@@ -3,13 +3,20 @@ import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
+  adjectivalKey,
+  adjectiveKey,
+  appositionKey,
   articleKey,
   clauseKey,
   complementClauseKey,
+  constructChainCompoundKey,
   constructchainKey,
+  nominalCompoundKey,
   nominalKey,
   nounKey,
   particleKey,
+  pronounKey,
+  quantifierKey,
   relativeClauseKey,
   suffixPronounKey,
 } from './keys.js';
@@ -25,13 +32,20 @@ export function parseObject(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
     constructchainKey,
     nounKey,
+    adjectiveKey,
+    adjectivalKey,
     complementClauseKey,
     particleKey,
     articleKey,
     nominalKey,
     clauseKey,
+    quantifierKey,
     suffixPronounKey,
     relativeClauseKey,
+    appositionKey,
+    nominalCompoundKey,
+    constructChainCompoundKey,
+    pronounKey,
   ];
 
   if (
@@ -58,9 +72,13 @@ export function parseObject(node: GrammarNode): GraphicalNode {
     if (
       childMap[constructchainKey] ||
       childMap[nounKey] ||
+      childMap[pronounKey] ||
       childMap[complementClauseKey] ||
       childMap[nominalKey] ||
-      childMap[suffixPronounKey]
+      childMap[suffixPronounKey] ||
+      childMap[appositionKey] ||
+      childMap[nominalCompoundKey] ||
+      childMap[constructChainCompoundKey]
     ) {
       return {
         ...node,
@@ -97,10 +115,106 @@ export function parseObject(node: GrammarNode): GraphicalNode {
       };
     }
 
+    if (childMap[particleKey] && childMap[nominalKey]) {
+      return {
+        ...node,
+        drawUnit: horizontalMerge(
+          [
+            (childMap[nominalKey] as GraphicalNode).drawUnit,
+            (childMap[particleKey] as GraphicalNode).drawUnit,
+          ],
+          { align: 'end' },
+        ),
+      };
+    }
+
+    if (childMap[adjectiveKey] && childMap[nounKey]) {
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [
+            (childMap[nounKey] as GraphicalNode).drawUnit,
+            drawModifier(childMap[adjectiveKey]),
+          ],
+          {
+            align: 'center',
+            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
+              .height,
+          },
+        ),
+      };
+    }
+
+    if (childMap[adjectivalKey] && childMap[nounKey]) {
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [
+            (childMap[nounKey] as GraphicalNode).drawUnit,
+            (childMap[adjectivalKey] as GraphicalNode).drawUnit,
+          ],
+          {
+            align: 'center',
+            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
+              .height,
+          },
+        ),
+      };
+    }
+
     if (childMap[articleKey] && childMap[nominalKey]) {
       return {
         ...node,
         drawUnit: (childMap[nominalKey] as GraphicalNode).drawUnit,
+      };
+    }
+
+    if (childMap[articleKey] && childMap[nounKey]) {
+      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
+
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [nounDrawUnit, drawModifier(childMap[articleKey])],
+          {
+            align: 'center',
+            verticalCenter: nounDrawUnit.height,
+            verticalEnd: nounDrawUnit.height,
+          },
+        ),
+      };
+    }
+
+    if (childMap[quantifierKey] && childMap[nounKey]) {
+      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
+
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [nounDrawUnit, drawModifier(childMap[quantifierKey])],
+          {
+            align: 'center',
+            verticalCenter: nounDrawUnit.height,
+            verticalEnd: nounDrawUnit.height,
+          },
+        ),
+      };
+    }
+
+    if (childMap[quantifierKey] && childMap[constructchainKey]) {
+      const nounDrawUnit = (childMap[constructchainKey] as GraphicalNode)
+        .drawUnit;
+
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [nounDrawUnit, drawModifier(childMap[quantifierKey])],
+          {
+            align: 'center',
+            verticalCenter: nounDrawUnit.height,
+            verticalEnd: nounDrawUnit.height,
+          },
+        ),
       };
     }
   }
@@ -147,8 +261,5 @@ export function parseObject(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'Nominal has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'Object has unexpected structure');
 }

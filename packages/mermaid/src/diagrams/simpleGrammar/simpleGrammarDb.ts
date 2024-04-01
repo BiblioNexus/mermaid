@@ -25,16 +25,18 @@ const clear = () => {
 
 clear();
 
-const getParent = (level: number) => {
+const getParent = (level: number): GrammarNode | undefined => {
   let current: GrammarNode | undefined = lastAdded;
 
   while (current && current.level >= level) {
     current = current.parent;
   }
 
-  if (current) {
-    return current;
+  if (current && current.content && isWord(current.content)) {
+    current = getParent(current.level);
   }
+
+  return current;
 };
 
 const getHebrewText = (str: string) => {
@@ -84,16 +86,14 @@ export function isFragment(fragment: Word | Fragment): fragment is Fragment {
 }
 
 const addWord = (level: number, pos: string, str: string, description: string) => {
+  // console.log({ level, pos, str, description });
+
   words[pos] = pos;
 
   const parent = getParent(level);
 
   if (!parent) {
     throw Error('Invalid Word Adding');
-  }
-
-  if (parent.content && isWord(parent.content)) {
-    throw Error('Word should be a leaf in diagram');
   }
 
   const { word, gloss } = parseStr(str);
@@ -116,14 +116,12 @@ const addWord = (level: number, pos: string, str: string, description: string) =
 const addFragment = (level: number, fragment: string, description: string) => {
   fragments[fragment] = fragment;
 
+  // console.log({ level, fragment, description });
+
   const parent = getParent(level);
 
   if (!parent) {
     throw Error('Invalid Fragment Adding');
-  }
-
-  if (parent.content && isWord(parent.content)) {
-    throw Error('Word should be a leaf in diagram');
   }
 
   parent.children.push({
@@ -141,6 +139,18 @@ const addFragment = (level: number, fragment: string, description: string) => {
 
 const getSimpleGrammar = () => {
   return rootNode;
+};
+
+(window as any).simpleGrammar = () => {
+  function dfs(node: GrammarNode) {
+    delete node.parent;
+
+    node.children.forEach((child) => dfs(child));
+  }
+
+  dfs(rootNode);
+
+  // console.log(rootNode);
 };
 
 export const db: SimpleGrammarDB = {

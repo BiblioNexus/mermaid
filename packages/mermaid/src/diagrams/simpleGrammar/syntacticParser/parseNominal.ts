@@ -19,6 +19,8 @@ import {
   suffixPronounKey,
   constructChainCompoundKey,
   nominalCompoundKey,
+  appositionKey,
+  adverbialKey,
 } from './keys.js';
 
 import { getChildMap } from './utils.js';
@@ -28,7 +30,6 @@ import { parse } from './parse.js';
 import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
 import { drawModifier } from '../svgDrawer/drawModifier.js';
-import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
 
 export function parseNominal(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
@@ -40,10 +41,12 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
     nominalKey,
     constructchainKey,
     adjectivalKey,
+    adverbialKey,
     relativeClauseKey,
     suffixPronounKey,
     constructChainCompoundKey,
     nominalCompoundKey,
+    appositionKey,
   ];
 
   if (
@@ -99,17 +102,18 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
   }
 
   if (keysLen === 1) {
-    if (childMap[nounKey]) {
+    if (
+      childMap[nounKey] ||
+      childMap[suffixPronounKey] ||
+      childMap[constructChainCompoundKey] ||
+      childMap[nominalCompoundKey] ||
+      childMap[constructchainKey] ||
+      childMap[verbparticipleKey] ||
+      childMap[appositionKey]
+    ) {
       return {
         ...node,
-        drawUnit: (childMap[nounKey] as GraphicalNode).drawUnit,
-      };
-    }
-
-    if (childMap[suffixPronounKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[suffixPronounKey] as GraphicalNode).drawUnit,
+        drawUnit: (node.children[0] as GraphicalNode).drawUnit,
       };
     }
 
@@ -130,42 +134,16 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       return {
         ...node,
         drawUnit: verticalMerge(
-          [drawEmptyWord(), drawModifier(childMap[adjectivalKey])],
+          [
+            drawEmptyWord(),
+            (childMap[adjectivalKey] as GraphicalNode).drawUnit,
+          ],
           {
             align: 'center',
             verticalCenter: drawEmptyWord().height,
+            verticalEnd: drawEmptyWord().height,
           },
         ),
-      };
-    }
-
-    if (childMap[constructChainCompoundKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[constructChainCompoundKey] as GraphicalNode)
-          .drawUnit,
-      };
-    }
-
-    if (childMap[verbparticipleKey]) {
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-            drawVerbparticipleDecorator(),
-          ],
-          {
-            align: 'end',
-          },
-        ),
-      };
-    }
-
-    if (childMap[nominalCompoundKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[nominalCompoundKey] as GraphicalNode).drawUnit,
       };
     }
   }
@@ -257,18 +235,12 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       if (childMap[adjectiveKey]) {
         return {
           ...node,
-          drawUnit: horizontalMerge(
+          drawUnit: verticalMerge(
             [
-              verticalMerge(
-                [
-                  (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-                  drawModifier(childMap[adjectiveKey]),
-                ],
-                { align: 'center' },
-              ),
-              drawVerbparticipleDecorator(),
+              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+              drawModifier(childMap[adjectiveKey]),
             ],
-            { align: 'start' },
+            { align: 'center' },
           ),
         };
       }
@@ -278,13 +250,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           ...node,
           drawUnit: verticalMerge(
             [
-              horizontalMerge(
-                [
-                  (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-                  drawVerbparticipleDecorator(),
-                ],
-                { align: 'end' },
-              ),
+              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
               drawModifier(childMap[articleKey]),
             ],
             { align: 'center' },
@@ -295,18 +261,12 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       if (childMap[quantifierKey]) {
         return {
           ...node,
-          drawUnit: horizontalMerge(
+          drawUnit: verticalMerge(
             [
-              verticalMerge(
-                [
-                  (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-                  drawModifier(childMap[quantifierKey]),
-                ],
-                { align: 'center' },
-              ),
-              drawVerbparticipleDecorator(),
+              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+              drawModifier(childMap[quantifierKey]),
             ],
-            { align: 'end' },
+            { align: 'center' },
           ),
         };
       }
@@ -316,13 +276,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           ...node,
           drawUnit: verticalMerge(
             [
-              horizontalMerge(
-                [
-                  (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-                  drawVerbparticipleDecorator(),
-                ],
-                { align: 'end' },
-              ),
+              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
               (childMap[adjectivalKey] as GraphicalNode).drawUnit,
             ],
             {
@@ -332,6 +286,26 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
                 .drawUnit.height,
               verticalEnd: (childMap[verbparticipleKey] as GraphicalNode)
                 .drawUnit.height,
+            },
+          ),
+        };
+      }
+
+      if (childMap[adverbialKey]) {
+        return {
+          ...node,
+          drawUnit: verticalMerge(
+            [
+              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+              (childMap[adverbialKey] as GraphicalNode).drawUnit,
+            ],
+            {
+              align: 'end',
+              verticalStart: 0,
+              verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
+                .drawUnit.height,
+              verticalEnd: (childMap[adverbialKey] as GraphicalNode).drawUnit
+                .height,
             },
           ),
         };
@@ -390,6 +364,28 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       };
     }
 
+    if (childMap[articleKey] && childMap[nounKey] && childMap[quantifierKey]) {
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [
+            (childMap[nounKey] as GraphicalNode).drawUnit,
+            horizontalMerge(
+              [childMap[quantifierKey], childMap[articleKey]].map((child) =>
+                drawModifier(child),
+              ),
+              { align: 'start' },
+            ),
+          ],
+          {
+            align: 'center',
+            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
+              .verticalEnd,
+          },
+        ),
+      };
+    }
+
     if (
       childMap[quantifierKey] &&
       childMap[nounKey] &&
@@ -426,13 +422,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: verticalMerge(
           [
-            horizontalMerge(
-              [
-                (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-                drawVerbparticipleDecorator(),
-              ],
-              { align: 'end' },
-            ),
+            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
             horizontalMerge(
               [
                 (childMap[adjectivalKey] as GraphicalNode).drawUnit,
@@ -459,15 +449,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: verticalMerge(
           [
-            horizontalMerge(
-              [
-                (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-                drawVerbparticipleDecorator(),
-              ],
-              {
-                align: 'end',
-              },
-            ),
+            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
             horizontalMerge(
               [
                 drawModifier(childMap[adjectiveKey]),
@@ -508,6 +490,8 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       };
     }
   }
+
+  console.log(node);
 
   throw new GrammarError(
     'InvalidStructure',

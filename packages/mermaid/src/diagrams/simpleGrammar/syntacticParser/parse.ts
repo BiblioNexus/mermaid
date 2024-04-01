@@ -45,6 +45,10 @@ import {
   clauseClusterKey,
   getKeyFromNode,
   verbinfinitiveKey,
+  appositionKey,
+  verbparticipleKey,
+  adverbKey,
+  casusPendensKey,
 } from './keys.js';
 
 import { settings } from '../settings.js';
@@ -79,6 +83,10 @@ import { parsePredicateCompound } from './parsePredicateCompound.js';
 import { parsePredicateGroup } from './parsePredicateGroup.js';
 import { parseConjunction } from './parseConjunction.js';
 import { parseClauseCluster } from './parseClauseCluster.js';
+import { parseApposition } from './parseApposition.js';
+import { drawVerbparticipleDecorator } from '~/svgDrawer/drawVerbparticipleDecorator.js';
+import { drawModifier } from '~/svgDrawer/drawModifier.js';
+import { parseCasusPendens } from './parseCasusPendens.js';
 
 const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [discourseunitKey]: parseDiscourseUnit,
@@ -86,6 +94,7 @@ const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [prepositionFragmentKey]: parsePreposition,
   [nominalKey]: parseNominal,
   [constructchainKey]: parseConstructChain,
+  [appositionKey]: parseApposition,
   [adjectivalKey]: parseAdjectival,
   [adverbialKey]: parseAdverbial,
   [clauseKey]: parseClause,
@@ -102,6 +111,7 @@ const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [relativeKey]: parseRelative,
   [subordinateClauseKey]: parseSubordinateClause,
   [vocativeKey]: parseVocative,
+  [casusPendensKey]: parseCasusPendens,
   [conjunctionFragmentKey]: parseConjunction,
   [adjectiveCompoundKey]: parseAdjectiveCompound,
   [adverbCompoundKey]: parseAdverbCompound,
@@ -126,7 +136,7 @@ export function parse(node: GrammarNode): GraphicalNode {
         node,
         'Simple Grammar',
         settings.titleColor,
-        settings.wordStrokeColor
+        settings.wordStrokeColor,
       ),
     };
   }
@@ -137,7 +147,12 @@ export function parse(node: GrammarNode): GraphicalNode {
     if (parserMap[key]) {
       return parserMap[key](node);
     } else {
-      throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
+      console.log(key);
+      console.log(node);
+      throw new GrammarError(
+        'InvalidStructure',
+        'Invalid structure, not defined parser',
+      );
     }
   }
 
@@ -156,11 +171,35 @@ export function parse(node: GrammarNode): GraphicalNode {
       };
     }
 
+    if (getKeyFromNode(node) === verbparticipleKey) {
+      const drawUnit = drawWord(node);
+
+      return {
+        ...node,
+        drawUnit: horizontalMerge([drawUnit, drawVerbparticipleDecorator()], {
+          align: ['end', 'end'],
+          verticalStart: drawUnit.verticalStart,
+          verticalCenter: drawUnit.verticalCenter,
+          verticalEnd: drawUnit.verticalEnd,
+        }),
+      };
+    }
+
+    if (getKeyFromNode(node) === adverbKey) {
+      return {
+        ...node,
+        drawUnit: drawModifier(node),
+      };
+    }
+
     return {
       ...node,
       drawUnit: drawWord(node),
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
+  throw new GrammarError(
+    'InvalidStructure',
+    'Invalid structure, not defined parser',
+  );
 }

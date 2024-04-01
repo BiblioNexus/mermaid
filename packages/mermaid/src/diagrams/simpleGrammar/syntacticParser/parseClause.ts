@@ -7,6 +7,7 @@ import {
   predicateKey,
   vocativeKey,
   subordinateClauseKey,
+  complementKey,
 } from './keys.js';
 
 import { getChildMap } from './utils.js';
@@ -21,6 +22,7 @@ export function parseClause(node: GrammarNode): GraphicalNode {
     predicateKey,
     vocativeKey,
     subordinateClauseKey,
+    complementKey,
   ];
 
   if (
@@ -42,16 +44,30 @@ export function parseClause(node: GrammarNode): GraphicalNode {
 
   const keysLen = Object.keys(childMap).length;
 
-  if (keysLen === 1 && childMap[predicateKey]) {
-    const drawUnit = (childMap[predicateKey] as GraphicalNode).drawUnit;
-    return {
-      ...node,
-      drawUnit: horizontalMerge([drawUnit, drawClauseDecorator()], {
-        align: 'center',
-        verticalCenter: drawUnit.verticalCenter,
-        verticalEnd: drawUnit.verticalEnd,
-      }),
-    };
+  if (keysLen === 1) {
+    const drawUnit = (node.children[0] as GraphicalNode).drawUnit;
+
+    if (childMap[predicateKey]) {
+      return {
+        ...node,
+        drawUnit: horizontalMerge([drawUnit, drawClauseDecorator()], {
+          align: 'center',
+          verticalCenter: drawUnit.verticalCenter,
+          verticalEnd: drawUnit.verticalEnd,
+        }),
+      };
+    }
+
+    if (childMap[subjectKey]) {
+      return {
+        ...node,
+        drawUnit: horizontalMerge([drawClauseDecorator(), drawUnit], {
+          align: 'center',
+          verticalCenter: drawUnit.verticalCenter,
+          verticalEnd: drawUnit.verticalEnd,
+        }),
+      };
+    }
   }
 
   if (keysLen === 2) {
@@ -69,8 +85,30 @@ export function parseClause(node: GrammarNode): GraphicalNode {
             predicateUnit.verticalCenter,
           ),
           verticalEnd: Math.max(
+            subjectUnit.verticalEnd,
+            predicateUnit.verticalEnd,
+          ),
+        }),
+      };
+    }
+
+    if (childMap[subjectKey] && childMap[complementKey]) {
+      const subjectUnit = (childMap[subjectKey] as GraphicalNode).drawUnit;
+      const decorator = drawClauseDecorator();
+      const complementUnit = (childMap[complementKey] as GraphicalNode)
+        .drawUnit;
+
+      return {
+        ...node,
+        drawUnit: horizontalMerge([complementUnit, decorator, subjectUnit], {
+          align: ['center', 'center', 'center'],
+          verticalCenter: Math.max(
             subjectUnit.verticalCenter,
-            predicateUnit.verticalCenter,
+            complementUnit.verticalCenter,
+          ),
+          verticalEnd: Math.max(
+            subjectUnit.verticalEnd,
+            complementUnit.verticalEnd,
           ),
         }),
       };
@@ -120,8 +158,38 @@ export function parseClause(node: GrammarNode): GraphicalNode {
     }
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'Nominal has unexpected structure',
-  );
+  if (
+    childMap[subjectKey] &&
+    childMap[predicateKey] &&
+    childMap[subordinateClauseKey]
+  ) {
+    const decoratorDrawUnit = drawClauseDecorator();
+    const subordinateClauseDrawUnit = (
+      childMap[subordinateClauseKey] as GraphicalNode
+    ).drawUnit;
+
+    return {
+      ...node,
+      drawUnit: horizontalMerge(
+        [
+          (childMap[predicateKey] as GraphicalNode).drawUnit,
+          verticalMerge([decoratorDrawUnit, subordinateClauseDrawUnit], {
+            align: 'center',
+            // horizontalStart:
+            //   subordinateClauseDrawUnit.horizontalCenter -
+            //   decoratorDrawUnit.horizontalCenter,
+            // horizontalCenter: decoratorDrawUnit.horizontalCenter,
+            // horizontalEnd: decoratorDrawUnit.horizontalEnd,
+            // verticalStart: decoratorDrawUnit.verticalStart,
+            // verticalCenter: decoratorDrawUnit.verticalCenter,
+            // verticalEnd: decoratorDrawUnit.verticalEnd,
+          }),
+          (childMap[subjectKey] as GraphicalNode).drawUnit,
+        ],
+        { align: 'center' },
+      ),
+    };
+  }
+
+  throw new GrammarError('InvalidStructure', 'Clause has unexpected structure');
 }

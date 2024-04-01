@@ -43,6 +43,7 @@ export function generateFragmentKey(value: string) {
 }
 
 export const nounKey = generateWordKey('noun');
+export const pronounKey = generateWordKey('pronoun');
 export const articleKey = generateWordKey('article');
 export const adjectiveKey = generateWordKey('adjective');
 export const prepositionKey = generateWordKey('preposition');
@@ -55,6 +56,8 @@ export const conjunctionKey = generateWordKey('conjunction');
 export const particleKey = generateWordKey('particle');
 export const suffixPronounKey = generateWordKey('suffix-pronoun');
 
+export const casusPendensKey = generateFragmentKey('CasusPendens');
+export const appositionKey = generateFragmentKey('Apposition');
 export const discourseunitKey = generateFragmentKey('DiscourseUnit');
 export const fragmentKey = generateFragmentKey('Fragment');
 export const prepositionFragmentKey = generateFragmentKey('Preposition');
@@ -68,7 +71,9 @@ export const predicateKey = generateFragmentKey('Predicate');
 export const complementKey = generateFragmentKey('Complement');
 export const conjunctionFragmentKey = generateFragmentKey('Conjunction');
 export const complementClauseKey = generateFragmentKey('ComplementClause');
-export const prepositionalPhraseKey = generateFragmentKey('PrepositionalPhrase');
+export const prepositionalPhraseKey = generateFragmentKey(
+  'PrepositionalPhrase',
+);
 export const objectKey = generateFragmentKey('Object');
 export const relativeClauseKey = generateFragmentKey('RelativeClause');
 export const relativeParticleKey = generateFragmentKey('RelativeParticle');
@@ -81,7 +86,9 @@ export const secondObjectKey = generateFragmentKey('SecondObject');
 export const adjectiveCompoundKey = generateFragmentKey('AdjectiveCompound');
 export const adverbCompoundKey = generateFragmentKey('AdverbCompound');
 export const adverbialCompoundKey = generateFragmentKey('AdverbialCompound');
-export const constructChainCompoundKey = generateFragmentKey('ConstructChainCompound');
+export const constructChainCompoundKey = generateFragmentKey(
+  'ConstructChainCompound',
+);
 export const nominalCompoundKey = generateFragmentKey('NominalCompound');
 export const predicateCompoundKey = generateFragmentKey('PredicateCompound');
 export const clauseCompoundKey = generateFragmentKey('ClauseCompound');

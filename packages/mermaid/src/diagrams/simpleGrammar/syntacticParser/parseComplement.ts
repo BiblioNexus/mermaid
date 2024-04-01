@@ -3,9 +3,15 @@ import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
+  adjectivalKey,
+  adjectiveCompoundKey,
   adjectiveKey,
+  adverbialGroupKey,
   adverbialKey,
+  constructChainCompoundKey,
   constructchainKey,
+  nominalCompoundKey,
+  nounKey,
   verbparticipleKey,
 } from './keys.js';
 
@@ -14,7 +20,6 @@ import { getChildMap } from './utils.js';
 import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawComplementDecorator } from '../svgDrawer/drawComplementDecorator.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
-import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
 
 export function parseComplement(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
@@ -22,6 +27,12 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
     adverbialKey,
     constructchainKey,
     verbparticipleKey,
+    nominalCompoundKey,
+    adjectiveCompoundKey,
+    constructChainCompoundKey,
+    adverbialGroupKey,
+    nounKey,
+    adjectivalKey,
   ];
 
   if (
@@ -44,12 +55,20 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
   const keysLen = Object.keys(childMap).length;
 
   if (keysLen === 1) {
-    if (childMap[constructchainKey]) {
+    if (
+      childMap[constructchainKey] ||
+      childMap[adjectiveKey] ||
+      childMap[verbparticipleKey] ||
+      childMap[nominalCompoundKey] ||
+      childMap[adjectiveCompoundKey] ||
+      childMap[nounKey] ||
+      childMap[constructChainCompoundKey]
+    ) {
       return {
         ...node,
         drawUnit: horizontalMerge(
           [
-            (childMap[constructchainKey] as GraphicalNode).drawUnit,
+            (node.children[0] as GraphicalNode).drawUnit,
             drawComplementDecorator(),
           ],
           { align: 'end' },
@@ -57,20 +76,7 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
       };
     }
 
-    if (childMap[adjectiveKey]) {
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            (childMap[adjectiveKey] as GraphicalNode).drawUnit,
-            drawComplementDecorator(),
-          ],
-          { align: 'end' },
-        ),
-      };
-    }
-
-    if (childMap[adverbialKey]) {
+    if (childMap[adverbialKey] || childMap[adjectivalKey]) {
       const drawUnit = drawEmptyWord();
 
       return {
@@ -78,7 +84,7 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         drawUnit: horizontalMerge(
           [
             verticalMerge(
-              [drawUnit, (childMap[adverbialKey] as GraphicalNode).drawUnit],
+              [drawUnit, (node.children[0] as GraphicalNode).drawUnit],
               {
                 align: 'center',
                 verticalCenter: drawUnit.height,
@@ -90,23 +96,9 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         ),
       };
     }
-
-    if (childMap[verbparticipleKey]) {
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-            drawVerbparticipleDecorator(),
-            drawComplementDecorator(),
-          ],
-          { align: 'end' },
-        ),
-      };
-    }
   }
 
-  if (keysLen === 2 && childMap[adjectiveKey] && childMap[adverbialKey]) {
+  if (childMap[adjectiveKey] && childMap[adverbialKey]) {
     const adjectiveDrawUnit = (childMap[adjectiveKey] as GraphicalNode)
       .drawUnit;
     return {
@@ -131,6 +123,42 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
       ),
     };
   }
+
+  if (childMap[verbparticipleKey] && childMap[adverbialKey]) {
+    return {
+      ...node,
+      drawUnit: verticalMerge(
+        [
+          (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+          (childMap[adverbialKey] as GraphicalNode).drawUnit,
+        ],
+        {
+          align: 'end',
+          verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
+            .drawUnit.height,
+        },
+      ),
+    };
+  }
+
+  if (childMap[verbparticipleKey] && childMap[adverbialGroupKey]) {
+    return {
+      ...node,
+      drawUnit: verticalMerge(
+        [
+          (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
+          (childMap[adverbialGroupKey] as GraphicalNode).drawUnit,
+        ],
+        {
+          align: 'end',
+          verticalCenter: (childMap[verbparticipleKey] as GraphicalNode)
+            .drawUnit.height,
+        },
+      ),
+    };
+  }
+
+  console.log(node);
 
   throw new GrammarError(
     'InvalidStructure',

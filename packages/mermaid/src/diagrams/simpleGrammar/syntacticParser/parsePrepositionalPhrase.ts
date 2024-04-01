@@ -2,7 +2,7 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import { objectKey, prepositionFragmentKey } from './keys.js';
+import { nounKey, objectKey, prepositionFragmentKey } from './keys.js';
 
 import { getChildMap } from './utils.js';
 
@@ -10,7 +10,7 @@ import { horizontalMerge } from '../svgDrawer/utils.js';
 import { drawPreposition } from '../svgDrawer/drawPreposition.js';
 
 export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [prepositionFragmentKey, objectKey];
+  const validKeys: string[] = [prepositionFragmentKey, objectKey, nounKey];
 
   if (
     !node.content ||
@@ -22,22 +22,32 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
     );
   }
 
-  if (node.children.length !== 2) {
-    throw new Error(
-      'Invalid Preposition Node: Preposition Node hast invalid children',
-    );
-  }
-
   const childMap = getChildMap(node.children, validKeys);
 
-  const keysLen = Object.keys(childMap).length;
-
-  if (
-    keysLen === 2 &&
-    childMap[prepositionFragmentKey] &&
-    childMap[objectKey]
-  ) {
+  if (childMap[prepositionFragmentKey] && childMap[objectKey]) {
     const objectDrawUnit = (childMap[objectKey] as GraphicalNode).drawUnit;
+
+    const height = objectDrawUnit.verticalEnd - objectDrawUnit.verticalStart;
+
+    const prepositionDrawUnit = drawPreposition(
+      childMap[prepositionFragmentKey].children[0],
+      height,
+    );
+
+    return {
+      ...node,
+      drawUnit: horizontalMerge([objectDrawUnit, prepositionDrawUnit], {
+        align: ['center', 'end'],
+        horizontalStart: objectDrawUnit.horizontalEnd,
+        horizontalCenter: objectDrawUnit.horizontalEnd,
+        horizontalEnd:
+          objectDrawUnit.horizontalEnd + prepositionDrawUnit.horizontalEnd,
+      }),
+    };
+  }
+
+  if (childMap[prepositionFragmentKey] && childMap[nounKey]) {
+    const objectDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
 
     const height = objectDrawUnit.verticalEnd - objectDrawUnit.verticalStart;
 

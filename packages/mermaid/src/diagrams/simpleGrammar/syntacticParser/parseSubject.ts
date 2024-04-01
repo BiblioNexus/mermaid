@@ -3,8 +3,15 @@ import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
+  articleKey,
+  casusPendensKey,
   clauseKey,
+  constructChainCompoundKey,
+  constructchainKey,
+  nominalCompoundKey,
+  nominalKey,
   nounKey,
+  pronounKey,
   relativeKey,
   verbparticipleKey,
   vocativeKey,
@@ -12,13 +19,15 @@ import {
 
 import { getChildMap } from './utils.js';
 
-import { horizontalMerge } from '../svgDrawer/utils.js';
+import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmpty } from '../svgDrawer/drawEmpty.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
 import { drawEqualDecorator } from '../svgDrawer/drawEqualDecorator.js';
+import { drawModifier } from '../svgDrawer/drawModifier.js';
 import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
 import { drawSubjectClauseDecorator } from '../svgDrawer/drawSubjectClauseDecorator.js';
 import { settings } from '../settings.js';
+import { drawCompoundEndDecorator } from '../svgDrawer/drawCompoundEndDecorator.js';
 
 export function parseSubject(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
@@ -27,6 +36,13 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     nounKey,
     vocativeKey,
     relativeKey,
+    constructchainKey,
+    articleKey,
+    pronounKey,
+    nominalKey,
+    nominalCompoundKey,
+    constructChainCompoundKey,
+    casusPendensKey,
   ];
 
   if (
@@ -59,10 +75,31 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
       };
     }
 
-    if (childMap[nounKey]) {
+    if (
+      childMap[nounKey] ||
+      childMap[nominalKey] ||
+      childMap[constructchainKey] ||
+      childMap[pronounKey] ||
+      childMap[casusPendensKey]
+    ) {
       return {
         ...node,
         drawUnit: (node.children[0] as GraphicalNode).drawUnit,
+      };
+    }
+
+    if (childMap[nominalCompoundKey] || childMap[constructChainCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: horizontalMerge(
+          [
+            drawCompoundEndDecorator(node.children[0] as GraphicalNode),
+            (node.children[0] as GraphicalNode).drawUnit,
+          ],
+          {
+            align: 'center',
+          },
+        ),
       };
     }
 
@@ -110,7 +147,25 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
             drawEqualDecorator(),
             (childMap[vocativeKey] as GraphicalNode).drawUnit,
           ],
-          { align: 'end' },
+          { align: 'center' },
+        ),
+      };
+    }
+  }
+
+  if (keysLen === 2) {
+    if (childMap[articleKey] && childMap[nounKey]) {
+      const drawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
+
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [drawUnit, drawModifier(childMap[articleKey])],
+          {
+            align: 'center',
+            verticalCenter: drawUnit.height,
+            verticalEnd: drawUnit.height,
+          },
         ),
       };
     }

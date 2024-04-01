@@ -4,6 +4,7 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
   adjectiveCompoundKey,
+  adverbialKey,
   clauseKey,
   nominalKey,
   prepositionalPhraseKey,
@@ -23,6 +24,7 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
     clauseKey,
     prepositionalPhraseKey,
     adjectiveCompoundKey,
+    adverbialKey,
   ];
 
   if (
@@ -82,6 +84,13 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
       return {
         ...node,
         drawUnit: (childMap[adjectiveCompoundKey] as GraphicalNode).drawUnit,
+      };
+    }
+
+    if (childMap[adverbialKey]) {
+      return {
+        ...node,
+        drawUnit: (childMap[adverbialKey] as GraphicalNode).drawUnit,
       };
     }
 
