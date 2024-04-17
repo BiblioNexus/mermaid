@@ -4,10 +4,10 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit } from '../simpleGrammarTypes.js';
 
-export const drawEmptyLine = (): DrawUnit => {
+export const drawEmptyLine = (lineWidth: number = 50): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
-  const width = 2 * settings.padding;
+  const width = lineWidth;
   const height = 0;
 
   const data: [number, number][] = [

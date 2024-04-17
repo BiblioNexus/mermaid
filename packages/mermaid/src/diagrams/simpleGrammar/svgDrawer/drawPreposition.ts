@@ -4,11 +4,16 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+} from '../simpleGrammarTypes.js';
 
 export function drawPreposition(
   node: GrammarNode | GraphicalNode,
-  height: number = settings.height
+  initialHeight: number = settings.height,
+  lineType: 'solid' | 'dash' = 'solid',
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -19,15 +24,16 @@ export function drawPreposition(
   const rect1 = ruler(node.content.word);
   const rect2 = ruler(node.content.gloss);
 
+  const height = initialHeight + settings.padding;
+
   const lineBottom = height / Math.sqrt(3);
 
   const width = Math.max(
     lineBottom,
-    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding
+    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding,
   );
 
   const slashData: [number, number][] = [
-    [width, 0],
     [(width + lineBottom) / 2, 0],
     [(width - lineBottom) / 2, height],
     [0, height],
@@ -38,24 +44,17 @@ export function drawPreposition(
     .x((d) => d[0])
     .y((d) => d[1]);
 
-  d3Elem
-    .append('path')
+  const line = d3Elem.append('path');
+
+  line
     .attr('d', lineGenerator(slashData))
     .attr('fill', 'none')
     .attr('stroke', settings.strokeColor)
     .attr('stroke-width', settings.lineStrokeWidth);
 
-  const lineData: [number, number][] = [
-    [0, 0],
-    [width, 0],
-  ];
-
-  d3Elem
-    .append('path')
-    .attr('d', lineGenerator(lineData))
-    .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
-    .attr('stroke-width', settings.lineStrokeWidth);
+  if (lineType === 'dash') {
+    line.attr('stroke-dasharray', '3,3');
+  }
 
   d3Elem
     .append('text')
@@ -65,7 +64,7 @@ export function drawPreposition(
       'transform',
       `translate(${width / 2 - 2 * settings.wordPadding - rect1.width}, ${
         (height + rect1.height) / 2
-      })`
+      })`,
     )
     .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
@@ -79,7 +78,7 @@ export function drawPreposition(
     .attr('fill', settings.glossColor)
     .attr(
       'transform',
-      `translate(${width / 2 + settings.wordPadding}, ${(height + rect2.height) / 2})`
+      `translate(${width / 2 + settings.wordPadding}, ${(height + rect2.height) / 2})`,
     )
     .text(node.content.gloss);
 
@@ -91,7 +90,8 @@ export function drawPreposition(
     verticalCenter: height / 2,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter: width / 2,
+    horizontalCenter:
+      lineBottom === width ? lineBottom : rect1.width + lineBottom,
     horizontalEnd: width,
   };
 }

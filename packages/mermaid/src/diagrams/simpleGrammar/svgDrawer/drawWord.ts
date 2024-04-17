@@ -4,9 +4,16 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+} from '../simpleGrammarTypes.js';
 
-export const drawWord = (node: GrammarNode | GraphicalNode): DrawUnit => {
+export const drawWord = (
+  node: GrammarNode | GraphicalNode,
+  withLine?: boolean,
+): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
   if (!node.content || !isWord(node.content)) {
@@ -29,12 +36,14 @@ export const drawWord = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .x((d) => d[0])
     .y((d) => d[1]);
 
-  d3Elem
-    .append('path')
-    .attr('d', lineGenerator(data))
-    .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
-    .attr('stroke-width', settings.lineStrokeWidth);
+  if (withLine) {
+    d3Elem
+      .append('path')
+      .attr('d', lineGenerator(data))
+      .attr('fill', 'none')
+      .attr('stroke', settings.strokeColor)
+      .attr('stroke-width', settings.lineStrokeWidth);
+  }
 
   d3Elem
     .append('text')
@@ -42,7 +51,10 @@ export const drawWord = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .attr('y', 0)
     .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
-    .attr('transform', `translate(${(width - rect1.width) / 2}, ${height - settings.wordPadding})`)
+    .attr(
+      'transform',
+      `translate(${(width - rect1.width) / 2}, ${height - settings.wordPadding})`,
+    )
     .text(node.content.word);
 
   d3Elem
@@ -53,7 +65,7 @@ export const drawWord = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .attr('fill', settings.glossColor)
     .attr(
       'transform',
-      `translate(${(width - rect2.width) / 2}, ${height - rect1.height - settings.wordPadding})`
+      `translate(${(width - rect2.width) / 2}, ${height - rect1.height - settings.wordPadding})`,
     )
     .text(node.content.gloss);
 

@@ -11,7 +11,7 @@ export function drawContainer(
   node: GrammarNode,
   title: string,
   color: string,
-  strokeColor: string
+  strokeColor: string,
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -27,7 +27,7 @@ export function drawContainer(
   for (const child of node.children) {
     if (isGraphicalNode(child)) {
       maxWidth = Math.max(maxWidth, child.drawUnit.width);
-      totalHeight += child.drawUnit.height;
+      totalHeight += child.drawUnit.height + settings.padding;
     }
   }
 
@@ -48,14 +48,17 @@ export function drawContainer(
   const childrenContainer = d3Elem.append('g');
 
   const xOrigin = width;
-  let yOrigin = textHeight + settings.padding;
+  let yOrigin = textHeight;
 
   for (const child of node.children) {
     if (isGraphicalNode(child)) {
       childrenContainer
         .append(() => child.drawUnit.element.node())
-        .attr('transform', `translate(${xOrigin - child.drawUnit.width}, ${yOrigin})`);
-      yOrigin += child.drawUnit.height;
+        .attr(
+          'transform',
+          `translate(${xOrigin - child.drawUnit.width}, ${yOrigin + settings.padding})`,
+        );
+      yOrigin += child.drawUnit.height + settings.padding;
     }
   }
 

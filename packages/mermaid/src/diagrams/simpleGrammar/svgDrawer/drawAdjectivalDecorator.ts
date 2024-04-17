@@ -4,11 +4,12 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit } from '../simpleGrammarTypes.js';
 
-export function drawAdjectivalDecorator(): DrawUnit {
+export function drawAdjectivalDecorator(
+  height: number = settings.height,
+): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
-  const width = settings.height / 2;
-  const height = settings.height;
+  const width = height / 2;
 
   function drawHalfCircle(context: d3.Path): d3.Path {
     context.moveTo(0, 0);

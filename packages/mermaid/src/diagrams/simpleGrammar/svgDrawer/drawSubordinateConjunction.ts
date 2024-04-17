@@ -4,25 +4,34 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode } from '../simpleGrammarTypes.js';
 
-export function drawSubordinateConjunction(node: GrammarNode | GraphicalNode): DrawUnit {
+export function drawSubordinateConjunction(
+  conjunctionNode: GrammarNode,
+  drawUnit: DrawUnit,
+): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
-  if (!node.content || !isWord(node.content)) {
+  if (!conjunctionNode.content || !isWord(conjunctionNode.content)) {
     throw new Error('SubordinateConjunctionDrawer Only draw Word');
   }
 
-  const rect1 = ruler(node.content.word);
-  const rect2 = ruler(node.content.gloss);
+  d3Elem.append(() => drawUnit.element.node());
 
-  const width = settings.height + settings.wordPadding + rect2.width;
-  const height = settings.height;
+  const rect1 = ruler(conjunctionNode.content.word);
+  const rect2 = ruler(conjunctionNode.content.gloss);
+
+  const width =
+    drawUnit.width + 4 * settings.wordPadding + rect1.width + rect2.width;
+  const height = drawUnit.height;
+
+  const startX = drawUnit.width;
+  const startY = drawUnit.verticalCenter;
 
   const data: [number, number][] = [
-    [0, height],
-    [height, height],
-    [height, 0],
+    [startX, startY],
+    [startX + 2 * settings.wordPadding + rect1.width, startY],
+    [startX + 2 * settings.wordPadding + rect1.width, 0],
   ];
 
   const lineGenerator = d3
@@ -46,11 +55,11 @@ export function drawSubordinateConjunction(node: GrammarNode | GraphicalNode): D
     .attr('fill', settings.wordColor)
     .attr(
       'transform',
-      `translate(${width - rect2.width - rect1.width - 2 * settings.wordPadding}, ${
-        height - settings.padding
-      })`
+      `translate(${width - rect2.width - rect1.width - 3 * settings.wordPadding}, ${
+        startY - settings.padding
+      })`,
     )
-    .text(node.content.word);
+    .text(conjunctionNode.content.word);
 
   d3Elem
     .append('text')
@@ -58,18 +67,21 @@ export function drawSubordinateConjunction(node: GrammarNode | GraphicalNode): D
     .attr('y', 0)
     .attr('stroke', settings.glossColor)
     .attr('fill', settings.glossColor)
-    .attr('transform', `translate(${width - rect2.width}, ${height - settings.padding})`)
-    .text(node.content.gloss);
+    .attr(
+      'transform',
+      `translate(${width - rect2.width}, ${startY - settings.padding})`,
+    )
+    .text(conjunctionNode.content.gloss);
 
   return {
     width,
     height,
     element: d3Elem,
     verticalStart: 0,
-    verticalCenter: height,
+    verticalCenter: height / 2,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter: settings.height,
-    horizontalEnd: settings.height,
+    horizontalCenter: startX + 2 * settings.wordPadding + rect1.width,
+    horizontalEnd: height,
   };
 }

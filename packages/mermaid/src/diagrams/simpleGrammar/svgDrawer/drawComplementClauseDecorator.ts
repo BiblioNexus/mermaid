@@ -4,19 +4,25 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit } from '../simpleGrammarTypes.js';
 
-export function drawAdjectivalClauseDecorator(drawUnit: DrawUnit): DrawUnit {
+export function drawComplementClauseDecorator(
+  drawUnit: DrawUnit,
+  paddingRight: number,
+): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
-  d3Elem.append(() => drawUnit.element.node());
+  d3Elem
+    .append(() => drawUnit.element.node())
+    .attr('transform', `translate(0, ${settings.height})`);
 
   const triangleEdge = 2 * settings.padding;
   const triangleHeight = (triangleEdge * Math.sqrt(3)) / 2;
 
-  const width = drawUnit.width + 2 * settings.height;
-  const height = drawUnit.height + settings.height + triangleHeight;
+  const width = drawUnit.width;
+  const height = drawUnit.height + 2 * settings.height + triangleHeight;
 
-  const startX = drawUnit.width;
-  const startY = drawUnit.verticalCenter;
+  let startX = width - paddingRight;
+
+  const startY = drawUnit.verticalCenter + settings.height;
 
   const data: [number, number][][] = [
     [
@@ -27,9 +33,8 @@ export function drawAdjectivalClauseDecorator(drawUnit: DrawUnit): DrawUnit {
       [startX, height - triangleHeight],
     ],
     [
-      [startX - triangleEdge / 2 - settings.padding, height],
-      [startX + triangleEdge / 2, height],
-      [startX + 2 * settings.height, 0],
+      [0, height],
+      [width, height],
     ],
   ];
 
@@ -52,7 +57,7 @@ export function drawAdjectivalClauseDecorator(drawUnit: DrawUnit): DrawUnit {
     height,
     element: d3Elem,
     verticalStart: 0,
-    verticalCenter: height / 2,
+    verticalCenter: height,
     verticalEnd: height,
     horizontalStart: 0,
     horizontalCenter: width / 2,

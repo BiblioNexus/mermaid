@@ -4,20 +4,31 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit } from '../simpleGrammarTypes.js';
 
-export const drawClauseDecorator = (): DrawUnit => {
+export const drawClauseDecorator = (drawUnit?: DrawUnit): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
-  const width = 2 * settings.padding;
-  const height = 3 * settings.padding;
+  const basicWidth = 2 * settings.padding;
+  const basicHeight = 3 * settings.padding;
+
+  const width = Math.max(drawUnit?.width || 0, basicWidth) + basicWidth / 2;
+  const height = basicHeight + (drawUnit?.height || 0);
+
+  if (drawUnit) {
+    d3Elem
+      .append(() => drawUnit.element.node())
+      .attr('transform', `translate(0, ${basicHeight})`);
+  }
+
+  const startX = drawUnit?.horizontalCenter || 0 + basicWidth / 2;
 
   const verticalLineData: [number, number][] = [
-    [width / 2, 0],
-    [width / 2, height],
+    [startX, 0],
+    [startX, basicHeight],
   ];
 
   const horizontalLineData: [number, number][] = [
-    [0, (height * 2) / 3],
-    [width, (height * 2) / 3],
+    [0, (basicHeight * 2) / 3],
+    [width, (basicHeight * 2) / 3],
   ];
 
   const lineGenerator = d3
@@ -44,7 +55,7 @@ export const drawClauseDecorator = (): DrawUnit => {
     height,
     element: d3Elem,
     verticalStart: 0,
-    verticalCenter: (height * 2) / 3,
+    verticalCenter: (basicHeight * 2) / 3,
     verticalEnd: height,
     horizontalStart: 0,
     horizontalCenter: width / 2,
