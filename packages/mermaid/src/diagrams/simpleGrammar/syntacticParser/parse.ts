@@ -181,7 +181,7 @@ export function parse(node: GrammarNode): GraphicalNode {
           node,
           'Simple Grammar',
           settings.titleColor,
-          settings.wordStrokeColor,
+          settings.wordStrokeColor
         ),
       };
     }
@@ -195,17 +195,11 @@ export function parse(node: GrammarNode): GraphicalNode {
         } catch (err) {
           return {
             ...node,
-            drawUnit: drawError(
-              node.content.fragment,
-              (err as GrammarError).errorType,
-            ),
+            drawUnit: drawError(node.content.fragment, (err as GrammarError).errorType),
           };
         }
       } else {
-        throw new GrammarError(
-          'InvalidStructure',
-          'Invalid structure, not defined parser',
-        );
+        throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
       }
     }
 
@@ -224,11 +218,7 @@ export function parse(node: GrammarNode): GraphicalNode {
         };
       }
 
-      if (
-        [adverbKey, adjectiveKey, articleKey, quantifierKey].includes(
-          getKeyFromNode(node),
-        )
-      ) {
+      if ([adverbKey, adjectiveKey, articleKey, quantifierKey].includes(getKeyFromNode(node))) {
         return {
           ...node,
           drawUnit: drawModifier(node),
@@ -241,13 +231,8 @@ export function parse(node: GrammarNode): GraphicalNode {
       };
     }
 
-    throw new GrammarError(
-      'InvalidStructure',
-      'Invalid structure, not defined parser',
-    );
+    throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
   } catch (err) {
-    console.log(err);
-
     return {
       ...node,
       drawUnit: drawError('Parse', (err as GrammarError).errorType),

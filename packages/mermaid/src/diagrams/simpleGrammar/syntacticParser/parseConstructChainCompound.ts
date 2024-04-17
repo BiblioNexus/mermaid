@@ -33,7 +33,7 @@ export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
   ) {
     throw new GrammarError(
       'InvalidParser',
-      'ConstructChainCompound parser requires ConstructChainCompound Node',
+      'ConstructChainCompound parser requires ConstructChainCompound Node'
     );
   }
 
@@ -42,7 +42,7 @@ export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
   if (!allValid || node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
-      'ConstructChainCompound has invalid length of children',
+      'ConstructChainCompound has invalid length of children'
     );
   }
 

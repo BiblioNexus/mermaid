@@ -8,7 +8,7 @@ import type { DrawUnit, GrammarNode } from '../simpleGrammarTypes.js';
 
 export function drawSubordinateConjunction(
   conjunctionNode: GrammarNode,
-  drawUnit: DrawUnit,
+  drawUnit: DrawUnit
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -21,8 +21,7 @@ export function drawSubordinateConjunction(
   const rect1 = ruler(conjunctionNode.content.word);
   const rect2 = ruler(conjunctionNode.content.gloss);
 
-  const width =
-    drawUnit.width + 4 * settings.wordPadding + rect1.width + rect2.width;
+  const width = drawUnit.width + 4 * settings.wordPadding + rect1.width + rect2.width;
   const height = drawUnit.height;
 
   const startX = drawUnit.width;
@@ -57,7 +56,7 @@ export function drawSubordinateConjunction(
       'transform',
       `translate(${width - rect2.width - rect1.width - 3 * settings.wordPadding}, ${
         startY - settings.padding
-      })`,
+      })`
     )
     .text(conjunctionNode.content.word);
 
@@ -67,10 +66,7 @@ export function drawSubordinateConjunction(
     .attr('y', 0)
     .attr('stroke', settings.glossColor)
     .attr('fill', settings.glossColor)
-    .attr(
-      'transform',
-      `translate(${width - rect2.width}, ${startY - settings.padding})`,
-    )
+    .attr('transform', `translate(${width - rect2.width}, ${startY - settings.padding})`)
     .text(conjunctionNode.content.gloss);
 
   return {

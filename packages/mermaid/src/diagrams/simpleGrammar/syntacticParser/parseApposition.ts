@@ -9,15 +9,8 @@ import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
 import { drawWord } from '../svgDrawer/drawWord.js';
 
 export function parseApposition(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Apposition'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Apposition parser requires Apposition Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Apposition') {
+    throw new GrammarError('InvalidParser', 'Apposition parser requires Apposition Node');
   }
 
   if (node.children.length === 1) {
@@ -39,7 +32,7 @@ export function parseApposition(node: GrammarNode): GraphicalNode {
           align: 'center',
           verticalCenter: firstDrawUnit.verticalCenter,
           verticalEnd: firstDrawUnit.verticalEnd,
-        },
+        }
       ),
     };
   }
@@ -58,17 +51,11 @@ export function parseApposition(node: GrammarNode): GraphicalNode {
 
     return {
       ...node,
-      drawUnit: horizontalMerge(
-        [firstDrawUnit, drawEqualDecorator(), secondDrawUnit],
-        {
-          align: 'center',
-        },
-      ),
+      drawUnit: horizontalMerge([firstDrawUnit, drawEqualDecorator(), secondDrawUnit], {
+        align: 'center',
+      }),
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'Apposition has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'Apposition has unexpected structure');
 }

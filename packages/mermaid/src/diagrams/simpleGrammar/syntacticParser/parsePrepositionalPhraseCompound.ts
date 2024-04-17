@@ -3,23 +3,13 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { GrammarError } from '../error.js';
 
-import {
-  conjunctionFragmentKey,
-  conjunctionKey,
-  prepositionalPhraseKey,
-} from './keys.js';
+import { conjunctionFragmentKey, conjunctionKey, prepositionalPhraseKey } from './keys.js';
 
 import { allGivenKeys } from './utils.js';
 import { drawCompound } from '../svgDrawer/drawCompound.js';
 
-export function parsePrepositionalPhraseCompound(
-  node: GrammarNode,
-): GraphicalNode {
-  const validKeys = [
-    prepositionalPhraseKey,
-    conjunctionFragmentKey,
-    conjunctionKey,
-  ];
+export function parsePrepositionalPhraseCompound(node: GrammarNode): GraphicalNode {
+  const validKeys = [prepositionalPhraseKey, conjunctionFragmentKey, conjunctionKey];
 
   if (
     !node.content ||
@@ -28,7 +18,7 @@ export function parsePrepositionalPhraseCompound(
   ) {
     throw new GrammarError(
       'InvalidParser',
-      'PrepositionalPhraseCompound parser requires PrepositionalPhraseCompound Node',
+      'PrepositionalPhraseCompound parser requires PrepositionalPhraseCompound Node'
     );
   }
 
@@ -37,7 +27,7 @@ export function parsePrepositionalPhraseCompound(
   if (!allValid || node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
-      'PrepositionalPhraseCompound has unexpected structure',
+      'PrepositionalPhraseCompound has unexpected structure'
     );
   }
 

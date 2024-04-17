@@ -43,19 +43,19 @@ export function drawNormalAdverbialDecorator(): DrawUnit {
 
 export function drawSpecialAdverbialDecorator(
   adverbDrawUnit: DrawUnit,
-  adverbialDrawUnit: DrawUnit,
+  adverbialDrawUnit: DrawUnit
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const horizontalCenter = Math.max(
     adverbDrawUnit.horizontalCenter,
-    adverbialDrawUnit.horizontalCenter,
+    adverbialDrawUnit.horizontalCenter
   );
   const width =
     horizontalCenter +
     Math.max(
       adverbDrawUnit.width - adverbDrawUnit.horizontalCenter,
-      adverbialDrawUnit.width - adverbialDrawUnit.horizontalCenter,
+      adverbialDrawUnit.width - adverbialDrawUnit.horizontalCenter
     ) +
     50;
   const height = adverbDrawUnit.height + adverbialDrawUnit.height;
@@ -64,15 +64,14 @@ export function drawSpecialAdverbialDecorator(
     .append(() => adverbialDrawUnit.element.node())
     .attr(
       'transform',
-      `translate(${horizontalCenter - adverbialDrawUnit.horizontalCenter}, ${adverbDrawUnit.height})`,
+      `translate(${horizontalCenter - adverbialDrawUnit.horizontalCenter}, ${
+        adverbDrawUnit.height
+      })`
     );
 
   d3Elem
     .append(() => adverbDrawUnit.element.node())
-    .attr(
-      'transform',
-      `translate(${horizontalCenter - adverbDrawUnit.horizontalCenter}, 0)`,
-    );
+    .attr('transform', `translate(${horizontalCenter - adverbDrawUnit.horizontalCenter}, 0)`);
 
   const startX = horizontalCenter + 7;
   const startY = (adverbDrawUnit.height * 2) / 3;
@@ -103,10 +102,7 @@ export function drawSpecialAdverbialDecorator(
     verticalCenter: height / 2,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter: Math.max(
-      adverbDrawUnit.horizontalCenter,
-      adverbialDrawUnit.horizontalCenter,
-    ),
+    horizontalCenter: Math.max(adverbDrawUnit.horizontalCenter, adverbialDrawUnit.horizontalCenter),
     horizontalEnd: width,
   };
 }
@@ -116,10 +112,7 @@ export function drawAdverbialDecorator(props?: {
   adverbialDrawUnit: DrawUnit;
 }) {
   if (props) {
-    return drawSpecialAdverbialDecorator(
-      props.adverbDrawUnit,
-      props.adverbialDrawUnit,
-    );
+    return drawSpecialAdverbialDecorator(props.adverbDrawUnit, props.adverbialDrawUnit);
   } else {
     return drawNormalAdverbialDecorator();
   }

@@ -26,14 +26,11 @@ export function parseAdjectiveCompound(node: GrammarNode): GraphicalNode {
   ];
 
   if (node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'AdjectiveCompound has no children',
-    );
+    throw new GrammarError('InvalidStructure', 'AdjectiveCompound has no children');
   }
 
   const validChildren = node.children.filter((child) =>
-    requiredKeys.includes(getKeyFromNode(child)),
+    requiredKeys.includes(getKeyFromNode(child))
   );
 
   const keysLen = validChildren.length;
@@ -51,13 +48,10 @@ export function parseAdjectiveCompound(node: GrammarNode): GraphicalNode {
             return drawModifier(child);
           }),
         ],
-        { align: 'start' },
+        { align: 'start' }
       ),
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'AdjectiveCompound has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'AdjectiveCompound has unexpected structure');
 }

@@ -4,16 +4,12 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type {
-  DrawUnit,
-  GrammarNode,
-  GraphicalNode,
-} from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 export function drawPreposition(
   node: GrammarNode | GraphicalNode,
   initialHeight: number = settings.height,
-  lineType: 'solid' | 'dash' = 'solid',
+  lineType: 'solid' | 'dash' = 'solid'
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -30,7 +26,7 @@ export function drawPreposition(
 
   const width = Math.max(
     lineBottom,
-    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding,
+    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding
   );
 
   const slashData: [number, number][] = [
@@ -64,7 +60,7 @@ export function drawPreposition(
       'transform',
       `translate(${width / 2 - 2 * settings.wordPadding - rect1.width}, ${
         (height + rect1.height) / 2
-      })`,
+      })`
     )
     .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
@@ -78,7 +74,7 @@ export function drawPreposition(
     .attr('fill', settings.glossColor)
     .attr(
       'transform',
-      `translate(${width / 2 + settings.wordPadding}, ${(height + rect2.height) / 2})`,
+      `translate(${width / 2 + settings.wordPadding}, ${(height + rect2.height) / 2})`
     )
     .text(node.content.gloss);
 
@@ -90,8 +86,7 @@ export function drawPreposition(
     verticalCenter: height / 2,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter:
-      lineBottom === width ? lineBottom : rect1.width + lineBottom,
+    horizontalCenter: lineBottom === width ? lineBottom : rect1.width + lineBottom,
     horizontalEnd: width,
   };
 }

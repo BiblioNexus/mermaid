@@ -4,9 +4,7 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit } from '../simpleGrammarTypes.js';
 
-export function drawAdjectivalDecorator(
-  height: number = settings.height,
-): DrawUnit {
+export function drawAdjectivalDecorator(height: number = settings.height): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const width = height / 2;

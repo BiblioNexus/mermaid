@@ -2,11 +2,7 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { GrammarError } from '../error.js';
 
-import {
-  conjunctionFragmentKey,
-  conjunctionKey,
-  getKeyFromNode,
-} from './keys.js';
+import { conjunctionFragmentKey, conjunctionKey, getKeyFromNode } from './keys.js';
 import { isGraphicalNode } from '../utils.js';
 
 export function getChildMap(nodes: GrammarNode[], validKeys: string[]) {
@@ -22,27 +18,18 @@ export function getChildMap(nodes: GrammarNode[], validKeys: string[]) {
     const key = getKeyFromNode(node);
 
     if (validMap[key] === undefined) {
-      console.log('undefined', nodes, key);
       throw new GrammarError('InvalidChildren', `Node has invalid children`);
     }
 
     const exists = childMap[key!];
 
     if (exists) {
-      console.log('exists', nodes);
-      throw new GrammarError(
-        'InvalidStructure',
-        `Node has duplicated children`,
-      );
+      throw new GrammarError('InvalidStructure', `Node has duplicated children`);
     } else {
       if (isGraphicalNode(node)) {
         childMap[key!] = node;
       } else {
-        console.log('non isGraphicalNode', nodes);
-        throw new GrammarError(
-          'InvalidStructure',
-          'Node has invalid structure',
-        );
+        throw new GrammarError('InvalidStructure', 'Node has invalid structure');
       }
     }
   });
@@ -71,8 +58,5 @@ export function allGivenKeys(nodes: GrammarNode[], keys: string[]): boolean {
 }
 
 export function isConjunction(node: GrammarNode): boolean {
-  return (
-    getKeyFromNode(node) === conjunctionKey ||
-    getKeyFromNode(node) === conjunctionFragmentKey
-  );
+  return getKeyFromNode(node) === conjunctionKey || getKeyFromNode(node) === conjunctionFragmentKey;
 }

@@ -55,15 +55,8 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
 
   const validKeys: string[] = [...bottomKeys, ...topKeys, ...specialKeys];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Adverbial'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Adverbial parser requires Adverbial Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Adverbial') {
+    throw new GrammarError('InvalidParser', 'Adverbial parser requires Adverbial Node');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -98,7 +91,7 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
         {
           align: ['center', 'end'],
           horizontalCenter: drawUnit.horizontalCenter,
-        },
+        }
       ),
     };
   }
@@ -119,7 +112,7 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
         {
           align: ['center', 'end'],
           horizontalCenter: drawUnit.horizontalCenter,
-        },
+        }
       ),
     };
   }
@@ -157,17 +150,12 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
       drawUnit: horizontalMerge(
         [
           childMap[constructchainKey].drawUnit,
-          drawPreposition(
-            spaceWord,
-            childMap[constructchainKey].drawUnit.verticalCenter,
-            'dash',
-          ),
+          drawPreposition(spaceWord, childMap[constructchainKey].drawUnit.verticalCenter, 'dash'),
         ],
         {
           align: ['center', 'end'],
-          horizontalCenter:
-            childMap[constructchainKey].drawUnit.horizontalCenter,
-        },
+          horizontalCenter: childMap[constructchainKey].drawUnit.horizontalCenter,
+        }
       ),
     };
   }
@@ -178,16 +166,12 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
       drawUnit: horizontalMerge(
         [
           childMap[nominalKey].drawUnit,
-          drawPreposition(
-            spaceWord,
-            childMap[nominalKey].drawUnit.verticalCenter,
-            'dash',
-          ),
+          drawPreposition(spaceWord, childMap[nominalKey].drawUnit.verticalCenter, 'dash'),
         ],
         {
           align: ['center', 'end'],
           horizontalCenter: childMap[nominalKey].drawUnit.horizontalCenter,
-        },
+        }
       ),
     };
   }
@@ -200,17 +184,12 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
           drawWord(childMap[verbinfinitiveKey], true),
           drawVerbInifinitiveDecorator(),
           drawVerbInifinitiveDecorator(),
-          drawPreposition(
-            spaceWord,
-            childMap[verbinfinitiveKey].drawUnit.verticalCenter,
-            'dash',
-          ),
+          drawPreposition(spaceWord, childMap[verbinfinitiveKey].drawUnit.verticalCenter, 'dash'),
         ],
         {
           align: ['center', 'center', 'center', 'end'],
-          horizontalCenter:
-            childMap[verbinfinitiveKey].drawUnit.horizontalCenter,
-        },
+          horizontalCenter: childMap[verbinfinitiveKey].drawUnit.horizontalCenter,
+        }
       ),
     };
   }
@@ -238,14 +217,13 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
           drawPreposition(
             spaceWord,
             childMap[prepositionalPhraseCompoundKey].drawUnit.verticalCenter,
-            'solid',
+            'solid'
           ),
         ],
         {
           align: ['center', 'end'],
-          horizontalCenter:
-            childMap[prepositionalPhraseCompoundKey].drawUnit.verticalCenter,
-        },
+          horizontalCenter: childMap[prepositionalPhraseCompoundKey].drawUnit.verticalCenter,
+        }
       ),
     };
   }
@@ -281,14 +259,11 @@ export function parseAdverbial(node: GrammarNode): GraphicalNode {
   return {
     ...node,
     drawUnit: horizontalMerge(
-      [
-        nomainalDrawUnit,
-        drawPreposition(spaceWord, nomainalDrawUnit.verticalCenter, 'dash'),
-      ],
+      [nomainalDrawUnit, drawPreposition(spaceWord, nomainalDrawUnit.verticalCenter, 'dash')],
       {
         align: ['center', 'end'],
         horizontalCenter: nomainalDrawUnit.horizontalCenter,
-      },
+      }
     ),
   };
 }

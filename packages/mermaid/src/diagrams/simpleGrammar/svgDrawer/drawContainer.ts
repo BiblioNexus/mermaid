@@ -11,7 +11,7 @@ export function drawContainer(
   node: GrammarNode,
   title: string,
   color: string,
-  strokeColor: string,
+  strokeColor: string
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -56,7 +56,7 @@ export function drawContainer(
         .append(() => child.drawUnit.element.node())
         .attr(
           'transform',
-          `translate(${xOrigin - child.drawUnit.width}, ${yOrigin + settings.padding})`,
+          `translate(${xOrigin - child.drawUnit.width}, ${yOrigin + settings.padding})`
         );
       yOrigin += child.drawUnit.height + settings.padding;
     }

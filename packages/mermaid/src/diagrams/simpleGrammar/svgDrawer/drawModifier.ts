@@ -4,11 +4,7 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type {
-  DrawUnit,
-  GrammarNode,
-  GraphicalNode,
-} from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
   const d3Elem = d3.create('svg:g');
@@ -20,8 +16,7 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
   const rect1 = ruler(node.content.word);
   const rect2 = ruler(node.content.gloss);
 
-  const width =
-    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding;
+  const width = rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding;
   const height = (settings.height * 2) / 3;
 
   const slashData: [number, number][] = [
@@ -47,7 +42,7 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
     .attr('y', 0)
     .attr(
       'transform',
-      `translate(${settings.padding}, ${(rect1.height + settings.wordPadding) / 2})`,
+      `translate(${settings.padding}, ${(rect1.height + settings.wordPadding) / 2})`
     )
     .attr('stroke', settings.wordStrokeColor)
     .attr('fill', settings.wordColor)
@@ -63,7 +58,7 @@ export const drawModifier = (node: GrammarNode | GraphicalNode): DrawUnit => {
       'transform',
       `translate(${settings.padding + 2 * settings.wordPadding + rect1.width}, ${
         (rect2.height + settings.wordPadding) / 2
-      })`,
+      })`
     )
     .text(node.content.gloss);
 

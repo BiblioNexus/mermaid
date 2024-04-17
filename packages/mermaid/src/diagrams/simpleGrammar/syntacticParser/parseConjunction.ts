@@ -5,11 +5,7 @@ import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
 
 export function parseConjunction(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Conjunction'
-  ) {
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Conjunction') {
     throw new Error('Conjunction parser requires Conjunction Node');
   }
 
@@ -28,7 +24,7 @@ export function parseConjunction(node: GrammarNode): GraphicalNode {
           return (child as GraphicalNode).drawUnit;
         }),
       ],
-      { align: 'start' },
+      { align: 'start' }
     ),
   };
 }

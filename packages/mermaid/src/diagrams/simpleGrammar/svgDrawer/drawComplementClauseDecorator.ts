@@ -4,10 +4,7 @@ import { settings } from '../settings.js';
 
 import type { DrawUnit } from '../simpleGrammarTypes.js';
 
-export function drawComplementClauseDecorator(
-  drawUnit: DrawUnit,
-  paddingRight: number,
-): DrawUnit {
+export function drawComplementClauseDecorator(drawUnit: DrawUnit, paddingRight: number): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   d3Elem
@@ -20,7 +17,7 @@ export function drawComplementClauseDecorator(
   const width = drawUnit.width;
   const height = drawUnit.height + 2 * settings.height + triangleHeight;
 
-  let startX = width - paddingRight;
+  const startX = width - paddingRight;
 
   const startY = drawUnit.verticalCenter + settings.height;
 

@@ -24,10 +24,7 @@ export function parseClauseCompound(node: GrammarNode): GraphicalNode {
   const allValid = allGivenKeys(node.children, validKeys);
 
   if (!allValid || node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'ClauseCompound has unexpected structure',
-    );
+    throw new GrammarError('InvalidStructure', 'ClauseCompound has unexpected structure');
   }
 
   return {

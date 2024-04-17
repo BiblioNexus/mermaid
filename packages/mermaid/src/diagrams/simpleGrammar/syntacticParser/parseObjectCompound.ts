@@ -11,24 +11,14 @@ import { drawCompound } from '../svgDrawer/drawCompound.js';
 export function parseObjectCompound(node: GrammarNode): GraphicalNode {
   const validKeys = [objectKey, conjunctionFragmentKey, conjunctionKey];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'ObjectCompound'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'ObjectCompound parser requires ObjectCompound Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'ObjectCompound') {
+    throw new GrammarError('InvalidParser', 'ObjectCompound parser requires ObjectCompound Node');
   }
 
   const allValid = allGivenKeys(node.children, validKeys);
 
   if (!allValid || node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'ObjectCompound has unexpected structure',
-    );
+    throw new GrammarError('InvalidStructure', 'ObjectCompound has unexpected structure');
   }
 
   return {

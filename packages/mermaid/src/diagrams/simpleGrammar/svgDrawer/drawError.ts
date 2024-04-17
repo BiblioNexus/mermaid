@@ -29,10 +29,7 @@ export const drawError = (fragment: string, description: string): DrawUnit => {
     .attr('y', 0)
     .attr('stroke', settings.errorColor)
     .attr('fill', settings.errorColor)
-    .attr(
-      'transform',
-      `translate(${(width - rect1.width) / 2}, ${rect1.height})`,
-    )
+    .attr('transform', `translate(${(width - rect1.width) / 2}, ${rect1.height})`)
     .text(fragment);
 
   d3Elem
@@ -43,7 +40,9 @@ export const drawError = (fragment: string, description: string): DrawUnit => {
     .attr('fill', settings.errorColor)
     .attr(
       'transform',
-      `translate(${(width - rect2.width) / 2}, ${rect1.height + rect2.height + settings.wordPadding})`,
+      `translate(${(width - rect2.width) / 2}, ${
+        rect1.height + rect2.height + settings.wordPadding
+      })`
     )
     .text(description);
 

@@ -15,7 +15,7 @@ export function parseVerbGroup(node: GrammarNode): GraphicalNode {
   }
 
   const validChildren = node.children.filter((child) =>
-    requiredKeys.includes(getKeyFromNode(child)),
+    requiredKeys.includes(getKeyFromNode(child))
   );
 
   const keysLen = validChildren.length;
@@ -33,13 +33,10 @@ export function parseVerbGroup(node: GrammarNode): GraphicalNode {
             return drawWord(child, true);
           }),
         ],
-        { align: 'center' },
+        { align: 'center' }
       ),
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'VerbGroup has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'VerbGroup has unexpected structure');
 }

@@ -4,15 +4,11 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type {
-  DrawUnit,
-  GrammarNode,
-  GraphicalNode,
-} from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 export function drawRelativeParticle(
   node: GrammarNode | GraphicalNode,
-  drawUnit: DrawUnit,
+  drawUnit: DrawUnit
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -23,11 +19,7 @@ export function drawRelativeParticle(
   const rect1 = ruler(node.content.word);
   const rect2 = ruler(node.content.gloss);
 
-  const width =
-    (drawUnit?.width || 0) +
-    settings.height +
-    settings.wordPadding +
-    rect2.width;
+  const width = (drawUnit?.width || 0) + settings.height + settings.wordPadding + rect2.width;
   const height = settings.height + settings.padding + (drawUnit?.height || 0);
 
   if (drawUnit) {
@@ -66,7 +58,9 @@ export function drawRelativeParticle(
     .attr('fill', settings.wordColor)
     .attr(
       'transform',
-      `translate(${width - rect2.width - rect1.width - 2 * settings.wordPadding}, ${startY - settings.padding})`,
+      `translate(${width - rect2.width - rect1.width - 2 * settings.wordPadding}, ${
+        startY - settings.padding
+      })`
     )
     .text(node.content.word);
 
@@ -76,10 +70,7 @@ export function drawRelativeParticle(
     .attr('y', 0)
     .attr('stroke', settings.glossColor)
     .attr('fill', settings.glossColor)
-    .attr(
-      'transform',
-      `translate(${width - rect2.width}, ${startY - settings.padding})`,
-    )
+    .attr('transform', `translate(${width - rect2.width}, ${startY - settings.padding})`)
     .text(node.content.gloss);
 
   return {

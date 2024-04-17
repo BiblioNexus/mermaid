@@ -14,9 +14,7 @@ export const drawClauseDecorator = (drawUnit?: DrawUnit): DrawUnit => {
   const height = basicHeight + (drawUnit?.height || 0);
 
   if (drawUnit) {
-    d3Elem
-      .append(() => drawUnit.element.node())
-      .attr('transform', `translate(0, ${basicHeight})`);
+    d3Elem.append(() => drawUnit.element.node()).attr('transform', `translate(0, ${basicHeight})`);
   }
 
   const startX = drawUnit?.horizontalCenter || 0 + basicWidth / 2;

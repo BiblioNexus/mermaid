@@ -40,20 +40,8 @@ import { drawConstructChainConnector } from '../svgDrawer/drawConstructChainConn
 import { drawAdverbialDecorator } from '../svgDrawer/drawAdverbialDecorator.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
 
-const topKeys = [
-  nounKey,
-  particleKey,
-  pronounKey,
-  verbparticipleKey,
-  suffixPronounKey,
-];
-const bottomKeys = [
-  adjectivalKey,
-  adverbialKey,
-  adjectiveKey,
-  articleKey,
-  quantifierKey,
-];
+const topKeys = [nounKey, particleKey, pronounKey, verbparticipleKey, suffixPronounKey];
+const bottomKeys = [adjectivalKey, adverbialKey, adjectiveKey, articleKey, quantifierKey];
 const specialKeys = [prepositionalPhraseKey, clauseKey, relativeClauseKey];
 
 const singleKeys = [
@@ -75,15 +63,8 @@ const validKeys: string[] = [
 ];
 
 export function parseNominal(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Nominal'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Nominal parser requires Nominal Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Nominal') {
+    throw new GrammarError('InvalidParser', 'Nominal parser requires Nominal Node');
   }
 
   if (node.children.length === 0) {
@@ -111,7 +92,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
 
     if (childMap[clauseKey]) {
       const subjectNode = childMap[clauseKey].children.find(
-        (child) => getKeyFromNode(child) === subjectKey,
+        (child) => getKeyFromNode(child) === subjectKey
       );
 
       return {
@@ -120,7 +101,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           childMap[clauseKey].drawUnit,
           subjectNode
             ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
-            : settings.padding,
+            : settings.padding
         ),
       };
     }
@@ -142,7 +123,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
               isNominal: true,
             }),
           ],
-          { align: 'center' },
+          { align: 'center' }
         ),
       };
     }
@@ -166,7 +147,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
               children: node.children as GraphicalNode[],
               isNominal: false,
             }),
-          },
+          }
         ),
       };
     }
@@ -183,7 +164,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
             }),
             childMap[nominalKey].drawUnit,
           ],
-          { align: 'center' },
+          { align: 'center' }
         ),
       };
     }
@@ -206,7 +187,7 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           {
             align: 'end',
             verticalCenter: drawEmptyWord().height,
-          },
+          }
         ),
       };
     }

@@ -1,10 +1,6 @@
 import { isFragment, isWord } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type {
-  DrawUnit,
-  GrammarNode,
-  GraphicalNode,
-} from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
   adjectivalGroupKey,
@@ -49,12 +45,7 @@ import { settings } from '../settings.js';
 import { drawWord } from '../svgDrawer/drawWord.js';
 
 export function parseObject(node: GrammarNode): GraphicalNode {
-  const preHorizontalKeys = [
-    nominalKey,
-    nominalCompoundKey,
-    secondObjectKey,
-    objectKey,
-  ];
+  const preHorizontalKeys = [nominalKey, nominalCompoundKey, secondObjectKey, objectKey];
   const afterHorizontalKeys = [particleKey];
   const topKeys = [nounKey, pronounKey, suffixPronounKey, verbparticipleKey];
   const bottomKeys = [
@@ -89,13 +80,9 @@ export function parseObject(node: GrammarNode): GraphicalNode {
   if (
     !node.content ||
     !isFragment(node.content) ||
-    (node.content.fragment !== 'Object' &&
-      node.content.fragment !== 'SecondObject')
+    (node.content.fragment !== 'Object' && node.content.fragment !== 'SecondObject')
   ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Object parser requires Object or SecondObject Node',
-    );
+    throw new GrammarError('InvalidParser', 'Object parser requires Object or SecondObject Node');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -123,7 +110,7 @@ export function parseObject(node: GrammarNode): GraphicalNode {
               children: node.children as GraphicalNode[],
               isNominal: false,
             }),
-          },
+          }
         ),
       };
     }
@@ -137,7 +124,7 @@ export function parseObject(node: GrammarNode): GraphicalNode {
 
     if (childMap[clauseKey]) {
       const subjectNode = childMap[clauseKey].children.find(
-        (child) => getKeyFromNode(child) === subjectKey,
+        (child) => getKeyFromNode(child) === subjectKey
       );
 
       return {
@@ -146,7 +133,7 @@ export function parseObject(node: GrammarNode): GraphicalNode {
           childMap[clauseKey].drawUnit,
           subjectNode
             ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
-            : settings.padding,
+            : settings.padding
         ),
       };
     }
@@ -192,7 +179,7 @@ export function parseObject(node: GrammarNode): GraphicalNode {
       bottomKeys,
       children: node.children as GraphicalNode[],
       isNominal: false,
-    }),
+    })
   );
 
   afterHorizontalKeys.forEach((key) => {

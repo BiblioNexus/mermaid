@@ -2,12 +2,7 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import {
-  nounKey,
-  objectGroupKey,
-  objectKey,
-  prepositionFragmentKey,
-} from './keys.js';
+import { nounKey, objectGroupKey, objectKey, prepositionFragmentKey } from './keys.js';
 
 import { getChildMap } from './utils.js';
 
@@ -15,12 +10,7 @@ import { horizontalMerge } from '../svgDrawer/utils.js';
 import { drawPreposition } from '../svgDrawer/drawPreposition.js';
 
 export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [
-    prepositionFragmentKey,
-    objectKey,
-    objectGroupKey,
-    nounKey,
-  ];
+  const validKeys: string[] = [prepositionFragmentKey, objectKey, objectGroupKey, nounKey];
 
   if (
     !node.content ||
@@ -29,7 +19,7 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
   ) {
     throw new GrammarError(
       'InvalidParser',
-      'PrepositionalPhrase parser requires PrepositionalPhrase Node',
+      'PrepositionalPhrase parser requires PrepositionalPhrase Node'
     );
   }
 
@@ -42,7 +32,7 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
 
     const prepositionDrawUnit = drawPreposition(
       childMap[prepositionFragmentKey].children[0],
-      height,
+      height
     );
 
     return {
@@ -50,8 +40,7 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
       drawUnit: horizontalMerge([objectDrawUnit, prepositionDrawUnit], {
         align: ['center', 'end'],
         horizontalStart: objectDrawUnit.horizontalEnd,
-        horizontalCenter:
-          objectDrawUnit.width + prepositionDrawUnit.horizontalCenter,
+        horizontalCenter: objectDrawUnit.width + prepositionDrawUnit.horizontalCenter,
         horizontalEnd: objectDrawUnit.width + prepositionDrawUnit.width,
       }),
     };
@@ -64,7 +53,7 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
 
     const prepositionDrawUnit = drawPreposition(
       childMap[prepositionFragmentKey].children[0],
-      height,
+      height
     );
 
     return {
@@ -73,8 +62,7 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
         align: ['center', 'end'],
         horizontalStart: objectDrawUnit.horizontalEnd,
         horizontalCenter: objectDrawUnit.horizontalEnd,
-        horizontalEnd:
-          objectDrawUnit.horizontalEnd + prepositionDrawUnit.horizontalEnd,
+        horizontalEnd: objectDrawUnit.horizontalEnd + prepositionDrawUnit.horizontalEnd,
       }),
     };
   }
@@ -86,7 +74,7 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
 
     const prepositionDrawUnit = drawPreposition(
       childMap[prepositionFragmentKey].children[0],
-      height,
+      height
     );
 
     return {
@@ -95,14 +83,10 @@ export function parsePrepositionalPhrase(node: GrammarNode): GraphicalNode {
         align: ['center', 'end'],
         horizontalStart: objectDrawUnit.horizontalEnd,
         horizontalCenter: objectDrawUnit.horizontalEnd,
-        horizontalEnd:
-          objectDrawUnit.horizontalEnd + prepositionDrawUnit.horizontalEnd,
+        horizontalEnd: objectDrawUnit.horizontalEnd + prepositionDrawUnit.horizontalEnd,
       }),
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'PrepositionalPhrase has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'PrepositionalPhrase has unexpected structure');
 }

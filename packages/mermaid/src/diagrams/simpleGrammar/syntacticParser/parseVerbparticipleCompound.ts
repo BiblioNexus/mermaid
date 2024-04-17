@@ -3,24 +3,14 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { GrammarError } from '../error.js';
 
-import {
-  adjectiveKey,
-  conjunctionFragmentKey,
-  conjunctionKey,
-  verbparticipleKey,
-} from './keys.js';
+import { adjectiveKey, conjunctionFragmentKey, conjunctionKey, verbparticipleKey } from './keys.js';
 
 import { allGivenKeys } from './utils.js';
 
 import { drawCompound } from '../svgDrawer/drawCompound.js';
 
 export function parseVerbparticipleCompound(node: GrammarNode): GraphicalNode {
-  const validKeys = [
-    verbparticipleKey,
-    adjectiveKey,
-    conjunctionFragmentKey,
-    conjunctionKey,
-  ];
+  const validKeys = [verbparticipleKey, adjectiveKey, conjunctionFragmentKey, conjunctionKey];
 
   if (
     !node.content ||
@@ -29,7 +19,7 @@ export function parseVerbparticipleCompound(node: GrammarNode): GraphicalNode {
   ) {
     throw new GrammarError(
       'InvalidParser',
-      'VerbParticipleCompound parser requires VerbParticipleCompound Node',
+      'VerbParticipleCompound parser requires VerbParticipleCompound Node'
     );
   }
 
@@ -38,7 +28,7 @@ export function parseVerbparticipleCompound(node: GrammarNode): GraphicalNode {
   if (!allValid || node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
-      'VerbParticipleCompound has invalid length of children',
+      'VerbParticipleCompound has invalid length of children'
     );
   }
 

@@ -7,21 +7,16 @@ import type { DrawUnit } from '../simpleGrammarTypes.js';
 export const drawCompoundEnd = (
   drawUnit: DrawUnit,
   lineType: 'solid' | 'dash',
-  withDecorator: boolean,
+  withDecorator: boolean
 ): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
-  const decoratorWidth = withDecorator
-    ? settings.wordPadding + 2 * settings.padding
-    : 0;
+  const decoratorWidth = withDecorator ? settings.wordPadding + 2 * settings.padding : 0;
   const lineConnectorWidth = settings.padding;
 
   d3Elem
     .append(() => drawUnit.element.node())
-    .attr(
-      'transform',
-      `translate(${lineConnectorWidth + decoratorWidth}, ${0})`,
-    );
+    .attr('transform', `translate(${lineConnectorWidth + decoratorWidth}, ${0})`);
 
   const lineWidth = drawUnit.horizontalEnd - drawUnit.horizontalStart;
 

@@ -4,11 +4,7 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type {
-  DrawUnit,
-  GrammarNode,
-  GraphicalNode,
-} from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 export const drawConjunctionWithNode = ({
   basicHeight,
@@ -63,7 +59,7 @@ export const drawConjunctionWithNode = ({
     .attr('fill', settings.wordColor)
     .attr(
       'transform',
-      `translate(${maxWordWidth - rect1.width - width}, ${height / 2 + settings.wordPadding})`,
+      `translate(${maxWordWidth - rect1.width - width}, ${height / 2 + settings.wordPadding})`
     )
     .text(node.content.word);
 
@@ -75,7 +71,7 @@ export const drawConjunctionWithNode = ({
     .attr('fill', settings.glossColor)
     .attr(
       'transform',
-      `translate(${maxWordWidth - rect2.width - width}, ${height / 2 - settings.wordPadding})`,
+      `translate(${maxWordWidth - rect2.width - width}, ${height / 2 - settings.wordPadding})`
     )
     .text(node.content.gloss);
 

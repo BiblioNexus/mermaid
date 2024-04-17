@@ -4,15 +4,9 @@ import { isFragment, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type {
-  DrawUnit,
-  GrammarNode,
-  GraphicalNode,
-} from '../simpleGrammarTypes.js';
+import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-export const drawMockFragment = (
-  node: GrammarNode | GraphicalNode,
-): DrawUnit => {
+export const drawMockFragment = (node: GrammarNode | GraphicalNode): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
   if (!node.content || !isFragment(node.content)) {
@@ -49,7 +43,7 @@ export const drawMockFragment = (
     .attr('fill', settings.glossColor)
     .attr(
       'transform',
-      `translate(${(width - rect.width) / 2}, ${height - rect.height - settings.wordPadding})`,
+      `translate(${(width - rect.width) / 2}, ${height - rect.height - settings.wordPadding})`
     )
     .text(node.content.fragment);
 

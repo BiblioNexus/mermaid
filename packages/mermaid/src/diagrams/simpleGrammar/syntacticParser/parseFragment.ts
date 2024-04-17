@@ -11,15 +11,8 @@ import { getKeyFromNode, verbparticipleKey } from './keys.js';
 import { drawWord } from '../svgDrawer/drawWord.js';
 
 export function parseFragment(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Fragment'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Fragment parser requires Fragment Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Fragment') {
+    throw new GrammarError('InvalidParser', 'Fragment parser requires Fragment Node');
   }
 
   if (isGraphicalNode(node.children[0])) {
@@ -32,7 +25,7 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
             [drawEmptyWord(), drawEmptyLine(70), drawUnit],
             {
               align: 'end',
-            },
+            }
           );
           break;
         }
@@ -45,19 +38,16 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
             ],
             {
               align: 'end',
-            },
+            }
           );
           break;
         }
         case 'Adverbial': {
           node.children[0].drawUnit = verticalMerge(
-            [
-              drawEmptyLine(drawUnit.horizontalEnd - drawUnit.horizontalStart),
-              drawUnit,
-            ],
+            [drawEmptyLine(drawUnit.horizontalEnd - drawUnit.horizontalStart), drawUnit],
             {
               align: 'end',
-            },
+            }
           );
           break;
         }
@@ -80,7 +70,7 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
         node,
         node.content.description,
         settings.descriptionColor,
-        settings.wordStrokeColor,
+        settings.wordStrokeColor
       ),
     };
   }

@@ -6,15 +6,8 @@ import { drawPreposition } from '../svgDrawer/drawPreposition.js';
 import { spaceWord } from '../constants.js';
 
 export function parsePreposition(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Preposition'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Preposition parser requires Preposition Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Preposition') {
+    throw new GrammarError('InvalidParser', 'Preposition parser requires Preposition Node');
   }
 
   if (node.children.length > 0) {

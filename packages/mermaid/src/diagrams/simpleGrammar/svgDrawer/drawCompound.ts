@@ -9,18 +9,14 @@ import { drawConjunction } from './drawConjunction.js';
 import { drawEmptyLine } from './drawEmptyLine.js';
 import { drawSpacer } from './drawSpacer.js';
 import { horizontalMerge, verticalMerge } from './utils.js';
-import {
-  adjectiveKey,
-  getKeyFromNode,
-  prepositionalPhraseKey,
-} from '../syntacticParser/keys.js';
+import { adjectiveKey, getKeyFromNode, prepositionalPhraseKey } from '../syntacticParser/keys.js';
 import { drawWord } from './drawWord.js';
 import { drawEmptyWord } from './drawEmptyWord.js';
 
 export const drawCompound = (
   nodes: GraphicalNode[],
   lineType: 'solid' | 'dash',
-  withDecorator: boolean,
+  withDecorator: boolean
 ): DrawUnit => {
   let firstNodeDrawUnit = drawEmptyLine();
   let conjunction = null;
@@ -38,23 +34,19 @@ export const drawCompound = (
           verticalStart: firstNodeDrawUnit.verticalStart,
           verticalCenter: firstNodeDrawUnit.verticalCenter,
           verticalEnd: firstNodeDrawUnit.verticalEnd,
-        },
+        }
       );
     }
 
     if (getKeyFromNode(nodes[0]) === prepositionalPhraseKey) {
       firstNodeDrawUnit = verticalMerge(
-        [
-          drawEmptyWord(),
-          drawEmptyLine(firstNodeDrawUnit.width),
-          firstNodeDrawUnit,
-        ],
+        [drawEmptyWord(), drawEmptyLine(firstNodeDrawUnit.width), firstNodeDrawUnit],
         {
           align: 'center',
           verticalStart: 0,
           verticalCenter: drawEmptyWord().verticalCenter,
           verticalEnd: firstNodeDrawUnit.verticalEnd,
-        },
+        }
       );
     }
 
@@ -88,7 +80,7 @@ export const drawCompound = (
           verticalStart: secondNodeDrawUnit.verticalStart,
           verticalCenter: secondNodeDrawUnit.verticalCenter,
           verticalEnd: secondNodeDrawUnit.verticalEnd,
-        },
+        }
       );
 
       if ([adjectiveKey].includes(getKeyFromNode(child))) {
@@ -98,17 +90,13 @@ export const drawCompound = (
 
     if (getKeyFromNode(nodes[i]) === prepositionalPhraseKey) {
       secondNodeDrawUnit = verticalMerge(
-        [
-          drawEmptyWord(),
-          drawEmptyLine(secondNodeDrawUnit.width),
-          secondNodeDrawUnit,
-        ],
+        [drawEmptyWord(), drawEmptyLine(secondNodeDrawUnit.width), secondNodeDrawUnit],
         {
           align: 'center',
           verticalStart: 0,
           verticalCenter: drawEmptyWord().verticalCenter,
           verticalEnd: secondNodeDrawUnit.verticalEnd,
-        },
+        }
       );
     }
 
@@ -122,14 +110,11 @@ export const drawCompound = (
 
     totalHeight += height;
 
-    const mergedDrawUnit = verticalMerge(
-      [firstNodeDrawUnit, spacerDrawUnit, secondNodeDrawUnit],
-      {
-        align: 'end',
-        verticalStart: firstNodeDrawUnit.verticalStart,
-        verticalCenter: firstNodeDrawUnit.verticalCenter + height / 2,
-      },
-    );
+    const mergedDrawUnit = verticalMerge([firstNodeDrawUnit, spacerDrawUnit, secondNodeDrawUnit], {
+      align: 'end',
+      verticalStart: firstNodeDrawUnit.verticalStart,
+      verticalCenter: firstNodeDrawUnit.verticalCenter + height / 2,
+    });
 
     firstNodeDrawUnit = horizontalMerge(
       [
@@ -145,7 +130,7 @@ export const drawCompound = (
         verticalStart: mergedDrawUnit.verticalStart,
         verticalCenter: firstNodeDrawUnit.verticalCenter + height,
         verticalEnd: mergedDrawUnit.verticalEnd,
-      },
+      }
     );
   }
 
@@ -173,10 +158,7 @@ export const drawCompound = (
 
   const decoratorData: [number, number][] = [
     [firstNodeDrawUnit.width, firstNodeDrawUnit.verticalStart],
-    [
-      firstNodeDrawUnit.width + decoratorWidth,
-      firstNodeDrawUnit.verticalCenter,
-    ],
+    [firstNodeDrawUnit.width + decoratorWidth, firstNodeDrawUnit.verticalCenter],
     [firstNodeDrawUnit.width, firstNodeDrawUnit.verticalEnd],
   ];
 

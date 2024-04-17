@@ -11,14 +11,11 @@ export function parseComplementGroup(node: GrammarNode): GraphicalNode {
   const requiredKeys: string[] = [complementKey];
 
   if (node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'ComplementGroup has no children',
-    );
+    throw new GrammarError('InvalidStructure', 'ComplementGroup has no children');
   }
 
   const validChildren = node.children.filter((child) =>
-    requiredKeys.includes(getKeyFromNode(child)),
+    requiredKeys.includes(getKeyFromNode(child))
   );
 
   const keysLen = validChildren.length;
@@ -36,13 +33,10 @@ export function parseComplementGroup(node: GrammarNode): GraphicalNode {
             return drawWord(child, true);
           }),
         ],
-        { align: 'center' },
+        { align: 'center' }
       ),
     };
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'ComplementGroup has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'ComplementGroup has unexpected structure');
 }

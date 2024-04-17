@@ -40,12 +40,7 @@ import { drawCompoundEnd } from '../svgDrawer/drawCompoundEnd.js';
 
 export function parseSubject(node: GrammarNode): GraphicalNode {
   const topKeys = [nounKey, pronounKey, verbparticipleKey];
-  const bottomKeys = [
-    adjectivalKey,
-    adjectiveKey,
-    articleKey,
-    relativeClauseKey,
-  ];
+  const bottomKeys = [adjectivalKey, adjectiveKey, articleKey, relativeClauseKey];
   const singleKeys = [appositionKey, casusPendensKey, objectKey, predicateKey];
   const specialKeys = [
     clauseKey,
@@ -56,22 +51,10 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     constructchainKey,
     vocativeKey,
   ];
-  const validKeys: string[] = [
-    ...topKeys,
-    ...bottomKeys,
-    ...singleKeys,
-    ...specialKeys,
-  ];
+  const validKeys: string[] = [...topKeys, ...bottomKeys, ...singleKeys, ...specialKeys];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Subject'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Subject parser requires Subject Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Subject') {
+    throw new GrammarError('InvalidParser', 'Subject parser requires Subject Node');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -91,7 +74,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: drawConstructChainConnector(
           childMap[constructchainKey].children as GraphicalNode[],
-          { horizontalLine: true },
+          { horizontalLine: true }
         ),
       };
     }
@@ -99,11 +82,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     if (childMap[constructChainCompoundKey]) {
       return {
         ...node,
-        drawUnit: drawCompoundEnd(
-          childMap[constructChainCompoundKey].drawUnit,
-          'solid',
-          true,
-        ),
+        drawUnit: drawCompoundEnd(childMap[constructChainCompoundKey].drawUnit, 'solid', true),
       };
     }
 
@@ -117,12 +96,10 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           drawUnit: verticalMerge(
             [
               nominalDrawUnit,
-              drawEmptyLine(
-                Math.max(nominalDrawUnit.width, adjectivalDrawUnit.width),
-              ),
+              drawEmptyLine(Math.max(nominalDrawUnit.width, adjectivalDrawUnit.width)),
               adjectivalDrawUnit,
             ],
-            { align: 'end' },
+            { align: 'end' }
           ),
         };
       }
@@ -136,22 +113,14 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     if (childMap[nominalGroupKey]) {
       return {
         ...node,
-        drawUnit: drawCompoundEnd(
-          childMap[nominalGroupKey].drawUnit,
-          'solid',
-          true,
-        ),
+        drawUnit: drawCompoundEnd(childMap[nominalGroupKey].drawUnit, 'solid', true),
       };
     }
 
     if (childMap[nominalCompoundKey]) {
       return {
         ...node,
-        drawUnit: drawCompoundEnd(
-          childMap[nominalCompoundKey].drawUnit,
-          'solid',
-          true,
-        ),
+        drawUnit: drawCompoundEnd(childMap[nominalCompoundKey].drawUnit, 'solid', true),
       };
     }
 
@@ -167,14 +136,14 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           [drawUnit, drawEqualDecorator(), childMap[vocativeKey].drawUnit],
           {
             align: 'center',
-          },
+          }
         ),
       };
     }
 
     if (childMap[clauseKey]) {
       const subjectNode = childMap[clauseKey].children.find(
-        (child) => getKeyFromNode(child) === subjectKey,
+        (child) => getKeyFromNode(child) === subjectKey
       );
 
       return {
@@ -183,7 +152,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           childMap[clauseKey].drawUnit,
           subjectNode
             ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
-            : settings.padding,
+            : settings.padding
         ),
       };
     }

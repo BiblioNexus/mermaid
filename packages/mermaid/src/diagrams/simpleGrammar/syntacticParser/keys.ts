@@ -72,9 +72,7 @@ export const predicateKey = generateFragmentKey('Predicate');
 export const complementKey = generateFragmentKey('Complement');
 export const conjunctionFragmentKey = generateFragmentKey('Conjunction');
 export const complementClauseKey = generateFragmentKey('ComplementClause');
-export const prepositionalPhraseKey = generateFragmentKey(
-  'PrepositionalPhrase',
-);
+export const prepositionalPhraseKey = generateFragmentKey('PrepositionalPhrase');
 export const objectKey = generateFragmentKey('Object');
 export const relativeClauseKey = generateFragmentKey('RelativeClause');
 export const relativeParticleKey = generateFragmentKey('RelativeParticle');
@@ -90,34 +88,22 @@ export const adjectiveCompoundKey = generateFragmentKey('AdjectiveCompound');
 export const adjectivalCompoundKey = generateFragmentKey('AdjectivalCompound');
 export const adverbCompoundKey = generateFragmentKey('AdverbCompound');
 export const adverbialCompoundKey = generateFragmentKey('AdverbialCompound');
-export const constructChainCompoundKey = generateFragmentKey(
-  'ConstructChainCompound',
-);
+export const constructChainCompoundKey = generateFragmentKey('ConstructChainCompound');
 export const nominalCompoundKey = generateFragmentKey('NominalCompound');
 export const predicateCompoundKey = generateFragmentKey('PredicateCompound');
 export const clauseCompoundKey = generateFragmentKey('ClauseCompound');
-export const prepositionalPhraseCompoundKey = generateFragmentKey(
-  'PrepositionalPhraseCompound',
-);
-export const verbParticipleCompoundKey = generateFragmentKey(
-  'VerbParticipleCompound',
-);
+export const prepositionalPhraseCompoundKey = generateFragmentKey('PrepositionalPhraseCompound');
+export const verbParticipleCompoundKey = generateFragmentKey('VerbParticipleCompound');
 export const objectCompoundKey = generateFragmentKey('ObjectCompound');
 
 export const adverbialGroupKey = generateFragmentKey('AdverbialGroup');
 export const predicateGroupKey = generateFragmentKey('PredicateGroup');
 export const adjectivalGroupKey = generateFragmentKey('AdjectivalGroup');
-export const verbParticipleGroupKey = generateFragmentKey(
-  'VerbParticipleGroup',
-);
+export const verbParticipleGroupKey = generateFragmentKey('VerbParticipleGroup');
 export const objectGroupKey = generateFragmentKey('ObjectGroup');
-export const PrepositionalPhraseGroupKey = generateFragmentKey(
-  'PrepositionalPhraseGroup',
-);
+export const PrepositionalPhraseGroupKey = generateFragmentKey('PrepositionalPhraseGroup');
 export const verbGroupKey = generateFragmentKey('VerbGroup');
-export const relativeClauseGroupKey = generateFragmentKey(
-  'RelativeClauseGroup',
-);
+export const relativeClauseGroupKey = generateFragmentKey('RelativeClauseGroup');
 export const subjectGroupKey = generateFragmentKey('SubjectGroup');
 export const complementGroupKey = generateFragmentKey('ComplementGroup');
 export const nominalGroupKey = generateFragmentKey('NominalGroup');

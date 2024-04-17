@@ -9,28 +9,17 @@ import { getChildMap } from './utils.js';
 import { drawSubordinateConjunction } from '../svgDrawer/drawSubordinateConjunction.js';
 
 export function parseSubordinateClause(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [
-    conjunctionFragmentKey,
-    clauseKey,
-    clauseClusterKey,
-  ];
+  const validKeys: string[] = [conjunctionFragmentKey, clauseKey, clauseClusterKey];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'SubordinateClause'
-  ) {
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'SubordinateClause') {
     throw new GrammarError(
       'InvalidParser',
-      'SubordinateClause parser requires SubordinateClause Node',
+      'SubordinateClause parser requires SubordinateClause Node'
     );
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'SubordinateClause has no children',
-    );
+    throw new GrammarError('InvalidStructure', 'SubordinateClause has no children');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -43,7 +32,7 @@ export function parseSubordinateClause(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: drawSubordinateConjunction(
           childMap[conjunctionFragmentKey].children[0],
-          childMap[clauseKey].drawUnit,
+          childMap[clauseKey].drawUnit
         ),
       };
     }
@@ -53,14 +42,11 @@ export function parseSubordinateClause(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: drawSubordinateConjunction(
           childMap[conjunctionFragmentKey].children[0],
-          childMap[clauseClusterKey].drawUnit,
+          childMap[clauseClusterKey].drawUnit
         ),
       };
     }
   }
 
-  throw new GrammarError(
-    'InvalidStructure',
-    'SubordinateClause has unexpected structure',
-  );
+  throw new GrammarError('InvalidStructure', 'SubordinateClause has unexpected structure');
 }

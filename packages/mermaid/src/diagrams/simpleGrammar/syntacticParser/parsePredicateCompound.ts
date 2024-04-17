@@ -25,24 +25,17 @@ export function parsePredicateCompound(node: GrammarNode): GraphicalNode {
     conjunctionKey,
   ];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'PredicateCompound'
-  ) {
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'PredicateCompound') {
     throw new GrammarError(
       'InvalidParser',
-      'PredicateCompound parser requires PredicateCompound Node',
+      'PredicateCompound parser requires PredicateCompound Node'
     );
   }
 
   const allValid = allGivenKeys(node.children, validKeys);
 
   if (!allValid || node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'PredicateCompound has unexpected structure',
-    );
+    throw new GrammarError('InvalidStructure', 'PredicateCompound has unexpected structure');
   }
 
   return {

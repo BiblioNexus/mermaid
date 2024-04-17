@@ -23,22 +23,18 @@ export function drawConstructChainConnector(
   options?: {
     horizontalLine?: boolean;
     drawUnit?: DrawUnit;
-  },
+  }
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   let totalWidth = 0;
 
   const drawUnits = nodes.map((child) => {
-    if (
-      [adjectivalKey, adjectiveKey, relativeClauseKey].includes(
-        getKeyFromNode(child),
-      )
-    ) {
-      return verticalMerge(
-        [drawEmptyWord(), drawEmptyLine(child.drawUnit.width), child.drawUnit],
-        { align: 'center', verticalCenter: drawEmptyWord().height },
-      );
+    if ([adjectivalKey, adjectiveKey, relativeClauseKey].includes(getKeyFromNode(child))) {
+      return verticalMerge([drawEmptyWord(), drawEmptyLine(child.drawUnit.width), child.drawUnit], {
+        align: 'center',
+        verticalCenter: drawEmptyWord().height,
+      });
     } else if (
       child.content &&
       isWord(child.content) &&
@@ -103,7 +99,7 @@ export function drawConstructChainConnector(
     if (i < drawUnits.length - 1) {
       const verticalLineHeight = Math.max(
         unit.height - unit.verticalCenter,
-        drawUnits[i + 1].verticalCenter,
+        drawUnits[i + 1].verticalCenter
       );
 
       const data: [number, number][] = [

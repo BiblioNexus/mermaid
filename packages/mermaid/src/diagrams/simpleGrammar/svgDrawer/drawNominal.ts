@@ -50,11 +50,8 @@ export const drawNominal = ({
 
   const line = drawEmptyLine(Math.max(topDrawUnit.width, bottomDrawUnit.width));
 
-  return verticalMerge(
-    [verticalMerge([topDrawUnit, line], { align: 'center' }), bottomDrawUnit],
-    {
-      align: 'end',
-      verticalCenter: topDrawUnit.height,
-    },
-  );
+  return verticalMerge([verticalMerge([topDrawUnit, line], { align: 'center' }), bottomDrawUnit], {
+    align: 'end',
+    verticalCenter: topDrawUnit.height,
+  });
 };
