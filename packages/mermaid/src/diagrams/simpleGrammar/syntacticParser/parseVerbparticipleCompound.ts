@@ -4,24 +4,20 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 import { GrammarError } from '../error.js';
 
 import {
-  appositionKey,
+  adjectiveKey,
   conjunctionFragmentKey,
   conjunctionKey,
-  constructchainKey,
-  nominalKey,
-  nounKey,
+  verbparticipleKey,
 } from './keys.js';
 
 import { allGivenKeys } from './utils.js';
 
 import { drawCompound } from '../svgDrawer/drawCompound.js';
 
-export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
+export function parseVerbparticipleCompound(node: GrammarNode): GraphicalNode {
   const validKeys = [
-    constructchainKey,
-    nounKey,
-    nominalKey,
-    appositionKey,
+    verbparticipleKey,
+    adjectiveKey,
     conjunctionFragmentKey,
     conjunctionKey,
   ];
@@ -29,11 +25,11 @@ export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
   if (
     !node.content ||
     !isFragment(node.content) ||
-    node.content.fragment !== 'ConstructChainCompound'
+    node.content.fragment !== 'VerbParticipleCompound'
   ) {
     throw new GrammarError(
       'InvalidParser',
-      'ConstructChainCompound parser requires ConstructChainCompound Node',
+      'VerbParticipleCompound parser requires VerbParticipleCompound Node',
     );
   }
 
@@ -42,7 +38,7 @@ export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
   if (!allValid || node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
-      'ConstructChainCompound has invalid length of children',
+      'VerbParticipleCompound has invalid length of children',
     );
   }
 

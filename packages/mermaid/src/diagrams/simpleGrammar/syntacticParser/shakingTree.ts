@@ -1,18 +1,21 @@
 import type { GrammarNode } from '../simpleGrammarTypes.js';
 
-import { GrammarError } from '../error.js';
-
 import {
+  adjectivalCompoundKey,
+  adjectivalKey,
   adjectiveCompoundKey,
   adjectiveKey,
   adverbCompoundKey,
   adverbKey,
   adverbialCompoundKey,
   adverbialKey,
+  appositionKey,
+  clausalClusterKey,
   clauseClusterKey,
   clauseCompoundKey,
   clauseKey,
   complementClauseKey,
+  complementKey,
   conjunctionFragmentKey,
   conjunctionKey,
   constructChainCompoundKey,
@@ -21,11 +24,22 @@ import {
   nominalCompoundKey,
   nominalKey,
   nounKey,
+  objectCompoundKey,
+  objectKey,
   predicateCompoundKey,
   predicateKey,
+  prepositionKey,
+  prepositionalPhraseCompoundKey,
+  prepositionalPhraseKey,
+  pronounKey,
+  relativeClauseKey,
+  subjectKey,
   subordinateClauseKey,
+  verbKey,
   verbparticipleKey,
 } from './keys.js';
+import { isFragment } from '../utils.js';
+import { allGivenKeys, havingGivenKeys } from './utils.js';
 
 export type CompoundType =
   | 'AdjectiveCompound'
@@ -34,75 +48,88 @@ export type CompoundType =
   | 'ConstructChainCompound'
   | 'NominalCompound'
   | 'PredicateCompound'
-  | 'ClauseCompound';
+  | 'ClauseCompound'
+  | 'PrepositionalPhraseCompound'
+  | 'VerbParticipleCompound'
+  | 'ObjectCompound'
+  | 'AdjectivalCompound';
 
-export type GroupType = 'AdverbialGroup' | 'PredicateGroup';
+export type GroupType =
+  | 'AdverbialGroup'
+  | 'AdjectivalGroup'
+  | 'PredicateGroup'
+  | 'AdjectiveGroup'
+  | 'VerbParticipleGroup'
+  | 'ObjectGroup'
+  | 'VerbGroup'
+  | 'RelativeClauseGroup'
+  | 'SubjectGroup';
 
-function isCompound(compoundType: CompoundType, leftKey: string | null, rightKey: string | null) {
-  const requiredKeys: Record<CompoundType, (string | null)[]> = {
-    AdjectiveCompound: [adjectiveKey, adjectiveCompoundKey],
-    AdverbCompound: [adverbKey, adverbCompoundKey],
-    AdverbialCompound: [adverbialKey, adverbKey],
-    ConstructChainCompound: [constructchainKey, constructChainCompoundKey],
-    NominalCompound: [nounKey, nominalKey, nominalCompoundKey],
-    PredicateCompound: [predicateKey, predicateCompoundKey],
-    ClauseCompound: [clauseKey, clauseClusterKey, clauseCompoundKey],
+function isCompound(compoundType: CompoundType, nodes: GrammarNode[]) {
+  const requiredKeys: Record<CompoundType, string[]> = {
+    AdjectiveCompound: [adjectiveKey],
+    AdverbCompound: [adverbKey],
+    AdverbialCompound: [adverbialKey],
+    AdjectivalCompound: [adjectivalKey],
+    ConstructChainCompound: [constructchainKey],
+    NominalCompound: [nounKey, pronounKey, nominalKey],
+    PredicateCompound: [predicateKey, verbKey],
+    ClauseCompound: [clauseKey, clauseClusterKey, clausalClusterKey],
+    PrepositionalPhraseCompound: [prepositionalPhraseKey],
+    VerbParticipleCompound: [verbparticipleKey],
+    ObjectCompound: [objectKey],
   };
   const additionalKeys: Record<CompoundType, (string | null)[]> = {
-    AdjectiveCompound: [verbparticipleKey],
+    AdjectiveCompound: [null],
     AdverbCompound: [null],
-    AdverbialCompound: [adverbKey, adverbCompoundKey, null],
-    ConstructChainCompound: [nounKey, nominalKey],
-    NominalCompound: [null],
-    PredicateCompound: [null],
+    AdverbialCompound: [adverbKey, null],
+    AdjectivalCompound: [adjectiveKey, null],
+    ConstructChainCompound: [nounKey, nominalKey, appositionKey],
+    NominalCompound: [appositionKey],
+    PredicateCompound: [objectKey],
     ClauseCompound: [null],
+    PrepositionalPhraseCompound: [null],
+    VerbParticipleCompound: [adjectiveKey],
+    ObjectCompound: [null],
   };
 
-  const validKeys = [...requiredKeys[compoundType], ...additionalKeys[compoundType]];
+  const validKeys = [
+    ...requiredKeys[compoundType],
+    ...additionalKeys[compoundType],
+    conjunctionFragmentKey,
+    conjunctionKey,
+  ];
 
-  const hasRequiredKeys =
-    requiredKeys[compoundType].includes(leftKey) || requiredKeys[compoundType].includes(rightKey);
+  const hasRequiredKeys = havingGivenKeys(nodes, requiredKeys[compoundType]);
 
-  const hasValidKey = validKeys.includes(leftKey) && validKeys.includes(rightKey);
-
-  if (compoundType === 'AdverbialCompound') {
-    return (
-      (leftKey === adverbKey && rightKey === adverbialKey) ||
-      (leftKey === adverbialKey && rightKey === adverbKey)
-    );
-  }
+  const hasValidKey = allGivenKeys(
+    nodes,
+    validKeys.filter((value) => !!value) as string[],
+  );
 
   return hasRequiredKeys && hasValidKey;
 }
 
-export function generateNewCompoundFragment(
-  conjunction: GrammarNode,
-  leftNode: GrammarNode | null,
-  rightNode: GrammarNode | null
-): GrammarNode {
-  const leftKey = leftNode ? getKeyFromNode(leftNode) : null;
-  const rightKey = rightNode ? getKeyFromNode(rightNode) : null;
-
-  if (!leftNode && !rightNode) {
-    return conjunction;
-  }
-
-  const children = [conjunction, leftNode, rightNode].filter((node) => !!node) as GrammarNode[];
+export function generateNewCompoundFragment(nodes: GrammarNode[]): GrammarNode {
+  const children = nodes;
 
   const compoundTypes: CompoundType[] = [
+    'VerbParticipleCompound',
     'AdjectiveCompound',
-    'AdverbCompound',
     'AdverbialCompound',
+    'AdverbCompound',
     'ConstructChainCompound',
     'NominalCompound',
     'PredicateCompound',
     'ClauseCompound',
+    'PrepositionalPhraseCompound',
+    'ObjectCompound',
   ];
 
   for (const compoundType of compoundTypes) {
-    if (isCompound(compoundType, leftKey, rightKey)) {
+    if (isCompound(compoundType, children)) {
       return {
-        ...conjunction,
+        level: 0,
         children,
         content: {
           fragment: compoundType,
@@ -112,7 +139,14 @@ export function generateNewCompoundFragment(
     }
   }
 
-  throw new GrammarError('InvalidStructure', `Node has invalid children`);
+  return {
+    level: 0,
+    children,
+    content: {
+      fragment: 'Error',
+      description: 'Invalid structure',
+    },
+  };
 }
 
 export function shakingTreeForConjunction(node: GrammarNode): GrammarNode {
@@ -124,56 +158,69 @@ export function shakingTreeForConjunction(node: GrammarNode): GrammarNode {
     return node;
   }
 
-  const skipKeys = [conjunctionFragmentKey, subordinateClauseKey, complementClauseKey];
+  const skipKeys = [
+    conjunctionFragmentKey,
+    subordinateClauseKey,
+    complementClauseKey,
+  ];
 
   if (skipKeys.includes(getKeyFromNode(node))) {
     return node;
   }
 
-  const newChildren: GrammarNode[] = [];
+  let groupNumber = 0;
+  const flag = [];
 
   for (let i = 0; i < node.children.length; i++) {
-    const conjunctions: GrammarNode[] = [];
+    flag.push(-1);
+  }
 
-    while (
-      i < node.children.length &&
-      (getKeyFromNode(node.children[i]) === conjunctionFragmentKey ||
-        getKeyFromNode(node.children[i]) === conjunctionKey)
+  for (let i = 0; i < node.children.length; i++) {
+    if (
+      getKeyFromNode(node.children[i]) === conjunctionFragmentKey ||
+      getKeyFromNode(node.children[i]) === conjunctionKey
     ) {
-      conjunctions.push(node.children[i]);
-      i++;
-    }
-
-    if (conjunctions.length === 1) {
-      const conjunction =
-        getKeyFromNode(conjunctions[0]) === conjunctionKey
-          ? {
-              ...conjunctions[0],
-              children: [conjunctions[0]],
-              content: {
-                fragment: 'Conjunction',
-                description: '',
-              },
-            }
-          : conjunctions[0];
-
-      const leftNode = newChildren.length > 0 ? newChildren[newChildren.length - 1] : null;
-      const rightNode = i < node.children.length ? node.children[i] : null;
-
-      if (newChildren.length > 0) {
-        newChildren[newChildren.length - 1] = generateNewCompoundFragment(
-          conjunction,
-          leftNode,
-          rightNode
-        );
-      } else {
-        newChildren.push(generateNewCompoundFragment(conjunction, leftNode, rightNode));
+      if (i === 0 || flag[i - 1] === -1) {
+        groupNumber += 1;
+        flag[i - 1] = groupNumber;
       }
-    } else if (conjunctions.length === 0) {
+
+      flag[i] = groupNumber;
+      flag[i + 1] = groupNumber;
+    }
+  }
+
+  const newChildren: GrammarNode[] = [];
+  let groupNodes: GrammarNode[] = [];
+
+  for (let i = 0; i < node.children.length; i++) {
+    if (flag[i] === -1) {
+      if (groupNodes.length > 0) {
+        if (
+          allGivenKeys(groupNodes, [conjunctionFragmentKey, conjunctionKey])
+        ) {
+          newChildren.push(...groupNodes);
+        } else {
+          newChildren.push(generateNewCompoundFragment(groupNodes));
+        }
+
+        groupNodes = [];
+      }
+
       newChildren.push(node.children[i]);
     } else {
-      throw new GrammarError('InvalidStructure', `Node has invalid children`);
+      groupNodes.push(node.children[i]);
     }
+  }
+
+  if (groupNodes.length > 0) {
+    if (allGivenKeys(groupNodes, [conjunctionFragmentKey, conjunctionKey])) {
+      newChildren.push(...groupNodes);
+    } else {
+      newChildren.push(generateNewCompoundFragment(groupNodes));
+    }
+
+    groupNodes = [];
   }
 
   return {
@@ -192,6 +239,8 @@ export function shakingTreeForDuplication(node: GrammarNode): GrammarNode {
   }
 
   const skipKeys = [
+    prepositionKey,
+    appositionKey,
     constructchainKey,
     conjunctionFragmentKey,
     adjectiveCompoundKey,
@@ -201,6 +250,8 @@ export function shakingTreeForDuplication(node: GrammarNode): GrammarNode {
     nominalCompoundKey,
     predicateCompoundKey,
     clauseCompoundKey,
+    objectCompoundKey,
+    prepositionalPhraseCompoundKey,
   ];
 
   if (skipKeys.includes(getKeyFromNode(node))) {
@@ -208,20 +259,31 @@ export function shakingTreeForDuplication(node: GrammarNode): GrammarNode {
   }
 
   const keyMap = {
-    AdverbialGroup: [adverbialKey, adverbialCompoundKey],
+    AdverbialGroup: [adverbialKey, adverbKey, adverbialCompoundKey],
+    AdjectivalGroup: [adjectivalKey, adjectivalCompoundKey],
     PredicateGroup: [predicateKey, predicateCompoundKey],
     ClauseCluster: [clauseKey, clauseCompoundKey],
+    PrepositionalPhraseGroup: [prepositionalPhraseKey],
+    ObjectGroup: [objectKey],
+    VerbGroup: [verbKey],
+    RelativeClauseGroup: [relativeClauseKey],
+    SubjectGroup: [subjectKey],
+    ComplementGroup: [complementKey],
+    NominalGroup: [nominalKey],
   };
 
-  const duplicatibleKeys = Object.values(keyMap).reduce((acc, item) => [...acc, ...item], []);
+  const duplicatibleKeys = Object.values(keyMap).reduce(
+    (acc, item) => [...acc, ...item],
+    [],
+  );
 
   const newChildren: GrammarNode[] = node.children.filter(
-    (child) => !duplicatibleKeys.includes(getKeyFromNode(child))
+    (child) => !duplicatibleKeys.includes(getKeyFromNode(child)),
   );
 
   Object.keys(keyMap).forEach((groupType) => {
     const children = node.children.filter((child) =>
-      keyMap[groupType as keyof typeof keyMap].includes(getKeyFromNode(child))
+      keyMap[groupType as keyof typeof keyMap].includes(getKeyFromNode(child)),
     );
 
     if (children.length > 1) {
@@ -245,18 +307,22 @@ export function shakingTreeForDuplication(node: GrammarNode): GrammarNode {
 }
 
 export function shakingTreeForEmptyFragment(node: GrammarNode): GrammarNode {
-  const deletionKeys = [predicateKey];
+  const exceptionKeys: string[] = [];
   const newChildren: GrammarNode[] = [];
 
   for (let i = 0; i < node.children.length; i++) {
-    if (
-      deletionKeys.includes(getKeyFromNode(node.children[i])) &&
-      node.children[i].children.length === 0
-    ) {
-      continue;
-    }
+    if (node.children[i].content && isFragment(node.children[i].content!)) {
+      if (
+        !exceptionKeys.includes(getKeyFromNode(node.children[i])) &&
+        node.children[i].children.length === 0
+      ) {
+        continue;
+      }
 
-    newChildren.push(shakingTreeForEmptyFragment(node.children[i]));
+      newChildren.push(shakingTreeForEmptyFragment(node.children[i]));
+    } else {
+      newChildren.push(node.children[i]);
+    }
   }
 
   return {
@@ -265,6 +331,8 @@ export function shakingTreeForEmptyFragment(node: GrammarNode): GrammarNode {
   };
 }
 
-export function shakingTree(node: GrammarNode): GrammarNode {
-  return shakingTreeForDuplication(shakingTreeForConjunction(shakingTreeForEmptyFragment(node)));
+export function shakingTree(root: GrammarNode): GrammarNode {
+  return shakingTreeForDuplication(
+    shakingTreeForConjunction(shakingTreeForEmptyFragment(root)),
+  );
 }

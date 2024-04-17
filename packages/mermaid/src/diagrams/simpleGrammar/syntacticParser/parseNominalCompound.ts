@@ -4,74 +4,46 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 import { GrammarError } from '../error.js';
 
 import {
+  appositionKey,
   conjunctionFragmentKey,
-  getKeyFromNode,
-  nominalCompoundKey,
+  conjunctionKey,
   nominalKey,
   nounKey,
+  pronounKey,
 } from './keys.js';
-import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
-import { drawConjunction } from '../svgDrawer/drawConjunction.js';
+
+import { allGivenKeys } from './utils.js';
+
+import { drawCompound } from '../svgDrawer/drawCompound.js';
 
 export function parseNominalCompound(node: GrammarNode): GraphicalNode {
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'NominalCompound'
-  ) {
+  const validKeys = [
+    nounKey,
+    pronounKey,
+    nominalKey,
+    appositionKey,
+    conjunctionFragmentKey,
+    conjunctionKey,
+  ];
+
+  if (!node.content || !isFragment(node.content)) {
     throw new GrammarError(
       'InvalidParser',
       'NominalCompound parser requires NominalCompound Node',
     );
   }
 
-  if (node.children.length === 0) {
+  const allValid = allGivenKeys(node.children, validKeys);
+
+  if (!allValid || node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
       'NominalCompound has invalid length of children',
     );
   }
 
-  const conjunctionFragmentNode = node.children.find(
-    (child) => getKeyFromNode(child) === conjunctionFragmentKey,
-  );
-
-  const keys = [nounKey, nominalKey, nominalCompoundKey];
-
-  const nominalNodes = node.children.filter((child) =>
-    keys.includes(getKeyFromNode(child)),
-  );
-
-  if (nominalNodes.length !== 2 || !conjunctionFragmentNode) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'NominalCompound has unexpected structure',
-    );
-  }
-
-  const firstNodeDrawUnit = (nominalNodes[0] as GraphicalNode).drawUnit;
-  const secondNodeDrawUnit = (nominalNodes[1] as GraphicalNode).drawUnit;
-
-  const height =
-    firstNodeDrawUnit.height -
-    firstNodeDrawUnit.verticalCenter +
-    secondNodeDrawUnit.verticalCenter;
-
   return {
     ...node,
-    drawUnit: horizontalMerge(
-      [
-        verticalMerge(
-          nominalNodes.map((node) => (node as GraphicalNode).drawUnit),
-          { align: 'end', verticalStart: firstNodeDrawUnit.verticalCenter },
-        ),
-        drawConjunction(conjunctionFragmentNode.children[0], height),
-      ],
-      {
-        align: 'start',
-        verticalCenter: firstNodeDrawUnit.verticalCenter + height / 2,
-        verticalEnd: firstNodeDrawUnit.verticalCenter + height / 2,
-      },
-    ),
+    drawUnit: drawCompound(node.children as GraphicalNode[], 'solid', true),
   };
 }

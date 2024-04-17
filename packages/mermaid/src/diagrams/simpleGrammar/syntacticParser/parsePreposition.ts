@@ -1,34 +1,40 @@
-import { isFragment } from '../utils.js';
+import { isFragment, isWord } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import { prepositionKey } from './keys.js';
-
-import { getChildMap } from './utils.js';
-
 import { drawPreposition } from '../svgDrawer/drawPreposition.js';
+import { spaceWord } from '../constants.js';
 
 export function parsePreposition(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [prepositionKey];
-
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Preposition') {
-    throw new Error('Preposition parser requires Preposition Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Preposition'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Preposition parser requires Preposition Node',
+    );
   }
 
-  if (node.children.length !== 1) {
-    throw new Error('Invalid Preposition Node: Preposition Node has 1 children');
+  if (node.children.length > 0) {
+    const child = node.children[0];
+
+    if (child.content && isWord(child.content)) {
+      return {
+        ...node,
+        drawUnit: drawPreposition(child),
+      };
+    } else {
+      return {
+        ...node,
+        drawUnit: (child as GraphicalNode).drawUnit,
+      };
+    }
   }
 
-  const childMap = getChildMap(node.children, validKeys);
-
-  const keysLen = Object.keys(childMap).length;
-
-  if (keysLen === 1 && childMap[prepositionKey]) {
-    return {
-      ...node,
-      drawUnit: drawPreposition(childMap[prepositionKey]),
-    };
-  }
-
-  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
+  return {
+    ...node,
+    drawUnit: drawPreposition(spaceWord),
+  };
 }

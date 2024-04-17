@@ -4,24 +4,19 @@ import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 import { GrammarError } from '../error.js';
 
 import {
-  appositionKey,
   conjunctionFragmentKey,
   conjunctionKey,
-  constructchainKey,
-  nominalKey,
-  nounKey,
+  prepositionalPhraseKey,
 } from './keys.js';
 
 import { allGivenKeys } from './utils.js';
-
 import { drawCompound } from '../svgDrawer/drawCompound.js';
 
-export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
+export function parsePrepositionalPhraseCompound(
+  node: GrammarNode,
+): GraphicalNode {
   const validKeys = [
-    constructchainKey,
-    nounKey,
-    nominalKey,
-    appositionKey,
+    prepositionalPhraseKey,
     conjunctionFragmentKey,
     conjunctionKey,
   ];
@@ -29,11 +24,11 @@ export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
   if (
     !node.content ||
     !isFragment(node.content) ||
-    node.content.fragment !== 'ConstructChainCompound'
+    node.content.fragment !== 'PrepositionalPhraseCompound'
   ) {
     throw new GrammarError(
       'InvalidParser',
-      'ConstructChainCompound parser requires ConstructChainCompound Node',
+      'PrepositionalPhraseCompound parser requires PrepositionalPhraseCompound Node',
     );
   }
 
@@ -42,7 +37,7 @@ export function parseConstructChainCompound(node: GrammarNode): GraphicalNode {
   if (!allValid || node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
-      'ConstructChainCompound has invalid length of children',
+      'PrepositionalPhraseCompound has unexpected structure',
     );
   }
 

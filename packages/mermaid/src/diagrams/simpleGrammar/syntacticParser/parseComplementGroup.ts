@@ -2,33 +2,18 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import {
-  adjectivalCompoundKey,
-  adjectivalGroupKey,
-  adjectivalKey,
-  adjectiveCompoundKey,
-  adjectiveKey,
-  getKeyFromNode,
-  relativeClauseKey,
-} from './keys.js';
+import { complementKey, getKeyFromNode } from './keys.js';
 
 import { horizontalMerge } from '../svgDrawer/utils.js';
-import { drawModifier } from '../svgDrawer/drawModifier.js';
+import { drawWord } from '../svgDrawer/drawWord.js';
 
-export function parseAdjectiveCompound(node: GrammarNode): GraphicalNode {
-  const requiredKeys: string[] = [
-    adjectiveKey,
-    adjectivalKey,
-    adjectivalGroupKey,
-    adjectivalCompoundKey,
-    adjectiveCompoundKey,
-    relativeClauseKey,
-  ];
+export function parseComplementGroup(node: GrammarNode): GraphicalNode {
+  const requiredKeys: string[] = [complementKey];
 
   if (node.children.length === 0) {
     throw new GrammarError(
       'InvalidStructure',
-      'AdjectiveCompound has no children',
+      'ComplementGroup has no children',
     );
   }
 
@@ -48,16 +33,16 @@ export function parseAdjectiveCompound(node: GrammarNode): GraphicalNode {
               return (child as GraphicalNode).drawUnit;
             }
 
-            return drawModifier(child);
+            return drawWord(child, true);
           }),
         ],
-        { align: 'start' },
+        { align: 'center' },
       ),
     };
   }
 
   throw new GrammarError(
     'InvalidStructure',
-    'AdjectiveCompound has unexpected structure',
+    'ComplementGroup has unexpected structure',
   );
 }

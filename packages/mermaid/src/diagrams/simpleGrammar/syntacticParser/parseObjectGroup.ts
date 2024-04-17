@@ -2,34 +2,16 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import {
-  adjectivalCompoundKey,
-  adjectivalGroupKey,
-  adjectivalKey,
-  adjectiveCompoundKey,
-  adjectiveKey,
-  getKeyFromNode,
-  relativeClauseKey,
-} from './keys.js';
+import { getKeyFromNode, objectKey } from './keys.js';
 
 import { horizontalMerge } from '../svgDrawer/utils.js';
-import { drawModifier } from '../svgDrawer/drawModifier.js';
+import { drawWord } from '../svgDrawer/drawWord.js';
 
-export function parseAdjectiveCompound(node: GrammarNode): GraphicalNode {
-  const requiredKeys: string[] = [
-    adjectiveKey,
-    adjectivalKey,
-    adjectivalGroupKey,
-    adjectivalCompoundKey,
-    adjectiveCompoundKey,
-    relativeClauseKey,
-  ];
+export function parseObjectGroup(node: GrammarNode): GraphicalNode {
+  const requiredKeys: string[] = [objectKey];
 
   if (node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'AdjectiveCompound has no children',
-    );
+    throw new GrammarError('InvalidStructure', 'ObjectGroup has no children');
   }
 
   const validChildren = node.children.filter((child) =>
@@ -48,16 +30,16 @@ export function parseAdjectiveCompound(node: GrammarNode): GraphicalNode {
               return (child as GraphicalNode).drawUnit;
             }
 
-            return drawModifier(child);
+            return drawWord(child, true);
           }),
         ],
-        { align: 'start' },
+        { align: 'center' },
       ),
     };
   }
 
   throw new GrammarError(
     'InvalidStructure',
-    'AdjectiveCompound has unexpected structure',
+    'ObjectGroup has unexpected structure',
   );
 }

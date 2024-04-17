@@ -1,51 +1,89 @@
-import { isFragment } from '../utils.js';
+import { isFragment, isWord } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+} from '../simpleGrammarTypes.js';
 
 import {
+  adjectivalGroupKey,
   adjectivalKey,
   adjectiveKey,
+  adverbialKey,
   appositionKey,
   articleKey,
+  casusPendensKey,
+  clauseClusterKey,
   clauseKey,
   complementClauseKey,
   constructChainCompoundKey,
   constructchainKey,
+  getKeyFromNode,
   nominalCompoundKey,
   nominalKey,
   nounKey,
+  objectCompoundKey,
+  objectGroupKey,
+  objectKey,
   particleKey,
+  predicateKey,
   pronounKey,
   quantifierKey,
+  relativeClauseGroupKey,
   relativeClauseKey,
+  secondObjectKey,
+  subjectKey,
   suffixPronounKey,
+  verbparticipleKey,
 } from './keys.js';
 
-import { getChildMap } from './utils.js';
+import { getChildMap, havingGivenKeys } from './utils.js';
+import { drawNominal } from '../svgDrawer/drawNominal.js';
+import { drawMockFragment } from '../svgDrawer/drawMockFragment.js';
+import { drawComplementClauseDecorator } from '../svgDrawer/drawComplementClauseDecorator.js';
 
-import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
-import { drawObjectClauseDecorator } from '../svgDrawer/drawObjectClauseDecorator.js';
-import { drawModifier } from '../svgDrawer/drawModifier.js';
-import { drawEmpty } from '../svgDrawer/drawEmpty.js';
+import { horizontalMerge } from '../svgDrawer/utils.js';
+import { drawConstructChainConnector } from '../svgDrawer/drawConstructChainConnector.js';
+import { settings } from '../settings.js';
+import { drawWord } from '../svgDrawer/drawWord.js';
 
 export function parseObject(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [
-    constructchainKey,
-    nounKey,
-    adjectiveKey,
-    adjectivalKey,
-    complementClauseKey,
-    particleKey,
-    articleKey,
+  const preHorizontalKeys = [
     nominalKey,
-    clauseKey,
-    quantifierKey,
-    suffixPronounKey,
-    relativeClauseKey,
-    appositionKey,
     nominalCompoundKey,
+    secondObjectKey,
+    objectKey,
+  ];
+  const afterHorizontalKeys = [particleKey];
+  const topKeys = [nounKey, pronounKey, suffixPronounKey, verbparticipleKey];
+  const bottomKeys = [
+    adjectivalKey,
+    adjectivalGroupKey,
+    adverbialKey,
+    adjectiveKey,
+    articleKey,
+    quantifierKey,
+    relativeClauseKey,
+    relativeClauseGroupKey,
+  ];
+  const singleKeys = [appositionKey, casusPendensKey, predicateKey];
+  const specialKeys = [
+    clauseKey,
+    clauseClusterKey,
+    complementClauseKey,
+    objectCompoundKey,
+    objectGroupKey,
+    constructchainKey,
     constructChainCompoundKey,
-    pronounKey,
+  ];
+  const validKeys: string[] = [
+    ...preHorizontalKeys,
+    ...afterHorizontalKeys,
+    ...topKeys,
+    ...bottomKeys,
+    ...singleKeys,
+    ...specialKeys,
   ];
 
   if (
@@ -54,212 +92,123 @@ export function parseObject(node: GrammarNode): GraphicalNode {
     (node.content.fragment !== 'Object' &&
       node.content.fragment !== 'SecondObject')
   ) {
-    throw new Error('Object parser requires Object Node');
+    throw new GrammarError(
+      'InvalidParser',
+      'Object parser requires Object or SecondObject Node',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
 
-  const keysLen = Object.keys(childMap).length;
-
-  if (keysLen === 0) {
-    return {
-      ...node,
-      drawUnit: drawEmpty(),
-    };
-  }
-
-  if (keysLen === 1) {
-    if (
-      childMap[constructchainKey] ||
-      childMap[nounKey] ||
-      childMap[pronounKey] ||
-      childMap[complementClauseKey] ||
-      childMap[nominalKey] ||
-      childMap[suffixPronounKey] ||
-      childMap[appositionKey] ||
-      childMap[nominalCompoundKey] ||
-      childMap[constructChainCompoundKey]
-    ) {
+  for (const key of singleKeys) {
+    if (childMap[key]) {
       return {
         ...node,
-        drawUnit: (node.children[0] as GraphicalNode).drawUnit,
+        drawUnit: childMap[key].drawUnit,
+      };
+    }
+  }
+
+  if (havingGivenKeys(node.children, specialKeys)) {
+    if (childMap[constructchainKey]) {
+      return {
+        ...node,
+        drawUnit: drawConstructChainConnector(
+          childMap[constructchainKey].children as GraphicalNode[],
+          {
+            horizontalLine: true,
+            drawUnit: drawNominal({
+              topKeys: [],
+              bottomKeys,
+              children: node.children as GraphicalNode[],
+              isNominal: false,
+            }),
+          },
+        ),
+      };
+    }
+
+    if (childMap[constructChainCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: childMap[constructChainCompoundKey].drawUnit,
       };
     }
 
     if (childMap[clauseKey]) {
-      const clauseDrawUnit = (childMap[clauseKey] as GraphicalNode).drawUnit;
-      const decoratorDrawUnit = drawObjectClauseDecorator();
+      const subjectNode = childMap[clauseKey].children.find(
+        (child) => getKeyFromNode(child) === subjectKey,
+      );
 
       return {
         ...node,
-        drawUnit: verticalMerge([clauseDrawUnit, decoratorDrawUnit], {
-          align: 'end',
-          verticalCenter:
-            decoratorDrawUnit.height + clauseDrawUnit.verticalCenter,
-        }),
+        drawUnit: drawComplementClauseDecorator(
+          childMap[clauseKey].drawUnit,
+          subjectNode
+            ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
+            : settings.padding,
+        ),
       };
     }
+
+    if (childMap[clauseClusterKey]) {
+      return {
+        ...node,
+        drawUnit: childMap[clauseClusterKey].drawUnit,
+      };
+    }
+
+    if (childMap[objectCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: childMap[objectCompoundKey].drawUnit,
+      };
+    }
+
+    if (childMap[complementClauseKey]) {
+      return {
+        ...node,
+        drawUnit: childMap[complementClauseKey].drawUnit,
+      };
+    }
+
+    return {
+      ...node,
+      drawUnit: drawMockFragment(node),
+    };
   }
 
-  if (keysLen === 2) {
-    if (childMap[particleKey] && childMap[nounKey]) {
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            (childMap[nounKey] as GraphicalNode).drawUnit,
-            (childMap[particleKey] as GraphicalNode).drawUnit,
-          ],
-          { align: 'end' },
-        ),
-      };
+  const elements: DrawUnit[] = [];
+
+  preHorizontalKeys.forEach((key) => {
+    if (childMap[key]) {
+      elements.push(childMap[key].drawUnit);
     }
+  });
 
-    if (childMap[particleKey] && childMap[nominalKey]) {
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            (childMap[nominalKey] as GraphicalNode).drawUnit,
-            (childMap[particleKey] as GraphicalNode).drawUnit,
-          ],
-          { align: 'end' },
-        ),
-      };
+  elements.push(
+    drawNominal({
+      topKeys,
+      bottomKeys,
+      children: node.children as GraphicalNode[],
+      isNominal: false,
+    }),
+  );
+
+  afterHorizontalKeys.forEach((key) => {
+    if (childMap[key]) {
+      let drawUnit = childMap[key].drawUnit;
+
+      if (childMap[key].content && isWord(childMap[key].content!)) {
+        drawUnit = drawWord(childMap[key], true);
+      }
+
+      elements.push(drawUnit);
     }
+  });
 
-    if (childMap[adjectiveKey] && childMap[nounKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[nounKey] as GraphicalNode).drawUnit,
-            drawModifier(childMap[adjectiveKey]),
-          ],
-          {
-            align: 'center',
-            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
-              .height,
-          },
-        ),
-      };
-    }
-
-    if (childMap[adjectivalKey] && childMap[nounKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[nounKey] as GraphicalNode).drawUnit,
-            (childMap[adjectivalKey] as GraphicalNode).drawUnit,
-          ],
-          {
-            align: 'center',
-            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
-              .height,
-          },
-        ),
-      };
-    }
-
-    if (childMap[articleKey] && childMap[nominalKey]) {
-      return {
-        ...node,
-        drawUnit: (childMap[nominalKey] as GraphicalNode).drawUnit,
-      };
-    }
-
-    if (childMap[articleKey] && childMap[nounKey]) {
-      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
-
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [nounDrawUnit, drawModifier(childMap[articleKey])],
-          {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-            verticalEnd: nounDrawUnit.height,
-          },
-        ),
-      };
-    }
-
-    if (childMap[quantifierKey] && childMap[nounKey]) {
-      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
-
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [nounDrawUnit, drawModifier(childMap[quantifierKey])],
-          {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-            verticalEnd: nounDrawUnit.height,
-          },
-        ),
-      };
-    }
-
-    if (childMap[quantifierKey] && childMap[constructchainKey]) {
-      const nounDrawUnit = (childMap[constructchainKey] as GraphicalNode)
-        .drawUnit;
-
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [nounDrawUnit, drawModifier(childMap[quantifierKey])],
-          {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-            verticalEnd: nounDrawUnit.height,
-          },
-        ),
-      };
-    }
-  }
-
-  if (keysLen === 3) {
-    if (childMap[particleKey] && childMap[nounKey] && childMap[articleKey]) {
-      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
-
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
-              align: 'center',
-              verticalCenter: nounDrawUnit.height,
-            }),
-            (childMap[particleKey] as GraphicalNode).drawUnit,
-          ],
-          { align: ['center', 'end'] },
-        ),
-      };
-    }
-
-    if (
-      childMap[relativeClauseKey] &&
-      childMap[nounKey] &&
-      childMap[articleKey]
-    ) {
-      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
-
-      return {
-        ...node,
-        drawUnit: horizontalMerge(
-          [
-            (childMap[relativeClauseKey] as GraphicalNode).drawUnit,
-            verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
-              align: 'center',
-              verticalCenter: nounDrawUnit.height,
-            }),
-          ],
-          { align: ['start', 'center'] },
-        ),
-      };
-    }
-  }
-
-  throw new GrammarError('InvalidStructure', 'Object has unexpected structure');
+  return {
+    ...node,
+    drawUnit: horizontalMerge(elements, { align: 'center' }),
+  };
 }

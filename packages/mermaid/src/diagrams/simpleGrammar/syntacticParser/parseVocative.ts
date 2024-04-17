@@ -1,33 +1,94 @@
-import { isFragment, isWord } from '../utils.js';
+import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import { drawWord } from '../svgDrawer/drawWord.js';
+import {
+  adjectivalKey,
+  appositionKey,
+  articleKey,
+  constructChainCompoundKey,
+  constructchainKey,
+  nominalKey,
+  nounKey,
+  relativeClauseKey,
+  vocativeKey,
+} from './keys.js';
+import { getChildMap, havingGivenKeys } from './utils.js';
+import { drawMockFragment } from '../svgDrawer/drawMockFragment.js';
+import { drawNominal } from '../svgDrawer/drawNominal.js';
+import { drawCompoundEnd } from '../svgDrawer/drawCompoundEnd.js';
 
 export function parseVocative(node: GrammarNode): GraphicalNode {
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Vocative') {
-    throw new Error('Vocative parser requires Vocative Node');
+  const topKeys = [nounKey];
+  const bottomKeys = [articleKey, adjectivalKey];
+  const singleKeys = [appositionKey, nominalKey];
+  const specialKeys = [
+    constructChainCompoundKey,
+    constructchainKey,
+    relativeClauseKey,
+    vocativeKey,
+  ];
+  const validKeys: string[] = [
+    ...topKeys,
+    ...bottomKeys,
+    ...singleKeys,
+    ...specialKeys,
+  ];
+
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Vocative'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Vocative parser requires Vocative Node',
+    );
   }
 
-  if (node.children.length !== 1) {
-    throw new Error('Invalid Vocative Node: Vocative Node does not have 1 children');
+  const childMap = getChildMap(node.children, validKeys);
+
+  for (const key of singleKeys) {
+    if (childMap[key]) {
+      return {
+        ...node,
+        drawUnit: childMap[key].drawUnit,
+      };
+    }
   }
 
-  const child = node.children[0];
+  if (havingGivenKeys(node.children, specialKeys)) {
+    if (childMap[constructchainKey]) {
+      return {
+        ...node,
+        drawUnit: childMap[constructchainKey].drawUnit,
+      };
+    }
 
-  if (child.content && isWord(child.content)) {
+    if (childMap[constructChainCompoundKey]) {
+      return {
+        ...node,
+        drawUnit: drawCompoundEnd(
+          childMap[constructChainCompoundKey].drawUnit,
+          'solid',
+          true,
+        ),
+      };
+    }
+
     return {
       ...node,
-      drawUnit: drawWord(child),
+      drawUnit: drawMockFragment(node),
     };
   }
 
-  if (child.content && isFragment(child.content) && child.content.fragment === 'Nominal') {
-    return {
-      ...node,
-      drawUnit: (child as GraphicalNode).drawUnit,
-    };
-  }
-
-  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
+  return {
+    ...node,
+    drawUnit: drawNominal({
+      topKeys,
+      bottomKeys,
+      children: node.children as GraphicalNode[],
+      isNominal: false,
+    }),
+  };
 }

@@ -1,13 +1,26 @@
 import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+} from '../simpleGrammarTypes.js';
 
-import { clauseClusterKey, clauseKey, conjunctionFragmentKey } from './keys.js';
+import {
+  clauseClusterKey,
+  clauseKey,
+  conjunctionFragmentKey,
+  getKeyFromNode,
+  subjectKey,
+} from './keys.js';
 
 import { getChildMap } from './utils.js';
 
 import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
-import { drawObjectClauseDecorator } from '../svgDrawer/drawObjectClauseDecorator.js';
+
+import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
+import { drawComplementClauseDecorator } from '../svgDrawer/drawComplementClauseDecorator.js';
+import { settings } from '../settings.js';
 
 export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
   const validKeys: string[] = [
@@ -27,49 +40,55 @@ export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
     );
   }
 
-  if (node.children.length === 0) {
-    throw new GrammarError(
-      'InvalidStructure',
-      'ComplementClause has no children',
-    );
-  }
-
   const childMap = getChildMap(node.children, validKeys);
 
-  // const keysLen = Object.keys(childMap).length;
+  let conjunctionDrawUnit: DrawUnit;
 
-  if (childMap[conjunctionFragmentKey] && childMap[clauseKey]) {
+  if (childMap[conjunctionFragmentKey]) {
+    const drawUnit = childMap[conjunctionFragmentKey].drawUnit;
+
+    conjunctionDrawUnit = verticalMerge(
+      [drawUnit, drawEmptyLine(drawUnit.width)],
+      {
+        align: 'center',
+        verticalCenter: drawUnit.height,
+      },
+    );
+  } else {
+    conjunctionDrawUnit = drawEmptyLine();
+  }
+
+  if (childMap[clauseKey]) {
+    const subjectNode = childMap[clauseKey].children.find(
+      (child) => getKeyFromNode(child) === subjectKey,
+    );
+
     return {
       ...node,
       drawUnit: horizontalMerge(
         [
-          verticalMerge(
-            [
-              (childMap[clauseKey] as GraphicalNode).drawUnit,
-              drawObjectClauseDecorator(),
-            ],
-            { align: 'end' },
+          drawComplementClauseDecorator(
+            childMap[clauseKey].drawUnit,
+            subjectNode
+              ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
+              : settings.padding,
           ),
-          (childMap[conjunctionFragmentKey] as GraphicalNode).drawUnit,
+          conjunctionDrawUnit,
         ],
-        { align: 'end' },
+        {
+          align: 'end',
+        },
       ),
     };
   }
 
-  if (childMap[conjunctionFragmentKey] && childMap[clauseClusterKey]) {
+  if (childMap[clauseClusterKey]) {
     return {
       ...node,
       drawUnit: horizontalMerge(
         [
-          verticalMerge(
-            [
-              (childMap[clauseClusterKey] as GraphicalNode).drawUnit,
-              drawObjectClauseDecorator(),
-            ],
-            { align: 'end' },
-          ),
-          (childMap[conjunctionFragmentKey] as GraphicalNode).drawUnit,
+          drawComplementClauseDecorator(childMap[clauseClusterKey].drawUnit, 0),
+          conjunctionDrawUnit,
         ],
         { align: 'end' },
       ),

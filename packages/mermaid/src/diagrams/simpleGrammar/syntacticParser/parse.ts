@@ -5,12 +5,11 @@ import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import { drawWord } from '../svgDrawer/drawWord.js';
-import { drawVerbInifinitiveDecorator } from '../svgDrawer/drawVerbInifinitiveDecorator.js';
 import { drawContainer } from '../svgDrawer/drawContainer.js';
-import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
 import { drawModifier } from '../svgDrawer/drawModifier.js';
 
 import { horizontalMerge } from '../svgDrawer/utils.js';
+import { drawVerbparticipleDecorator } from '../svgDrawer/drawVerbparticipleDecorator.js';
 
 import {
   adjectivalKey,
@@ -24,6 +23,7 @@ import {
   generateFragmentKey,
   nominalKey,
   objectKey,
+  objectGroupKey,
   predicateKey,
   prepositionFragmentKey,
   prepositionalPhraseKey,
@@ -46,27 +46,46 @@ import {
   conjunctionFragmentKey,
   clauseClusterKey,
   getKeyFromNode,
-  verbinfinitiveKey,
   appositionKey,
   verbparticipleKey,
   adverbKey,
   casusPendensKey,
+  prepositionalPhraseCompoundKey,
+  prepositionKey,
+  articleKey,
+  quantifierKey,
+  adjectiveKey,
+  objectCompoundKey,
+  PrepositionalPhraseGroupKey,
+  verbParticipleCompoundKey,
+  adjectivalGroupKey,
+  verbGroupKey,
+  relativeClauseGroupKey,
+  clausalClusterKey,
+  subjectGroupKey,
+  complementGroupKey,
+  nominalGroupKey,
+  clauseclusterKey,
+  errorKey,
 } from './keys.js';
 
 import { settings } from '../settings.js';
 
-import { parseConstructChain } from './parseConstructChain.js';
-import { parseAdjectival } from './parseAdjectival.js';
+// import { parseConstructChain } from './parseConstructChain.js';
 import { parseFragment } from './parseFragment.js';
 import { parseNominal } from './parseNominal.js';
+import { parseAdjectival } from './parseAdjectival.js';
 import { parsePrepositionalPhrase } from './parsePrepositionalPhrase.js';
 import { parseAdverbial } from './parseAdverbial.js';
+import { parseApposition } from './parseApposition.js';
+import { parseCasusPendens } from './parseCasusPendens.js';
 import { parseClause } from './parseClause.js';
 import { parseSubject } from './parseSubject.js';
 import { parsePredicate } from './parsePredicate.js';
 import { parseComplement } from './parseComplement.js';
 import { parseComplementClauseClause } from './parseComplementClause.js';
 import { parseObject } from './parseObject.js';
+import { parseObjectCompound } from './parseObjectCompound.js';
 import { parseRelativeClause } from './parseRelativeClause.js';
 import { parseSubordinateClause } from './parseSubordinateClause.js';
 import { parseRelative } from './parseRelative.js';
@@ -85,35 +104,50 @@ import { parsePredicateCompound } from './parsePredicateCompound.js';
 import { parsePredicateGroup } from './parsePredicateGroup.js';
 import { parseConjunction } from './parseConjunction.js';
 import { parseClauseCluster } from './parseClauseCluster.js';
-import { parseApposition } from './parseApposition.js';
-import { parseCasusPendens } from './parseCasusPendens.js';
+
+import { mockParser } from './mockParser.js';
+import { drawError } from '../svgDrawer/drawError.js';
+import { parseConstructChain } from './parseConstructChain.js';
+import { parsePrepositionalPhraseCompound } from './parsePrepositionalPhraseCompound.js';
+import { parseVerbparticipleCompound } from './parseVerbparticipleCompound.js';
+import { parseVerbGroup } from './parseVerbGroup.js';
+import { parseObjectGroup } from './parseObjectGroup.js';
+import { parseSubjectGroup } from './parseSubjectGroup.js';
+import { parseComplementGroup } from './parseComplementGroup.js';
+import { parseError } from './parseError.js';
 
 const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [discourseunitKey]: parseDiscourseUnit,
   [fragmentKey]: parseFragment,
-  [prepositionFragmentKey]: parsePreposition,
   [nominalKey]: parseNominal,
-  [constructchainKey]: parseConstructChain,
-  [appositionKey]: parseApposition,
   [adjectivalKey]: parseAdjectival,
   [adverbialKey]: parseAdverbial,
+  [prepositionKey]: parsePreposition,
+  [prepositionFragmentKey]: mockParser,
+  [prepositionalPhraseKey]: parsePrepositionalPhrase,
+  [prepositionalPhraseCompoundKey]: parsePrepositionalPhraseCompound,
+  [appositionKey]: parseApposition,
+  [casusPendensKey]: parseCasusPendens,
+  [constructchainKey]: parseConstructChain,
   [clauseKey]: parseClause,
   [clauseClusterKey]: parseClauseCluster,
   [subjectKey]: parseSubject,
   [predicateKey]: parsePredicate,
   [complementKey]: parseComplement,
   [complementClauseKey]: parseComplementClauseClause,
-  [prepositionalPhraseKey]: parsePrepositionalPhrase,
   [objectKey]: parseObject,
+  [objectCompoundKey]: parseObjectCompound,
+  [objectGroupKey]: parseObjectGroup,
   [secondObjectKey]: parseObject,
   [relativeClauseKey]: parseRelativeClause,
   [relativeParticleKey]: parseRelativeParticle,
   [relativeKey]: parseRelative,
   [subordinateClauseKey]: parseSubordinateClause,
   [vocativeKey]: parseVocative,
-  [casusPendensKey]: parseCasusPendens,
   [conjunctionFragmentKey]: parseConjunction,
   [adjectiveCompoundKey]: parseAdjectiveCompound,
+  [adjectivalGroupKey]: parseAdjectiveCompound,
+  [adjectivalGroupKey]: parseAdjectiveCompound,
   [adverbCompoundKey]: parseAdverbCompound,
   [adverbialCompoundKey]: parseAdverbialCompound,
   [adverbialGroupKey]: parseAdverbialGroup,
@@ -122,76 +156,101 @@ const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
   [nominalCompoundKey]: parseNominalCompound,
   [predicateCompoundKey]: parsePredicateCompound,
   [predicateGroupKey]: parsePredicateGroup,
+  [PrepositionalPhraseGroupKey]: parsePrepositionalPhraseCompound,
+  [verbParticipleCompoundKey]: parseVerbparticipleCompound,
+  [verbGroupKey]: parseVerbGroup,
+  [relativeClauseGroupKey]: parseAdjectiveCompound,
+  [clausalClusterKey]: parseClauseCompound,
+  [subjectGroupKey]: parseSubjectGroup,
+  [complementGroupKey]: parseComplementGroup,
+  [nominalGroupKey]: parseNominalCompound,
+  [clauseclusterKey]: parseClauseCluster,
+  [errorKey]: parseError,
 };
 
 export function parse(node: GrammarNode): GraphicalNode {
-  for (let i = 0; i < node.children.length; i++) {
-    node.children[i] = parse(node.children[i]);
-  }
+  try {
+    for (let i = 0; i < node.children.length; i++) {
+      node.children[i] = parse(node.children[i]);
+    }
 
-  if (node.content === null) {
+    if (node.content === null) {
+      return {
+        ...node,
+        drawUnit: drawContainer(
+          node,
+          'Simple Grammar',
+          settings.titleColor,
+          settings.wordStrokeColor,
+        ),
+      };
+    }
+
+    if (isFragment(node.content)) {
+      const key = generateFragmentKey(node.content.fragment);
+
+      if (parserMap[key]) {
+        try {
+          return parserMap[key](node);
+        } catch (err) {
+          return {
+            ...node,
+            drawUnit: drawError(
+              node.content.fragment,
+              (err as GrammarError).errorType,
+            ),
+          };
+        }
+      } else {
+        throw new GrammarError(
+          'InvalidStructure',
+          'Invalid structure, not defined parser',
+        );
+      }
+    }
+
+    if (isWord(node.content)) {
+      if (getKeyFromNode(node) === verbparticipleKey) {
+        const drawUnit = drawWord(node);
+
+        return {
+          ...node,
+          drawUnit: horizontalMerge([drawUnit, drawVerbparticipleDecorator()], {
+            align: ['end', 'end'],
+            verticalStart: drawUnit.verticalStart,
+            verticalCenter: drawUnit.verticalCenter,
+            verticalEnd: drawUnit.verticalEnd,
+          }),
+        };
+      }
+
+      if (
+        [adverbKey, adjectiveKey, articleKey, quantifierKey].includes(
+          getKeyFromNode(node),
+        )
+      ) {
+        return {
+          ...node,
+          drawUnit: drawModifier(node),
+        };
+      }
+
+      return {
+        ...node,
+        drawUnit: drawWord(node),
+      };
+    }
+
+    throw new GrammarError(
+      'InvalidStructure',
+      'Invalid structure, not defined parser',
+    );
+  } catch (err) {
+    console.log(err);
+
     return {
       ...node,
-      drawUnit: drawContainer(
-        node,
-        'Simple Grammar',
-        settings.titleColor,
-        settings.wordStrokeColor
-      ),
+      drawUnit: drawError('Parse', (err as GrammarError).errorType),
     };
   }
-
-  if (isFragment(node.content)) {
-    const key = generateFragmentKey(node.content.fragment);
-
-    if (parserMap[key]) {
-      return parserMap[key](node);
-    } else {
-      throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
-    }
-  }
-
-  if (isWord(node.content)) {
-    if (getKeyFromNode(node) === verbinfinitiveKey) {
-      const drawUnit = drawWord(node);
-
-      return {
-        ...node,
-        drawUnit: horizontalMerge([drawUnit, drawVerbInifinitiveDecorator()], {
-          align: ['end', 'center'],
-          verticalStart: drawUnit.verticalStart,
-          verticalCenter: drawUnit.verticalCenter,
-          verticalEnd: drawUnit.verticalEnd,
-        }),
-      };
-    }
-
-    if (getKeyFromNode(node) === verbparticipleKey) {
-      const drawUnit = drawWord(node);
-
-      return {
-        ...node,
-        drawUnit: horizontalMerge([drawUnit, drawVerbparticipleDecorator()], {
-          align: ['end', 'end'],
-          verticalStart: drawUnit.verticalStart,
-          verticalCenter: drawUnit.verticalCenter,
-          verticalEnd: drawUnit.verticalEnd,
-        }),
-      };
-    }
-
-    if (getKeyFromNode(node) === adverbKey) {
-      return {
-        ...node,
-        drawUnit: drawModifier(node),
-      };
-    }
-
-    return {
-      ...node,
-      drawUnit: drawWord(node),
-    };
-  }
-
-  throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
 }

@@ -1,6 +1,6 @@
-import { isFragment, isWord } from '../utils.js';
+import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { GrammarNode, GraphicalNode, Word } from '../simpleGrammarTypes.js';
+import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
 import {
   nounKey,
@@ -17,36 +17,73 @@ import {
   nominalCompoundKey,
   appositionKey,
   adverbialKey,
+  clauseKey,
+  clauseClusterKey,
+  complementClauseKey,
+  prepositionalPhraseKey,
+  particleKey,
+  pronounKey,
+  getKeyFromNode,
+  clauseCompoundKey,
+  subjectKey,
 } from './keys.js';
 
-import { getChildMap } from './utils.js';
+import { getChildMap, havingGivenKeys } from './utils.js';
 
-import { parse } from './parse.js';
-
+import { drawMockFragment } from '../svgDrawer/drawMockFragment.js';
+import { drawNominal } from '../svgDrawer/drawNominal.js';
+import { drawComplementClauseDecorator } from '../svgDrawer/drawComplementClauseDecorator.js';
+import { settings } from '../settings.js';
 import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
+import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
+import { drawConstructChainConnector } from '../svgDrawer/drawConstructChainConnector.js';
+import { drawAdverbialDecorator } from '../svgDrawer/drawAdverbialDecorator.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
-import { drawModifier } from '../svgDrawer/drawModifier.js';
+
+const topKeys = [
+  nounKey,
+  particleKey,
+  pronounKey,
+  verbparticipleKey,
+  suffixPronounKey,
+];
+const bottomKeys = [
+  adjectivalKey,
+  adverbialKey,
+  adjectiveKey,
+  articleKey,
+  quantifierKey,
+];
+const specialKeys = [prepositionalPhraseKey, clauseKey, relativeClauseKey];
+
+const singleKeys = [
+  nominalCompoundKey,
+  appositionKey,
+  clauseClusterKey,
+  clauseCompoundKey,
+  complementClauseKey,
+  constructChainCompoundKey,
+];
+
+const validKeys: string[] = [
+  ...topKeys,
+  ...bottomKeys,
+  ...specialKeys,
+  ...singleKeys,
+  constructchainKey,
+  nominalKey,
+];
 
 export function parseNominal(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [
-    nounKey,
-    articleKey,
-    adjectiveKey,
-    quantifierKey,
-    verbparticipleKey,
-    nominalKey,
-    constructchainKey,
-    adjectivalKey,
-    adverbialKey,
-    relativeClauseKey,
-    suffixPronounKey,
-    constructChainCompoundKey,
-    nominalCompoundKey,
-    appositionKey,
-  ];
-
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Nominal') {
-    throw new GrammarError('InvalidParser', 'Nominal parser requires Nominal Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Nominal'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Nominal parser requires Nominal Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -57,369 +94,131 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
 
   const keysLen = Object.keys(childMap).length;
 
-  if (childMap[nominalKey]) {
-    if (
-      childMap[adjectiveKey] &&
-      childMap[nominalKey].children.length === 1 &&
-      childMap[nominalKey].children[0].content !== null &&
-      isWord(childMap[nominalKey].children[0].content!) &&
-      (childMap[nominalKey].children[0].content as Word).pos === 'verb-participle'
-    ) {
+  if (keysLen === 1 && singleKeys.includes(getKeyFromNode(node.children[0]))) {
+    return {
+      ...node,
+      drawUnit: (node.children[0] as GraphicalNode).drawUnit,
+    };
+  }
+
+  if (havingGivenKeys(node.children, specialKeys)) {
+    if (childMap[constructchainKey]) {
       return {
         ...node,
-        drawUnit: verticalMerge(
-          [(childMap[nominalKey] as GraphicalNode).drawUnit, drawModifier(childMap[adjectiveKey])],
-          {
-            align: 'center',
-            verticalCenter: (childMap[nominalKey] as GraphicalNode).drawUnit.verticalCenter,
-            verticalStart: (childMap[nominalKey] as GraphicalNode).drawUnit.verticalCenter,
-          }
+        drawUnit: childMap[constructchainKey].drawUnit,
+      };
+    }
+
+    if (childMap[clauseKey]) {
+      const subjectNode = childMap[clauseKey].children.find(
+        (child) => getKeyFromNode(child) === subjectKey,
+      );
+
+      return {
+        ...node,
+        drawUnit: drawComplementClauseDecorator(
+          childMap[clauseKey].drawUnit,
+          subjectNode
+            ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
+            : settings.padding,
+        ),
+      };
+    }
+
+    if (childMap[relativeClauseKey]) {
+      const drawUnit = childMap[relativeClauseKey].drawUnit;
+      return {
+        ...node,
+        drawUnit: horizontalMerge(
+          [
+            verticalMerge([drawEmptyLine(drawUnit.width), drawUnit], {
+              align: 'end',
+              verticalCenter: 0,
+            }),
+            drawNominal({
+              topKeys,
+              bottomKeys,
+              children: node.children as GraphicalNode[],
+              isNominal: true,
+            }),
+          ],
+          { align: 'center' },
         ),
       };
     }
 
     return {
       ...node,
-      drawUnit: (childMap[nominalKey] as GraphicalNode).drawUnit,
+      drawUnit: drawMockFragment(node),
     };
   }
 
-  if (keysLen === 1) {
-    if (
-      childMap[nounKey] ||
-      childMap[suffixPronounKey] ||
-      childMap[constructChainCompoundKey] ||
-      childMap[nominalCompoundKey] ||
-      childMap[constructchainKey] ||
-      childMap[verbparticipleKey] ||
-      childMap[appositionKey]
-    ) {
+  if (!havingGivenKeys(node.children, topKeys)) {
+    if (childMap[constructchainKey]) {
       return {
         ...node,
-        drawUnit: (node.children[0] as GraphicalNode).drawUnit,
-      };
-    }
-
-    if (childMap[adjectiveKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge([drawEmptyWord(), drawModifier(childMap[adjectiveKey])], {
-          align: 'center',
-          verticalCenter: drawEmptyWord().height,
-        }),
-      };
-    }
-
-    if (childMap[adjectivalKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [drawEmptyWord(), (childMap[adjectivalKey] as GraphicalNode).drawUnit],
+        drawUnit: drawConstructChainConnector(
+          childMap[constructchainKey].children as GraphicalNode[],
           {
-            align: 'center',
-            verticalCenter: drawEmptyWord().height,
-            verticalEnd: drawEmptyWord().height,
-          }
-        ),
-      };
-    }
-  }
-
-  if (keysLen === 2) {
-    if (childMap[nounKey]) {
-      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
-
-      if (childMap[adjectiveKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge([nounDrawUnit, drawModifier(childMap[adjectiveKey])], {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-          }),
-        };
-      }
-
-      if (childMap[articleKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-            verticalEnd: nounDrawUnit.height,
-          }),
-        };
-      }
-
-      if (childMap[quantifierKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge([nounDrawUnit, drawModifier(childMap[quantifierKey])], {
-            align: 'center',
-            verticalCenter: nounDrawUnit.height,
-          }),
-        };
-      }
-
-      if (childMap[adjectivalKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge(
-            [nounDrawUnit, (childMap[adjectivalKey] as GraphicalNode).drawUnit],
-            {
-              align: 'end',
-              verticalCenter: nounDrawUnit.height,
-              verticalStart: 0,
-              verticalEnd: nounDrawUnit.height,
-            }
-          ),
-        };
-      }
-
-      if (childMap[constructchainKey]) {
-        return {
-          ...node,
-          drawUnit: nounDrawUnit,
-        };
-      }
-
-      if (childMap[relativeClauseKey]) {
-        return {
-          ...node,
-          drawUnit: horizontalMerge(
-            [(childMap[relativeClauseKey] as GraphicalNode).drawUnit, nounDrawUnit],
-            {
-              align: ['start', 'end'],
-              verticalCenter: nounDrawUnit.height,
-            }
-          ),
-        };
-      }
-    }
-
-    if (childMap[verbparticipleKey]) {
-      if (childMap[adjectiveKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge(
-            [
-              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-              drawModifier(childMap[adjectiveKey]),
-            ],
-            { align: 'center' }
-          ),
-        };
-      }
-
-      if (childMap[articleKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge(
-            [
-              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-              drawModifier(childMap[articleKey]),
-            ],
-            { align: 'center' }
-          ),
-        };
-      }
-
-      if (childMap[quantifierKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge(
-            [
-              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-              drawModifier(childMap[quantifierKey]),
-            ],
-            { align: 'center' }
-          ),
-        };
-      }
-
-      if (childMap[adjectivalKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge(
-            [
-              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-              (childMap[adjectivalKey] as GraphicalNode).drawUnit,
-            ],
-            {
-              align: 'end',
-              verticalStart: 0,
-              verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-              verticalEnd: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-            }
-          ),
-        };
-      }
-
-      if (childMap[adverbialKey]) {
-        return {
-          ...node,
-          drawUnit: verticalMerge(
-            [
-              (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-              (childMap[adverbialKey] as GraphicalNode).drawUnit,
-            ],
-            {
-              align: 'end',
-              verticalStart: 0,
-              verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-              verticalEnd: (childMap[adverbialKey] as GraphicalNode).drawUnit.height,
-            }
-          ),
-        };
-      }
-    }
-
-    if (childMap[constructchainKey] && childMap[quantifierKey]) {
-      const constructchainNode = JSON.parse(JSON.stringify(childMap[constructchainKey]));
-      const quantifierNode = JSON.parse(JSON.stringify(childMap[quantifierKey]));
-
-      const firstNode = constructchainNode.children[0];
-
-      if (isWord(firstNode.content!)) {
-        const newNominal: GrammarNode = {
-          level: 0,
-          children: [firstNode, quantifierNode],
-          content: {
-            fragment: 'Nominal',
-            description: '',
+            drawUnit: drawNominal({
+              topKeys,
+              bottomKeys,
+              children: node.children as GraphicalNode[],
+              isNominal: false,
+            }),
           },
-        };
-        constructchainNode.children[0] = newNominal;
-      } else if (isFragment(firstNode.content!)) {
-        firstNode.children.unshift(quantifierNode);
-      }
-
-      const newConstructChainNode = parse(constructchainNode);
-
-      return {
-        ...node,
-        drawUnit: (newConstructChainNode as GraphicalNode).drawUnit,
-      };
-    }
-  }
-
-  if (keysLen === 3) {
-    if (childMap[articleKey] && childMap[nounKey] && childMap[adjectiveKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[nounKey] as GraphicalNode).drawUnit,
-            horizontalMerge(
-              [childMap[adjectiveKey], childMap[articleKey]].map((child) => drawModifier(child)),
-              { align: 'start' }
-            ),
-          ],
-          { align: 'center' }
         ),
       };
     }
-
-    if (childMap[articleKey] && childMap[nounKey] && childMap[quantifierKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[nounKey] as GraphicalNode).drawUnit,
-            horizontalMerge(
-              [childMap[quantifierKey], childMap[articleKey]].map((child) => drawModifier(child)),
-              { align: 'start' }
-            ),
-          ],
-          {
-            align: 'center',
-            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit.verticalEnd,
-          }
-        ),
-      };
-    }
-
-    if (childMap[quantifierKey] && childMap[nounKey] && childMap[adjectivalKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[nounKey] as GraphicalNode).drawUnit,
-            horizontalMerge(
-              [
-                (childMap[adjectivalKey] as GraphicalNode).drawUnit,
-                drawModifier(childMap[quantifierKey]),
-              ],
-              { align: 'start' }
-            ),
-          ],
-          {
-            align: 'center',
-            verticalCenter: (childMap[nounKey] as GraphicalNode).drawUnit.height,
-          }
-        ),
-      };
-    }
-
-    if (childMap[articleKey] && childMap[verbparticipleKey] && childMap[adjectivalKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-            horizontalMerge(
-              [
-                (childMap[adjectivalKey] as GraphicalNode).drawUnit,
-                drawModifier(childMap[articleKey]),
-              ],
-              { align: 'start' }
-            ),
-          ],
-          {
-            align: 'center',
-            verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-          }
-        ),
-      };
-    }
-
-    if (childMap[articleKey] && childMap[verbparticipleKey] && childMap[adjectiveKey]) {
-      return {
-        ...node,
-        drawUnit: verticalMerge(
-          [
-            (childMap[verbparticipleKey] as GraphicalNode).drawUnit,
-            horizontalMerge(
-              [drawModifier(childMap[adjectiveKey]), drawModifier(childMap[articleKey])],
-              { align: 'start' }
-            ),
-          ],
-          {
-            align: 'center',
-            verticalCenter: (childMap[verbparticipleKey] as GraphicalNode).drawUnit.height,
-          }
-        ),
-      };
-    }
-
-    if (childMap[nounKey] && childMap[articleKey] && childMap[relativeClauseKey]) {
-      const nounDrawUnit = (childMap[nounKey] as GraphicalNode).drawUnit;
+    if (childMap[nominalKey]) {
       return {
         ...node,
         drawUnit: horizontalMerge(
           [
-            (childMap[relativeClauseKey] as GraphicalNode).drawUnit,
-            verticalMerge([nounDrawUnit, drawModifier(childMap[articleKey])], {
-              align: 'center',
-              verticalCenter: nounDrawUnit.height,
+            drawNominal({
+              topKeys,
+              bottomKeys,
+              children: node.children as GraphicalNode[],
+              isNominal: false,
             }),
+            childMap[nominalKey].drawUnit,
+          ],
+          { align: 'center' },
+        ),
+      };
+    }
+
+    if (childMap[adjectiveKey] && childMap[adverbialKey]) {
+      const drawUnit = drawAdverbialDecorator({
+        adverbDrawUnit: childMap[adjectiveKey].drawUnit,
+        adverbialDrawUnit: childMap[adverbialKey].drawUnit,
+      });
+
+      return {
+        ...node,
+        drawUnit: verticalMerge(
+          [
+            verticalMerge([drawEmptyWord(), drawEmptyLine(drawUnit.width)], {
+              align: 'center',
+            }),
+            drawUnit,
           ],
           {
-            align: ['start', 'center'],
-          }
+            align: 'end',
+            verticalCenter: drawEmptyWord().height,
+          },
         ),
       };
     }
   }
 
-  throw new GrammarError('InvalidStructure', 'Nominal has unexpected structure');
+  return {
+    ...node,
+    drawUnit: drawNominal({
+      topKeys,
+      bottomKeys,
+      children: node.children as GraphicalNode[],
+      isNominal: true,
+    }),
+  };
 }

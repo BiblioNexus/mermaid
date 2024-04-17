@@ -6,7 +6,6 @@ import { conjunctionFragmentKey, clauseKey, clauseClusterKey } from './keys.js';
 
 import { getChildMap } from './utils.js';
 
-import { horizontalMerge } from '../svgDrawer/utils.js';
 import { drawSubordinateConjunction } from '../svgDrawer/drawSubordinateConjunction.js';
 
 export function parseSubordinateClause(node: GrammarNode): GraphicalNode {
@@ -40,48 +39,28 @@ export function parseSubordinateClause(node: GrammarNode): GraphicalNode {
 
   if (keysLen === 2) {
     if (childMap[clauseKey] && childMap[conjunctionFragmentKey]) {
-      const clauseNodeDrawUnit = (childMap[clauseKey] as GraphicalNode)
-        .drawUnit;
-      const conjunctionDrawUnit = drawSubordinateConjunction(
-        childMap[conjunctionFragmentKey].children[0],
-      );
-      const center =
-        clauseNodeDrawUnit.width + conjunctionDrawUnit.horizontalCenter;
-
       return {
         ...node,
-        drawUnit: horizontalMerge([clauseNodeDrawUnit, conjunctionDrawUnit], {
-          align: ['center', 'end'],
-          horizontalStart: center,
-          horizontalCenter: center,
-          horizontalEnd: center,
-        }),
+        drawUnit: drawSubordinateConjunction(
+          childMap[conjunctionFragmentKey].children[0],
+          childMap[clauseKey].drawUnit,
+        ),
       };
     }
 
     if (childMap[clauseClusterKey] && childMap[conjunctionFragmentKey]) {
-      const clauseNodeDrawUnit = (childMap[clauseClusterKey] as GraphicalNode)
-        .drawUnit;
-      const conjunctionDrawUnit = drawSubordinateConjunction(
-        childMap[conjunctionFragmentKey].children[0],
-      );
-      const center =
-        clauseNodeDrawUnit.width + conjunctionDrawUnit.horizontalCenter;
-
       return {
         ...node,
-        drawUnit: horizontalMerge([clauseNodeDrawUnit, conjunctionDrawUnit], {
-          align: ['center', 'end'],
-          horizontalStart: center,
-          horizontalCenter: center,
-          horizontalEnd: center,
-        }),
+        drawUnit: drawSubordinateConjunction(
+          childMap[conjunctionFragmentKey].children[0],
+          childMap[clauseClusterKey].drawUnit,
+        ),
       };
     }
   }
 
   throw new GrammarError(
     'InvalidStructure',
-    'Nominal has unexpected structure',
+    'SubordinateClause has unexpected structure',
   );
 }
