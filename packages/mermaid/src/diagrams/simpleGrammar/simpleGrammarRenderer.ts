@@ -32,10 +32,11 @@ export const draw: DrawDefinition = (text, id, _version, diagObj) => {
     nodesElem.append(() => graphicalNode.drawUnit.element.node());
   }
   svg.attr('transform', `translate(${settings.padding}, ${0})`);
+
   configureSvgSize(
     svg,
     graphicalNode.drawUnit.height,
-    graphicalNode.drawUnit.width + 2 * settings.padding,
+    graphicalNode.drawUnit.width + 200 + 2 * settings.padding,
     false
   );
 };

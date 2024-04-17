@@ -14,4 +14,6 @@ export const settings = {
   fontSize: 20,
   fontFamily: '"trebuchet ms",verdana,arial,sans-serif',
   minWidth: 1024,
+  errorColor: '#b91c1c',
+  errorFillColor: '#fed7aa',
 };
