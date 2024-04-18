@@ -36,7 +36,7 @@ export const draw: DrawDefinition = (text, id, _version, diagObj) => {
   configureSvgSize(
     svg,
     graphicalNode.drawUnit.height,
-    graphicalNode.drawUnit.width + 200 + 2 * settings.padding,
+    graphicalNode.drawUnit.width + 2 * settings.padding,
     false
   );
 };
