@@ -2,23 +2,32 @@ import * as d3 from 'd3';
 
 import { settings } from '../settings.js';
 
-import { isWord } from '../utils.js';
-import type { DrawUnit, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GraphicalNode,
+  StatusType,
+} from '../simpleGrammarTypes.js';
 import { isConjunction } from '../syntacticParser/utils.js';
 import { drawConjunction } from './drawConjunction.js';
 import { drawEmptyLine } from './drawEmptyLine.js';
 import { drawSpacer } from './drawSpacer.js';
-import { horizontalMerge, verticalMerge } from './utils.js';
-import { adjectiveKey, getKeyFromNode, prepositionalPhraseKey } from '../syntacticParser/keys.js';
+import { getColorByStatus, horizontalMerge, verticalMerge } from './utils.js';
+import {
+  adjectiveKey,
+  conjunctionKey,
+  getKeyFromNode,
+  prepositionalPhraseKey,
+} from '../syntacticParser/keys.js';
 import { drawWord } from './drawWord.js';
 import { drawEmptyWord } from './drawEmptyWord.js';
 
 export const drawCompound = (
   nodes: GraphicalNode[],
   lineType: 'solid' | 'dash',
-  withDecorator: boolean
+  withDecorator: boolean,
+  status?: StatusType,
 ): DrawUnit => {
-  let firstNodeDrawUnit = drawEmptyLine();
+  let firstNodeDrawUnit = drawEmptyLine({ status });
   let conjunction = null;
 
   if (isConjunction(nodes[0])) {
@@ -26,32 +35,27 @@ export const drawCompound = (
   } else {
     firstNodeDrawUnit = (nodes[0] as GraphicalNode).drawUnit;
 
-    if (nodes[0].content && isWord(nodes[0].content)) {
-      firstNodeDrawUnit = verticalMerge(
-        [firstNodeDrawUnit, drawEmptyLine(firstNodeDrawUnit.width)],
-        {
-          align: 'center',
-          verticalStart: firstNodeDrawUnit.verticalStart,
-          verticalCenter: firstNodeDrawUnit.verticalCenter,
-          verticalEnd: firstNodeDrawUnit.verticalEnd,
-        }
-      );
-    }
-
     if (getKeyFromNode(nodes[0]) === prepositionalPhraseKey) {
       firstNodeDrawUnit = verticalMerge(
-        [drawEmptyWord(), drawEmptyLine(firstNodeDrawUnit.width), firstNodeDrawUnit],
+        [
+          drawEmptyWord(status),
+          drawEmptyLine({ lineWidth: firstNodeDrawUnit.width, status }),
+          firstNodeDrawUnit,
+        ],
         {
           align: 'center',
           verticalStart: 0,
-          verticalCenter: drawEmptyWord().verticalCenter,
+          verticalCenter: drawEmptyWord(status).verticalCenter,
           verticalEnd: firstNodeDrawUnit.verticalEnd,
-        }
+        },
       );
     }
 
     if ([adjectiveKey].includes(getKeyFromNode(nodes[0]))) {
-      firstNodeDrawUnit = drawWord(nodes[0], true);
+      firstNodeDrawUnit = drawWord(nodes[0], {
+        withLine: true,
+        status: nodes[0].status,
+      });
     }
   }
 
@@ -72,31 +76,26 @@ export const drawCompound = (
 
     let secondNodeDrawUnit = (child as GraphicalNode).drawUnit;
 
-    if (child.content && isWord(child.content)) {
-      secondNodeDrawUnit = verticalMerge(
-        [secondNodeDrawUnit, drawEmptyLine(secondNodeDrawUnit.width)],
-        {
-          align: 'center',
-          verticalStart: secondNodeDrawUnit.verticalStart,
-          verticalCenter: secondNodeDrawUnit.verticalCenter,
-          verticalEnd: secondNodeDrawUnit.verticalEnd,
-        }
-      );
-
-      if ([adjectiveKey].includes(getKeyFromNode(child))) {
-        secondNodeDrawUnit = drawWord(child, true);
-      }
+    if ([adjectiveKey].includes(getKeyFromNode(child))) {
+      secondNodeDrawUnit = drawWord(child, {
+        withLine: true,
+        status: child.status,
+      });
     }
 
     if (getKeyFromNode(nodes[i]) === prepositionalPhraseKey) {
       secondNodeDrawUnit = verticalMerge(
-        [drawEmptyWord(), drawEmptyLine(secondNodeDrawUnit.width), secondNodeDrawUnit],
+        [
+          drawEmptyWord(status),
+          drawEmptyLine({ lineWidth: secondNodeDrawUnit.width, status }),
+          secondNodeDrawUnit,
+        ],
         {
           align: 'center',
           verticalStart: 0,
-          verticalCenter: drawEmptyWord().verticalCenter,
+          verticalCenter: drawEmptyWord(status).verticalCenter,
           verticalEnd: secondNodeDrawUnit.verticalEnd,
-        }
+        },
       );
     }
 
@@ -110,19 +109,29 @@ export const drawCompound = (
 
     totalHeight += height;
 
-    const mergedDrawUnit = verticalMerge([firstNodeDrawUnit, spacerDrawUnit, secondNodeDrawUnit], {
-      align: 'end',
-      verticalStart: firstNodeDrawUnit.verticalStart,
-      verticalCenter: firstNodeDrawUnit.verticalCenter + height / 2,
-    });
+    const mergedDrawUnit = verticalMerge(
+      [firstNodeDrawUnit, spacerDrawUnit, secondNodeDrawUnit],
+      {
+        align: 'end',
+        verticalStart: firstNodeDrawUnit.verticalStart,
+        verticalCenter: firstNodeDrawUnit.verticalCenter + height / 2,
+      },
+    );
+
+    const conjunctionNode = conjunction
+      ? getKeyFromNode(conjunction) === conjunctionKey
+        ? conjunction
+        : conjunction.children[0]
+      : undefined;
 
     firstNodeDrawUnit = horizontalMerge(
       [
         mergedDrawUnit,
         drawConjunction({
           basicHeight: height,
-          node: conjunction?.children[0] || undefined,
+          node: conjunctionNode,
           lineType,
+          status: conjunctionNode?.status || status,
         }),
       ],
       {
@@ -130,7 +139,7 @@ export const drawCompound = (
         verticalStart: mergedDrawUnit.verticalStart,
         verticalCenter: firstNodeDrawUnit.verticalCenter + height,
         verticalEnd: mergedDrawUnit.verticalEnd,
-      }
+      },
     );
   }
 
@@ -158,7 +167,10 @@ export const drawCompound = (
 
   const decoratorData: [number, number][] = [
     [firstNodeDrawUnit.width, firstNodeDrawUnit.verticalStart],
-    [firstNodeDrawUnit.width + decoratorWidth, firstNodeDrawUnit.verticalCenter],
+    [
+      firstNodeDrawUnit.width + decoratorWidth,
+      firstNodeDrawUnit.verticalCenter,
+    ],
     [firstNodeDrawUnit.width, firstNodeDrawUnit.verticalEnd],
   ];
 
@@ -171,7 +183,14 @@ export const drawCompound = (
     .append('path')
     .attr('d', lineGenerator(decoratorData))
     .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.strokeColor,
+        type: 'line',
+      }),
+    )
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {

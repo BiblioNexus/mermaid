@@ -4,12 +4,21 @@ import { isWord, ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+  StatusType,
+} from '../simpleGrammarTypes.js';
+import { drawGloss, getColorByStatus, getHebrew } from './utils.js';
 
 export function drawPreposition(
   node: GrammarNode | GraphicalNode,
-  initialHeight: number = settings.height,
-  lineType: 'solid' | 'dash' = 'solid'
+  options?: {
+    initialHeight?: number;
+    lineType?: 'solid' | 'dash';
+    status?: StatusType;
+  },
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
@@ -17,7 +26,11 @@ export function drawPreposition(
     throw new Error('drawPreposition Only draw Word');
   }
 
-  const rect1 = ruler(node.content.word);
+  const initialHeight = options?.initialHeight || settings.height;
+  const lineType = options?.lineType || 'solid';
+  const status = options?.status;
+
+  const rect1 = ruler(getHebrew({ status, hebrew: node.content.word }));
   const rect2 = ruler(node.content.gloss);
 
   const height = initialHeight + settings.padding;
@@ -26,7 +39,7 @@ export function drawPreposition(
 
   const width = Math.max(
     lineBottom,
-    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding
+    rect1.width + rect2.width + 2 * settings.padding + 2 * settings.wordPadding,
   );
 
   const slashData: [number, number][] = [
@@ -45,7 +58,14 @@ export function drawPreposition(
   line
     .attr('d', lineGenerator(slashData))
     .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.strokeColor,
+        type: 'line',
+      }),
+    )
     .attr('stroke-width', settings.lineStrokeWidth);
 
   if (lineType === 'dash') {
@@ -60,23 +80,41 @@ export function drawPreposition(
       'transform',
       `translate(${width / 2 - 2 * settings.wordPadding - rect1.width}, ${
         (height + rect1.height) / 2
-      })`
+      })`,
     )
-    .attr('stroke', settings.wordStrokeColor)
-    .attr('fill', settings.wordColor)
-    .text(node.content.word);
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.wordStrokeColor,
+        type: 'hebrew',
+      }),
+    )
+    .attr(
+      'fill',
+      getColorByStatus({
+        status,
+        defaultColor: settings.wordColor,
+        type: 'hebrew',
+      }),
+    )
+    .text(getHebrew({ status, hebrew: node.content.word }));
+
+  const glossDraw = drawGloss(
+    node.content.gloss,
+    getColorByStatus({
+      status: status,
+      defaultColor: settings.glossColor,
+      type: 'gloss',
+    }),
+  );
 
   d3Elem
-    .append('text')
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('stroke', settings.glossColor)
-    .attr('fill', settings.glossColor)
+    .append(() => glossDraw.node())
     .attr(
       'transform',
-      `translate(${width / 2 + settings.wordPadding}, ${(height + rect2.height) / 2})`
-    )
-    .text(node.content.gloss);
+      `translate(${width / 2 + settings.wordPadding}, ${(height + rect2.height) / 2})`,
+    );
 
   return {
     width,
@@ -86,7 +124,8 @@ export function drawPreposition(
     verticalCenter: height / 2,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter: lineBottom === width ? lineBottom : rect1.width + lineBottom,
+    horizontalCenter:
+      lineBottom === width ? lineBottom : rect1.width + lineBottom,
     horizontalEnd: width,
   };
 }

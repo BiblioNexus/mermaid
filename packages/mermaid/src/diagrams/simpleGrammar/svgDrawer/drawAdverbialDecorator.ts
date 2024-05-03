@@ -2,9 +2,10 @@ import * as d3 from 'd3';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit } from '../simpleGrammarTypes.js';
+import type { DrawUnit, StatusType } from '../simpleGrammarTypes.js';
+import { getColorByStatus } from './utils.js';
 
-export function drawNormalAdverbialDecorator(): DrawUnit {
+export function drawNormalAdverbialDecorator(status?: StatusType): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const width = settings.height;
@@ -25,7 +26,14 @@ export function drawNormalAdverbialDecorator(): DrawUnit {
     .attr('d', lineGenerator(slashData))
     .attr('fill', 'none')
     .attr('stroke-dasharray', '3,3')
-    .attr('stroke', settings.strokeColor)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.strokeColor,
+        type: 'line',
+      }),
+    )
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -43,19 +51,20 @@ export function drawNormalAdverbialDecorator(): DrawUnit {
 
 export function drawSpecialAdverbialDecorator(
   adverbDrawUnit: DrawUnit,
-  adverbialDrawUnit: DrawUnit
+  adverbialDrawUnit: DrawUnit,
+  status?: StatusType,
 ): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const horizontalCenter = Math.max(
     adverbDrawUnit.horizontalCenter,
-    adverbialDrawUnit.horizontalCenter
+    adverbialDrawUnit.horizontalCenter,
   );
   const width =
     horizontalCenter +
     Math.max(
       adverbDrawUnit.width - adverbDrawUnit.horizontalCenter,
-      adverbialDrawUnit.width - adverbialDrawUnit.horizontalCenter
+      adverbialDrawUnit.width - adverbialDrawUnit.horizontalCenter,
     ) +
     50;
   const height = adverbDrawUnit.height + adverbialDrawUnit.height;
@@ -66,12 +75,15 @@ export function drawSpecialAdverbialDecorator(
       'transform',
       `translate(${horizontalCenter - adverbialDrawUnit.horizontalCenter}, ${
         adverbDrawUnit.height
-      })`
+      })`,
     );
 
   d3Elem
     .append(() => adverbDrawUnit.element.node())
-    .attr('transform', `translate(${horizontalCenter - adverbDrawUnit.horizontalCenter}, 0)`);
+    .attr(
+      'transform',
+      `translate(${horizontalCenter - adverbDrawUnit.horizontalCenter}, 0)`,
+    );
 
   const startX = horizontalCenter + 7;
   const startY = (adverbDrawUnit.height * 2) / 3;
@@ -91,7 +103,14 @@ export function drawSpecialAdverbialDecorator(
     .append('path')
     .attr('d', lineGenerator(lineData))
     .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.strokeColor,
+        type: 'line',
+      }),
+    )
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
@@ -102,18 +121,31 @@ export function drawSpecialAdverbialDecorator(
     verticalCenter: height / 2,
     verticalEnd: height,
     horizontalStart: 0,
-    horizontalCenter: Math.max(adverbDrawUnit.horizontalCenter, adverbialDrawUnit.horizontalCenter),
+    horizontalCenter: Math.max(
+      adverbDrawUnit.horizontalCenter,
+      adverbialDrawUnit.horizontalCenter,
+    ),
     horizontalEnd: width,
   };
 }
 
-export function drawAdverbialDecorator(props?: {
-  adverbDrawUnit: DrawUnit;
-  adverbialDrawUnit: DrawUnit;
+export function drawAdverbialDecorator({
+  props,
+  status,
+}: {
+  props?: {
+    adverbDrawUnit: DrawUnit;
+    adverbialDrawUnit: DrawUnit;
+  };
+  status?: StatusType;
 }) {
   if (props) {
-    return drawSpecialAdverbialDecorator(props.adverbDrawUnit, props.adverbialDrawUnit);
+    return drawSpecialAdverbialDecorator(
+      props.adverbDrawUnit,
+      props.adverbialDrawUnit,
+      status,
+    );
   } else {
-    return drawNormalAdverbialDecorator();
+    return drawNormalAdverbialDecorator(status);
   }
 }

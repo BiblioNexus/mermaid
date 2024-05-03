@@ -2,9 +2,10 @@ import * as d3 from 'd3';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit } from '../simpleGrammarTypes.js';
+import type { DrawUnit, StatusType } from '../simpleGrammarTypes.js';
+import { getColorByStatus } from './utils.js';
 
-export function drawVerbparticipleDecorator(): DrawUnit {
+export function drawVerbparticipleDecorator(status?: StatusType): DrawUnit {
   const d3Elem = d3.create('svg:g');
 
   const radius = (settings.height * 2) / 3;
@@ -23,7 +24,14 @@ export function drawVerbparticipleDecorator(): DrawUnit {
     .append('path')
     .attr('d', drawHalfCircle(d3.path()).toString())
     .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.strokeColor,
+        type: 'line',
+      }),
+    )
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {

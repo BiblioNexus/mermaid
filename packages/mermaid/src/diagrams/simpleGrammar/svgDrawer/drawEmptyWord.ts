@@ -1,6 +1,10 @@
 import { drawWord } from './drawWord.js';
 
-import type { DrawUnit, GrammarNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  StatusType,
+} from '../simpleGrammarTypes.js';
 
 const emptyWord: GrammarNode = {
   level: 0,
@@ -10,9 +14,11 @@ const emptyWord: GrammarNode = {
     word: '( )',
     gloss: '',
     description: '',
+    arguments: '',
   },
+  status: 'elided',
 };
 
-export const drawEmptyWord = (): DrawUnit => {
-  return drawWord(emptyWord);
+export const drawEmptyWord = (status?: StatusType): DrawUnit => {
+  return drawWord(emptyWord, { status });
 };

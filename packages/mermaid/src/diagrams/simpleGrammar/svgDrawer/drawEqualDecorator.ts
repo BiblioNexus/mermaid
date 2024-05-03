@@ -4,9 +4,10 @@ import { ruler } from '../utils.js';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit } from '../simpleGrammarTypes.js';
+import type { DrawUnit, StatusType } from '../simpleGrammarTypes.js';
+import { getColorByStatus } from './utils.js';
 
-export const drawEqualDecorator = (): DrawUnit => {
+export const drawEqualDecorator = (status?: StatusType): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
   const word = ' = ';
@@ -20,9 +21,26 @@ export const drawEqualDecorator = (): DrawUnit => {
     .append('text')
     .attr('x', 0)
     .attr('y', 0)
-    .attr('stroke', settings.wordStrokeColor)
-    .attr('fill', settings.wordColor)
-    .attr('transform', `translate(${(width - rect.width) / 2}, ${height / 2 + rect.height})`)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.wordStrokeColor,
+        type: 'hebrew',
+      }),
+    )
+    .attr(
+      'fill',
+      getColorByStatus({
+        status,
+        defaultColor: settings.wordColor,
+        type: 'hebrew',
+      }),
+    )
+    .attr(
+      'transform',
+      `translate(${(width - rect.width) / 2}, ${height / 2 + rect.height})`,
+    )
     .text(word);
 
   return {

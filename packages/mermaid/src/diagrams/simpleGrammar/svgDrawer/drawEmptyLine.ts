@@ -2,9 +2,16 @@ import * as d3 from 'd3';
 
 import { settings } from '../settings.js';
 
-import type { DrawUnit } from '../simpleGrammarTypes.js';
+import type { DrawUnit, StatusType } from '../simpleGrammarTypes.js';
+import { getColorByStatus } from './utils.js';
 
-export const drawEmptyLine = (lineWidth: number = 50): DrawUnit => {
+export const drawEmptyLine = ({
+  lineWidth = settings.height,
+  status,
+}: {
+  lineWidth?: number;
+  status?: StatusType;
+}): DrawUnit => {
   const d3Elem = d3.create('svg:g');
 
   const width = lineWidth;
@@ -24,7 +31,14 @@ export const drawEmptyLine = (lineWidth: number = 50): DrawUnit => {
     .append('path')
     .attr('d', lineGenerator(data))
     .attr('fill', 'none')
-    .attr('stroke', settings.strokeColor)
+    .attr(
+      'stroke',
+      getColorByStatus({
+        status,
+        defaultColor: settings.strokeColor,
+        type: 'line',
+      }),
+    )
     .attr('stroke-width', settings.lineStrokeWidth);
 
   return {
