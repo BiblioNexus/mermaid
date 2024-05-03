@@ -19,11 +19,13 @@ export type Word = {
   word: string;
   gloss: string;
   description: string;
+  arguments: string;
 };
 
 export type Fragment = {
   fragment: string;
   description: string;
+  arguments: string;
 };
 
 export type GrammarNode = {
@@ -43,4 +45,5 @@ export interface SimpleGrammarDB extends DiagramDB {
   getSimpleGrammar: () => GrammarNode;
   addWord: (level: number, pos: string, str: string, description: string) => void;
   addFragment: (level: number, fragment: string, description: string) => void;
+  addNewLine: (level: number, line: string) => void;
 }

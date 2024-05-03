@@ -8,6 +8,7 @@ export const emptyWord: GrammarNode = {
     word: '( )',
     gloss: '',
     description: '',
+    arguments: '',
   },
 };
 
@@ -19,6 +20,7 @@ export const spaceWord: GrammarNode = {
     word: '',
     gloss: '',
     description: '',
+    arguments: '',
   },
 };
 
@@ -30,6 +32,7 @@ export const sampleWord: GrammarNode = {
     word: 'דָּ֘בָ֤ר',
     gloss: 'theme',
     description: '',
+    arguments: '',
   },
 };
 
@@ -39,5 +42,6 @@ export const sampleConstructChainNode: GrammarNode = {
   content: {
     fragment: 'ConstructChain',
     description: '',
+    arguments: '',
   },
 };

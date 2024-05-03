@@ -2,6 +2,18 @@ import { log } from '../../logger.js';
 
 import type { SimpleGrammarDB, Fragment, Word, GrammarNode } from './simpleGrammarTypes.js';
 
+const keywords: Record<string, string> = {
+  clausecluster: 'ClauseCluster',
+  constructchain: 'ConstructChain',
+  discourseunit: 'DiscourseUnit',
+  prepositionalphrase: 'PrepositionalPhrase',
+  relativeclause: 'RelativeClause',
+  relativeparticle: 'RelativeParticle',
+  subordinateclause: 'SubordinateClause',
+  secondobject: 'SecondObject',
+  complementclause: 'ComplementClause',
+};
+
 const rootNode: GrammarNode = {
   level: -1,
   children: [],
@@ -67,14 +79,87 @@ const getHebrewText = (str: string) => {
   return str.slice(i, j);
 };
 
+const getDelimited = (str: string, left: string, right: string) => {
+  let result = '';
+  let remainStr = '';
+  let status: 'init' | 'started' | 'ended' = 'init';
+
+  let i = 0;
+
+  while (i < str.length) {
+    if (status === 'init' && str[i] === left) {
+      status = 'started';
+      i++;
+      continue;
+    }
+
+    if (status === 'started' && str[i] === right) {
+      status = 'ended';
+      i++;
+      continue;
+    }
+
+    if (status === 'started') {
+      result = result + str[i];
+    } else {
+      remainStr += str[i];
+    }
+
+    i++;
+  }
+
+  return {
+    result,
+    remainStr,
+  };
+};
+
+const getDescription = (str: string) => {
+  return getDelimited(str, '[', ']');
+};
+
+const getArguments = (str: string) => {
+  return getDelimited(str, '<', '>');
+};
+
 const parseStr = (str: string) => {
-  const hebrew = getHebrewText(str);
-  const english = str.replace(hebrew, '').trim();
+  const descriptionResult = getDescription(str);
+  const argumentsResult = getArguments(descriptionResult.remainStr);
+
+  const hebrew = getHebrewText(argumentsResult.remainStr);
+  const english = argumentsResult.remainStr.replace(hebrew, '').trim();
 
   return {
     word: hebrew,
     gloss: english,
+    description: descriptionResult.result,
+    argumentsStr: argumentsResult.result,
   };
+};
+
+const getFirstWord = (line: string) => {
+  let word = '';
+
+  let i = 0;
+  let isStarted = false;
+
+  while (i < line.length) {
+    if (line[i] !== ' ' && isStarted === false) {
+      isStarted = true;
+    }
+
+    if ((line[i] === ' ' || line[i] === ':') && isStarted) {
+      return word;
+    }
+
+    if (isStarted) {
+      word = word + line[i];
+    }
+
+    i++;
+  }
+
+  return word;
 };
 
 export function isWord(word: Word | Fragment): word is Word {
@@ -85,9 +170,7 @@ export function isFragment(fragment: Word | Fragment): fragment is Fragment {
   return (fragment as Fragment).fragment !== undefined;
 }
 
-const addWord = (level: number, pos: string, str: string, description: string) => {
-  // console.log({ level, pos, str, description });
-
+const addWord = (level: number, pos: string, str: string) => {
   words[pos] = pos;
 
   const parent = getParent(level);
@@ -96,7 +179,7 @@ const addWord = (level: number, pos: string, str: string, description: string) =
     throw Error('Invalid Word Adding');
   }
 
-  const { word, gloss } = parseStr(str);
+  const { word, gloss, description, argumentsStr } = parseStr(str);
 
   parent.children.push({
     level,
@@ -107,16 +190,15 @@ const addWord = (level: number, pos: string, str: string, description: string) =
       word,
       gloss,
       description,
+      arguments: argumentsStr,
     },
   });
 
   lastAdded = parent.children[parent.children.length - 1];
 };
 
-const addFragment = (level: number, fragment: string, description: string) => {
+const addFragment = (level: number, fragment: string, str: string) => {
   fragments[fragment] = fragment;
-
-  // console.log({ level, fragment, description });
 
   const parent = getParent(level);
 
@@ -124,17 +206,36 @@ const addFragment = (level: number, fragment: string, description: string) => {
     throw Error('Invalid Fragment Adding');
   }
 
+  const { description, argumentsStr } = parseStr(str);
+
   parent.children.push({
     level,
     parent,
     children: [],
     content: {
-      fragment,
+      fragment: keywords[fragment.toLowerCase()] ? keywords[fragment.toLowerCase()] : fragment,
       description,
+      arguments: argumentsStr,
     },
   });
 
   lastAdded = parent.children[parent.children.length - 1];
+};
+
+const addNewLine = (indent: number, line: string) => {
+  const firstWord = getFirstWord(line);
+
+  if (firstWord.trim() === '') {
+    return;
+  }
+
+  const l = line.slice(firstWord.length);
+
+  if (l.startsWith(':')) {
+    addWord(indent, firstWord, l.slice(1).trim());
+  } else {
+    addFragment(indent, firstWord, l.trim());
+  }
 };
 
 const getSimpleGrammar = () => {
@@ -150,11 +251,12 @@ const getSimpleGrammar = () => {
 
   dfs(rootNode);
 
-  // console.log(rootNode);
+  console.log(rootNode);
 };
 
 export const db: SimpleGrammarDB = {
   getLogger,
+  addNewLine,
   addWord,
   addFragment,
   getSimpleGrammar,
