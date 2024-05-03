@@ -40,12 +40,7 @@ import { drawCompoundEnd } from '../svgDrawer/drawCompoundEnd.js';
 
 export function parseSubject(node: GrammarNode): GraphicalNode {
   const topKeys = [nounKey, pronounKey, verbparticipleKey];
-  const bottomKeys = [
-    adjectivalKey,
-    adjectiveKey,
-    articleKey,
-    relativeClauseKey,
-  ];
+  const bottomKeys = [adjectivalKey, adjectiveKey, articleKey, relativeClauseKey];
   const singleKeys = [appositionKey, casusPendensKey, objectKey, predicateKey];
   const specialKeys = [
     clauseKey,
@@ -56,22 +51,10 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     constructchainKey,
     vocativeKey,
   ];
-  const validKeys: string[] = [
-    ...topKeys,
-    ...bottomKeys,
-    ...singleKeys,
-    ...specialKeys,
-  ];
+  const validKeys: string[] = [...topKeys, ...bottomKeys, ...singleKeys, ...specialKeys];
 
-  if (
-    !node.content ||
-    !isFragment(node.content) ||
-    node.content.fragment !== 'Subject'
-  ) {
-    throw new GrammarError(
-      'InvalidParser',
-      'Subject parser requires Subject Node',
-    );
+  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Subject') {
+    throw new GrammarError('InvalidParser', 'Subject parser requires Subject Node');
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -91,7 +74,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: drawConstructChainConnector(
           childMap[constructchainKey].children as GraphicalNode[],
-          { horizontalLine: true, status: childMap[constructchainKey].status },
+          { horizontalLine: true, status: childMap[constructchainKey].status, order: 'before' }
         ),
       };
     }
@@ -103,7 +86,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           childMap[constructChainCompoundKey].drawUnit,
           'solid',
           true,
-          node.status,
+          node.status
         ),
       };
     }
@@ -119,15 +102,12 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
             [
               nominalDrawUnit,
               drawEmptyLine({
-                lineWidth: Math.max(
-                  nominalDrawUnit.width,
-                  adjectivalDrawUnit.width,
-                ),
+                lineWidth: Math.max(nominalDrawUnit.width, adjectivalDrawUnit.width),
                 status: node.status,
               }),
               adjectivalDrawUnit,
             ],
-            { align: 'end' },
+            { align: 'end' }
           ),
         };
       }
@@ -141,12 +121,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
     if (childMap[nominalGroupKey]) {
       return {
         ...node,
-        drawUnit: drawCompoundEnd(
-          childMap[nominalGroupKey].drawUnit,
-          'solid',
-          true,
-          node.status,
-        ),
+        drawUnit: drawCompoundEnd(childMap[nominalGroupKey].drawUnit, 'solid', true, node.status),
       };
     }
 
@@ -157,7 +132,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           childMap[nominalCompoundKey].drawUnit,
           'solid',
           true,
-          node.status,
+          node.status
         ),
       };
     }
@@ -168,7 +143,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
         {
           align: 'center',
           verticalCenter: drawEmptyWord(node.status).height,
-        },
+        }
       );
 
       return {
@@ -177,14 +152,14 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           [drawUnit, drawEqualDecorator(), childMap[vocativeKey].drawUnit],
           {
             align: 'center',
-          },
+          }
         ),
       };
     }
 
     if (childMap[clauseKey]) {
       const subjectNode = childMap[clauseKey].children.find(
-        (child) => getKeyFromNode(child) === subjectKey,
+        (child) => getKeyFromNode(child) === subjectKey
       );
 
       return {
@@ -194,7 +169,7 @@ export function parseSubject(node: GrammarNode): GraphicalNode {
           subjectNode
             ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
             : settings.padding,
-          node.status,
+          node.status
         ),
       };
     }

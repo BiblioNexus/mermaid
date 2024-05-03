@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
-
-import type { D3Element, DrawUnit, StatusType } from '../simpleGrammarTypes.js';
+import type { D3Element } from '../../../mermaidAPI.js';
+import type { DrawUnit, StatusType } from '../simpleGrammarTypes.js';
 import { settings } from '../settings.js';
 import { ruler } from '../utils.js';
 
@@ -19,10 +19,7 @@ type MergeOptions = {
   special?: boolean;
 };
 
-export function verticalMergeNormal(
-  drawUnits: DrawUnit[],
-  options?: MergeOptions,
-): DrawUnit {
+export function verticalMergeNormal(drawUnits: DrawUnit[], options?: MergeOptions): DrawUnit {
   if (
     options?.align &&
     Array.isArray(options?.align) &&
@@ -37,7 +34,7 @@ export function verticalMergeNormal(
 
   const innerHeight = drawUnits.reduce(
     (acc, item) => acc + (item.verticalEnd - item.verticalStart),
-    0,
+    0
   );
 
   let topOuter = 0;
@@ -49,21 +46,17 @@ export function verticalMergeNormal(
     topOuter = Math.max(topOuter, drawUnits[i].verticalStart - stackTop);
     bottomOuter = Math.max(
       bottomOuter,
-      drawUnits[n - i - 1].height -
-        drawUnits[n - i - 1].verticalEnd -
-        stackBottom,
+      drawUnits[n - i - 1].height - drawUnits[n - i - 1].verticalEnd - stackBottom
     );
 
     stackTop += drawUnits[i].verticalEnd - drawUnits[i].verticalStart;
-    stackBottom +=
-      drawUnits[n - i - 1].verticalEnd - drawUnits[n - i - 1].verticalStart;
+    stackBottom += drawUnits[n - i - 1].verticalEnd - drawUnits[n - i - 1].verticalStart;
   }
 
   let maxLeftOuter = 0;
   let maxRightOuter = 0;
 
-  const baseline: Alignment[] =
-    options && Array.isArray(options?.align) ? options.align : [];
+  const baseline: Alignment[] = options && Array.isArray(options?.align) ? options.align : [];
 
   if (!Array.isArray(options?.align)) {
     for (let i = 0; i < n; i++) {
@@ -78,26 +71,17 @@ export function verticalMergeNormal(
     switch (align) {
       case 'start': {
         maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalStart);
-        maxRightOuter = Math.max(
-          maxRightOuter,
-          unit.width - unit.horizontalStart,
-        );
+        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.horizontalStart);
         break;
       }
       case 'center': {
         maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalCenter);
-        maxRightOuter = Math.max(
-          maxRightOuter,
-          unit.width - unit.horizontalCenter,
-        );
+        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.horizontalCenter);
         break;
       }
       case 'end': {
         maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalEnd);
-        maxRightOuter = Math.max(
-          maxRightOuter,
-          unit.width - unit.horizontalEnd,
-        );
+        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.horizontalEnd);
         break;
       }
       default: {
@@ -141,7 +125,7 @@ export function verticalMergeNormal(
       .append(() => unit.element.node())
       .attr(
         'transform',
-        `translate(${maxLeftOuter - xMovementAmount}, ${yStack - unit.verticalStart})`,
+        `translate(${maxLeftOuter - xMovementAmount}, ${yStack - unit.verticalStart})`
       );
 
     yStack += unit.verticalEnd - unit.verticalStart;
@@ -151,31 +135,20 @@ export function verticalMergeNormal(
     width: options?.width !== undefined ? options.width : width,
     height: options?.height !== undefined ? options.height : height,
     element: d3Elem,
-    verticalStart:
-      options?.verticalStart !== undefined ? options.verticalStart : topOuter,
+    verticalStart: options?.verticalStart !== undefined ? options.verticalStart : topOuter,
     verticalCenter:
       options?.verticalCenter !== undefined
         ? options.verticalCenter
         : topOuter + (height - topOuter) / 2,
-    verticalEnd:
-      options?.verticalEnd !== undefined
-        ? options.verticalEnd
-        : height - bottomOuter,
-    horizontalStart:
-      options?.horizontalStart !== undefined ? options.horizontalStart : 0,
+    verticalEnd: options?.verticalEnd !== undefined ? options.verticalEnd : height - bottomOuter,
+    horizontalStart: options?.horizontalStart !== undefined ? options.horizontalStart : 0,
     horizontalCenter:
-      options?.horizontalCenter !== undefined
-        ? options.horizontalCenter
-        : maxLeftOuter,
-    horizontalEnd:
-      options?.horizontalEnd !== undefined ? options.horizontalEnd : width,
+      options?.horizontalCenter !== undefined ? options.horizontalCenter : maxLeftOuter,
+    horizontalEnd: options?.horizontalEnd !== undefined ? options.horizontalEnd : width,
   };
 }
 
-export function verticalMergeSpecial(
-  drawUnits: DrawUnit[],
-  options?: MergeOptions,
-): DrawUnit {
+export function verticalMergeSpecial(drawUnits: DrawUnit[], options?: MergeOptions): DrawUnit {
   if (
     options?.align &&
     Array.isArray(options?.align) &&
@@ -189,8 +162,7 @@ export function verticalMergeSpecial(
   const n = drawUnits.length;
 
   const height = drawUnits.reduce((acc, item) => acc + item.height, 0);
-  const topOuter =
-    n > 0 && drawUnits[0].verticalStart > 0 ? drawUnits[0].verticalStart : 0;
+  const topOuter = n > 0 && drawUnits[0].verticalStart > 0 ? drawUnits[0].verticalStart : 0;
   const bottomOuter =
     n > 0 && drawUnits[n - 1].horizontalEnd < drawUnits[n - 1].height
       ? drawUnits[n - 1].height - drawUnits[n - 1].horizontalEnd
@@ -199,8 +171,7 @@ export function verticalMergeSpecial(
   let maxLeftOuter = 0;
   let maxRightOuter = 0;
 
-  const baseline: Alignment[] =
-    options && Array.isArray(options?.align) ? options.align : [];
+  const baseline: Alignment[] = options && Array.isArray(options?.align) ? options.align : [];
 
   if (!Array.isArray(options?.align)) {
     for (let i = 0; i < n; i++) {
@@ -215,26 +186,17 @@ export function verticalMergeSpecial(
     switch (align) {
       case 'start': {
         maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalStart);
-        maxRightOuter = Math.max(
-          maxRightOuter,
-          unit.width - unit.horizontalStart,
-        );
+        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.horizontalStart);
         break;
       }
       case 'center': {
         maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalCenter);
-        maxRightOuter = Math.max(
-          maxRightOuter,
-          unit.width - unit.horizontalCenter,
-        );
+        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.horizontalCenter);
         break;
       }
       case 'end': {
         maxLeftOuter = Math.max(maxLeftOuter, unit.horizontalEnd);
-        maxRightOuter = Math.max(
-          maxRightOuter,
-          unit.width - unit.horizontalEnd,
-        );
+        maxRightOuter = Math.max(maxRightOuter, unit.width - unit.horizontalEnd);
         break;
       }
       default: {
@@ -275,10 +237,7 @@ export function verticalMergeSpecial(
 
     childrenContainer
       .append(() => unit.element.node())
-      .attr(
-        'transform',
-        `translate(${maxLeftOuter - xMovementAmount}, ${yStack})`,
-      );
+      .attr('transform', `translate(${maxLeftOuter - xMovementAmount}, ${yStack})`);
 
     yStack += unit.height;
   }
@@ -287,40 +246,26 @@ export function verticalMergeSpecial(
     width: options?.width !== undefined ? options.width : width,
     height: options?.height !== undefined ? options.height : height,
     element: d3Elem,
-    verticalStart:
-      options?.verticalStart !== undefined ? options.verticalStart : topOuter,
+    verticalStart: options?.verticalStart !== undefined ? options.verticalStart : topOuter,
     verticalCenter:
       options?.verticalCenter !== undefined
         ? options.verticalCenter
         : topOuter + (height - topOuter) / 2,
-    verticalEnd:
-      options?.verticalEnd !== undefined
-        ? options.verticalEnd
-        : height - bottomOuter,
-    horizontalStart:
-      options?.horizontalStart !== undefined ? options.horizontalStart : 0,
+    verticalEnd: options?.verticalEnd !== undefined ? options.verticalEnd : height - bottomOuter,
+    horizontalStart: options?.horizontalStart !== undefined ? options.horizontalStart : 0,
     horizontalCenter:
-      options?.horizontalCenter !== undefined
-        ? options.horizontalCenter
-        : maxLeftOuter,
-    horizontalEnd:
-      options?.horizontalEnd !== undefined ? options.horizontalEnd : width,
+      options?.horizontalCenter !== undefined ? options.horizontalCenter : maxLeftOuter,
+    horizontalEnd: options?.horizontalEnd !== undefined ? options.horizontalEnd : width,
   };
 }
 
-export function verticalMerge(
-  drawUnits: DrawUnit[],
-  options?: MergeOptions,
-): DrawUnit {
+export function verticalMerge(drawUnits: DrawUnit[], options?: MergeOptions): DrawUnit {
   return options?.special
     ? verticalMergeSpecial(drawUnits, options)
     : verticalMergeNormal(drawUnits, options);
 }
 
-export function horizontalMerge(
-  drawUnits: DrawUnit[],
-  options?: MergeOptions,
-): DrawUnit {
+export function horizontalMerge(drawUnits: DrawUnit[], options?: MergeOptions): DrawUnit {
   if (
     options?.align &&
     Array.isArray(options?.align) &&
@@ -334,10 +279,7 @@ export function horizontalMerge(
   const n = drawUnits.length;
 
   const width = drawUnits.reduce((acc, item) => acc + item.width, 0);
-  const leftOuter =
-    n > 0 && drawUnits[0].horizontalStart > 0
-      ? drawUnits[0].horizontalStart
-      : 0;
+  const leftOuter = n > 0 && drawUnits[0].horizontalStart > 0 ? drawUnits[0].horizontalStart : 0;
   const rightOuter =
     n > 0 && drawUnits[n - 1].horizontalEnd < drawUnits[n - 1].width
       ? drawUnits[n - 1].width - drawUnits[n - 1].horizontalEnd
@@ -346,8 +288,7 @@ export function horizontalMerge(
   let maxTopOuter = 0;
   let maxBottomOuter = 0;
 
-  const baseline: Alignment[] =
-    options && Array.isArray(options?.align) ? options.align : [];
+  const baseline: Alignment[] = options && Array.isArray(options?.align) ? options.align : [];
 
   if (!Array.isArray(options?.align)) {
     for (let i = 0; i < n; i++) {
@@ -362,26 +303,17 @@ export function horizontalMerge(
     switch (align) {
       case 'start': {
         maxTopOuter = Math.max(maxTopOuter, unit.verticalStart);
-        maxBottomOuter = Math.max(
-          maxBottomOuter,
-          unit.height - unit.verticalStart,
-        );
+        maxBottomOuter = Math.max(maxBottomOuter, unit.height - unit.verticalStart);
         break;
       }
       case 'center': {
         maxTopOuter = Math.max(maxTopOuter, unit.verticalCenter);
-        maxBottomOuter = Math.max(
-          maxBottomOuter,
-          unit.height - unit.verticalCenter,
-        );
+        maxBottomOuter = Math.max(maxBottomOuter, unit.height - unit.verticalCenter);
         break;
       }
       case 'end': {
         maxTopOuter = Math.max(maxTopOuter, unit.verticalEnd);
-        maxBottomOuter = Math.max(
-          maxBottomOuter,
-          unit.height - unit.verticalEnd,
-        );
+        maxBottomOuter = Math.max(maxBottomOuter, unit.height - unit.verticalEnd);
         break;
       }
       default: {
@@ -422,10 +354,7 @@ export function horizontalMerge(
 
     childrenContainer
       .append(() => unit.element.node())
-      .attr(
-        'transform',
-        `translate(${xStack}, ${maxTopOuter - yMovementAmount})`,
-      );
+      .attr('transform', `translate(${xStack}, ${maxTopOuter - yMovementAmount})`);
 
     xStack += unit.width;
   }
@@ -434,35 +363,19 @@ export function horizontalMerge(
     width,
     height,
     element: d3Elem,
-    verticalStart:
-      options?.verticalStart !== undefined ? options.verticalStart : 0,
-    verticalCenter:
-      options?.verticalCenter !== undefined
-        ? options.verticalCenter
-        : maxTopOuter,
-    verticalEnd:
-      options?.verticalEnd !== undefined ? options.verticalEnd : height,
-    horizontalStart:
-      options?.horizontalStart !== undefined
-        ? options.horizontalStart
-        : leftOuter,
+    verticalStart: options?.verticalStart !== undefined ? options.verticalStart : 0,
+    verticalCenter: options?.verticalCenter !== undefined ? options.verticalCenter : maxTopOuter,
+    verticalEnd: options?.verticalEnd !== undefined ? options.verticalEnd : height,
+    horizontalStart: options?.horizontalStart !== undefined ? options.horizontalStart : leftOuter,
     horizontalCenter:
       options?.horizontalCenter !== undefined
         ? options.horizontalCenter
         : leftOuter + (width - leftOuter - rightOuter) / 2,
-    horizontalEnd: options?.horizontalEnd
-      ? options.horizontalEnd
-      : width - rightOuter,
+    horizontalEnd: options?.horizontalEnd ? options.horizontalEnd : width - rightOuter,
   };
 }
 
-export function getHebrew({
-  status,
-  hebrew,
-}: {
-  status?: StatusType;
-  hebrew: string;
-}) {
+export function getHebrew({ status, hebrew }: { status?: StatusType; hebrew: string }) {
   if (status === 'elided') {
     return hebrew.trim() !== '( )' ? '( )' : `( ${hebrew} )`;
   }
@@ -510,9 +423,7 @@ export function drawGloss(gloss: string, color: string): D3Element {
   if (parts.length === 2) {
     const reversed = parts[0].includes('*');
 
-    const rect1 = ruler(
-      `${parts[0].replace('*', '')}${reversed ? '' : ' >> '}`,
-    );
+    const rect1 = ruler(`${parts[0].replace('*', '')}${reversed ? '' : ' >> '}`);
 
     d3Elem
       .append('text')
