@@ -23,7 +23,10 @@ export function parseClauseCluster(node: GrammarNode): GraphicalNode {
       node.content.fragment !== 'ClausalCluster' &&
       node.content.fragment !== 'Clausecluster')
   ) {
-    throw new GrammarError('InvalidParser', 'ClauseCluster parser requires ClauseCluster Node');
+    throw new GrammarError(
+      'InvalidParser',
+      'ClauseCluster parser requires ClauseCluster Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -38,13 +41,15 @@ export function parseClauseCluster(node: GrammarNode): GraphicalNode {
   }
 
   const clauseNodes = node.children.filter((child): child is GraphicalNode =>
-    [clauseKey, clauseCompoundKey, clauseClusterKey].includes(getKeyFromNode(child))
+    [clauseKey, clauseCompoundKey, clauseClusterKey].includes(
+      getKeyFromNode(child),
+    ),
   );
 
-  let compoundDrawUnit = drawCompound(clauseNodes, 'dash', false);
+  let compoundDrawUnit = drawCompound(clauseNodes, 'dash', false, node.status);
 
   const subordinateClauseNode = node.children.find(
-    (child) => getKeyFromNode(child) === subordinateClauseKey
+    (child) => getKeyFromNode(child) === subordinateClauseKey,
   );
 
   if (subordinateClauseNode) {
@@ -52,15 +57,21 @@ export function parseClauseCluster(node: GrammarNode): GraphicalNode {
 
     compoundDrawUnit = horizontalMerge(
       [
-        verticalMerge([drawEmptyLine(drawUnit.width), drawUnit], {
-          align: 'start',
-          verticalCenter: 0,
-        }),
-        drawCompoundEnd(compoundDrawUnit, 'dash', false),
+        verticalMerge(
+          [
+            drawEmptyLine({ lineWidth: drawUnit.width, status: node.status }),
+            drawUnit,
+          ],
+          {
+            align: 'start',
+            verticalCenter: 0,
+          },
+        ),
+        drawCompoundEnd(compoundDrawUnit, 'dash', false, node.status),
       ],
       {
         align: 'center',
-      }
+      },
     );
   }
 

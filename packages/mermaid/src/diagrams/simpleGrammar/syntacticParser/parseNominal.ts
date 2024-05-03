@@ -40,8 +40,20 @@ import { drawConstructChainConnector } from '../svgDrawer/drawConstructChainConn
 import { drawAdverbialDecorator } from '../svgDrawer/drawAdverbialDecorator.js';
 import { drawEmptyWord } from '../svgDrawer/drawEmptyWord.js';
 
-const topKeys = [nounKey, particleKey, pronounKey, verbparticipleKey, suffixPronounKey];
-const bottomKeys = [adjectivalKey, adverbialKey, adjectiveKey, articleKey, quantifierKey];
+const topKeys = [
+  nounKey,
+  particleKey,
+  pronounKey,
+  verbparticipleKey,
+  suffixPronounKey,
+];
+const bottomKeys = [
+  adjectivalKey,
+  adverbialKey,
+  adjectiveKey,
+  articleKey,
+  quantifierKey,
+];
 const specialKeys = [prepositionalPhraseKey, clauseKey, relativeClauseKey];
 
 const singleKeys = [
@@ -63,8 +75,15 @@ const validKeys: string[] = [
 ];
 
 export function parseNominal(node: GrammarNode): GraphicalNode {
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Nominal') {
-    throw new GrammarError('InvalidParser', 'Nominal parser requires Nominal Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Nominal'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Nominal parser requires Nominal Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -83,16 +102,9 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
   }
 
   if (havingGivenKeys(node.children, specialKeys)) {
-    if (childMap[constructchainKey]) {
-      return {
-        ...node,
-        drawUnit: childMap[constructchainKey].drawUnit,
-      };
-    }
-
     if (childMap[clauseKey]) {
       const subjectNode = childMap[clauseKey].children.find(
-        (child) => getKeyFromNode(child) === subjectKey
+        (child) => getKeyFromNode(child) === subjectKey,
       );
 
       return {
@@ -101,7 +113,8 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
           childMap[clauseKey].drawUnit,
           subjectNode
             ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
-            : settings.padding
+            : settings.padding,
+          node.status,
         ),
       };
     }
@@ -112,18 +125,28 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
         ...node,
         drawUnit: horizontalMerge(
           [
-            verticalMerge([drawEmptyLine(drawUnit.width), drawUnit], {
-              align: 'end',
-              verticalCenter: 0,
-            }),
+            verticalMerge(
+              [
+                drawEmptyLine({
+                  lineWidth: drawUnit.width,
+                  status: node.status,
+                }),
+                drawUnit,
+              ],
+              {
+                align: 'end',
+                verticalCenter: 0,
+              },
+            ),
             drawNominal({
               topKeys,
               bottomKeys,
               children: node.children as GraphicalNode[],
               isNominal: true,
+              status: node.status,
             }),
           ],
-          { align: 'center' }
+          { align: 'center' },
         ),
       };
     }
@@ -136,6 +159,13 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
 
   if (!havingGivenKeys(node.children, topKeys)) {
     if (childMap[constructchainKey]) {
+      const constructchainKeyIndex = node.children.findIndex(
+        (item) => getKeyFromNode(item) === constructchainKey,
+      );
+      const bottomKeyIndex = node.children.findIndex((item) =>
+        bottomKeys.includes(getKeyFromNode(item)),
+      );
+
       return {
         ...node,
         drawUnit: drawConstructChainConnector(
@@ -146,8 +176,11 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
               bottomKeys,
               children: node.children as GraphicalNode[],
               isNominal: false,
+              status: node.status,
             }),
-          }
+            status: childMap[constructchainKey].status,
+            order: bottomKeyIndex > constructchainKeyIndex ? 'before' : 'after',
+          },
         ),
       };
     }
@@ -161,33 +194,46 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
               bottomKeys,
               children: node.children as GraphicalNode[],
               isNominal: false,
+              status: node.status,
             }),
             childMap[nominalKey].drawUnit,
           ],
-          { align: 'center' }
+          { align: 'center' },
         ),
       };
     }
 
     if (childMap[adjectiveKey] && childMap[adverbialKey]) {
       const drawUnit = drawAdverbialDecorator({
-        adverbDrawUnit: childMap[adjectiveKey].drawUnit,
-        adverbialDrawUnit: childMap[adverbialKey].drawUnit,
+        props: {
+          adverbDrawUnit: childMap[adjectiveKey].drawUnit,
+          adverbialDrawUnit: childMap[adverbialKey].drawUnit,
+        },
+        status: node.status,
       });
 
       return {
         ...node,
         drawUnit: verticalMerge(
           [
-            verticalMerge([drawEmptyWord(), drawEmptyLine(drawUnit.width)], {
-              align: 'center',
-            }),
+            verticalMerge(
+              [
+                drawEmptyWord(node.status),
+                drawEmptyLine({
+                  lineWidth: drawUnit.width,
+                  status: node.status,
+                }),
+              ],
+              {
+                align: 'center',
+              },
+            ),
             drawUnit,
           ],
           {
             align: 'end',
-            verticalCenter: drawEmptyWord().height,
-          }
+            verticalCenter: drawEmptyWord(node.status).height,
+          },
         ),
       };
     }
@@ -200,6 +246,8 @@ export function parseNominal(node: GrammarNode): GraphicalNode {
       bottomKeys,
       children: node.children as GraphicalNode[],
       isNominal: true,
+      status: node.status,
+      message: node.content.message,
     }),
   };
 }

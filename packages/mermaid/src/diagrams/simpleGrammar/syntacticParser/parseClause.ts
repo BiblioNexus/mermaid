@@ -1,6 +1,10 @@
 import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+} from '../simpleGrammarTypes.js';
 
 import {
   subjectKey,
@@ -43,8 +47,15 @@ export function parseClause(node: GrammarNode): GraphicalNode {
 
   const validKeys: string[] = [...ignoreKeys, ...specialKeys];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Clause') {
-    throw new GrammarError('InvalidParser', 'Clause parser requires Clause Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Clause'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Clause parser requires Clause Node',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -52,7 +63,7 @@ export function parseClause(node: GrammarNode): GraphicalNode {
   if (havingGivenKeys(node.children, ignoreKeys)) {
     return {
       ...node,
-      drawUnit: drawClauseDecorator(),
+      drawUnit: drawClauseDecorator({ status: node.status }),
     };
   }
 
@@ -60,25 +71,37 @@ export function parseClause(node: GrammarNode): GraphicalNode {
 
   if (childMap[complementKey]) {
     elements.push(
-      horizontalMerge([childMap[complementKey].drawUnit, drawComplementDecorator()], {
-        align: ['center', 'end'],
-      })
+      horizontalMerge(
+        [
+          childMap[complementKey].drawUnit,
+          drawComplementDecorator(node.status),
+        ],
+        {
+          align: ['center', 'end'],
+        },
+      ),
     );
   }
 
   if (childMap[secondObjectKey]) {
     elements.push(
-      horizontalMerge([childMap[secondObjectKey].drawUnit, drawVerticalLine()], {
-        align: ['center', 'end'],
-      })
+      horizontalMerge(
+        [childMap[secondObjectKey].drawUnit, drawVerticalLine(node.status)],
+        {
+          align: ['center', 'end'],
+        },
+      ),
     );
   }
 
   if (childMap[objectKey]) {
     elements.push(
-      horizontalMerge([childMap[objectKey].drawUnit, drawVerticalLine()], {
-        align: ['center', 'end'],
-      })
+      horizontalMerge(
+        [childMap[objectKey].drawUnit, drawVerticalLine(node.status)],
+        {
+          align: ['center', 'end'],
+        },
+      ),
     );
   }
 
@@ -91,10 +114,20 @@ export function parseClause(node: GrammarNode): GraphicalNode {
   }
 
   if (childMap[verbKey]) {
-    elements.push(drawWord(childMap[verbKey], true));
+    elements.push(
+      drawWord(childMap[verbKey], {
+        withLine: true,
+        status: node.status,
+      }),
+    );
   }
 
-  elements.push(drawClauseDecorator(childMap[subordinateClauseKey]?.drawUnit || undefined));
+  elements.push(
+    drawClauseDecorator({
+      drawUnit: childMap[subordinateClauseKey]?.drawUnit || undefined,
+      status: node.status,
+    }),
+  );
 
   if (childMap[subjectKey]) {
     elements.push(childMap[subjectKey].drawUnit);

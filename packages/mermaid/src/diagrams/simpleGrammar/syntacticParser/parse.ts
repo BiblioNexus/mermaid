@@ -71,7 +71,6 @@ import {
 
 import { settings } from '../settings.js';
 
-// import { parseConstructChain } from './parseConstructChain.js';
 import { parseFragment } from './parseFragment.js';
 import { parseNominal } from './parseNominal.js';
 import { parseAdjectival } from './parseAdjectival.js';
@@ -171,7 +170,22 @@ const parserMap: Record<string, (node: GrammarNode) => GraphicalNode> = {
 export function parse(node: GrammarNode): GraphicalNode {
   try {
     for (let i = 0; i < node.children.length; i++) {
-      node.children[i] = parse(node.children[i]);
+      if (
+        node.content &&
+        node.children[i].content &&
+        getKeyFromNode(node) === adjectivalKey &&
+        getKeyFromNode(node.children[i]) === nominalKey
+      ) {
+        node.children[i] = parse({
+          ...node.children[i],
+          content: {
+            ...node.children[i].content,
+            message: 'adjectival > nominal',
+          },
+        } as GrammarNode);
+      } else {
+        node.children[i] = parse(node.children[i]);
+      }
     }
 
     if (node.content === null) {
@@ -181,7 +195,7 @@ export function parse(node: GrammarNode): GraphicalNode {
           node,
           'Simple Grammar',
           settings.titleColor,
-          settings.wordStrokeColor
+          settings.wordStrokeColor,
         ),
       };
     }
@@ -195,43 +209,59 @@ export function parse(node: GrammarNode): GraphicalNode {
         } catch (err) {
           return {
             ...node,
-            drawUnit: drawError(node.content.fragment, (err as GrammarError).errorType),
+            drawUnit: drawError(
+              node.content.fragment,
+              (err as GrammarError).errorType,
+            ),
           };
         }
       } else {
-        throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
+        throw new GrammarError(
+          'InvalidStructure',
+          'Invalid structure, not defined parser',
+        );
       }
     }
 
     if (isWord(node.content)) {
       if (getKeyFromNode(node) === verbparticipleKey) {
-        const drawUnit = drawWord(node);
+        const drawUnit = drawWord(node, { status: node.status });
 
         return {
           ...node,
-          drawUnit: horizontalMerge([drawUnit, drawVerbparticipleDecorator()], {
-            align: ['end', 'end'],
-            verticalStart: drawUnit.verticalStart,
-            verticalCenter: drawUnit.verticalCenter,
-            verticalEnd: drawUnit.verticalEnd,
-          }),
+          drawUnit: horizontalMerge(
+            [drawUnit, drawVerbparticipleDecorator(node.status)],
+            {
+              align: ['end', 'end'],
+              verticalStart: drawUnit.verticalStart,
+              verticalCenter: drawUnit.verticalCenter,
+              verticalEnd: drawUnit.verticalEnd,
+            },
+          ),
         };
       }
 
-      if ([adverbKey, adjectiveKey, articleKey, quantifierKey].includes(getKeyFromNode(node))) {
+      if (
+        [adverbKey, adjectiveKey, articleKey, quantifierKey].includes(
+          getKeyFromNode(node),
+        )
+      ) {
         return {
           ...node,
-          drawUnit: drawModifier(node),
+          drawUnit: drawModifier(node, node.status),
         };
       }
 
       return {
         ...node,
-        drawUnit: drawWord(node),
+        drawUnit: drawWord(node, { status: node.status, withLine: true }),
       };
     }
 
-    throw new GrammarError('InvalidStructure', 'Invalid structure, not defined parser');
+    throw new GrammarError(
+      'InvalidStructure',
+      'Invalid structure, not defined parser',
+    );
   } catch (err) {
     return {
       ...node,

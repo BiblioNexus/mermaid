@@ -10,16 +10,26 @@ import { drawModifier } from '../svgDrawer/drawModifier.js';
 export function parseAdverbCompound(node: GrammarNode): GraphicalNode {
   const requiredKeys: string[] = [adverbKey, adverbCompoundKey];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'AdverbCompound') {
-    throw new GrammarError('InvalidParser', 'AdverbCompound parser requires AdverbCompound Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'AdverbCompound'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'AdverbCompound parser requires AdverbCompound Node',
+    );
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError('InvalidStructure', 'AdverbCompound has no children');
+    throw new GrammarError(
+      'InvalidStructure',
+      'AdverbCompound has no children',
+    );
   }
 
   const validChildren = node.children.filter((child) =>
-    requiredKeys.includes(getKeyFromNode(child))
+    requiredKeys.includes(getKeyFromNode(child)),
   );
 
   const keysLen = validChildren.length;
@@ -29,18 +39,23 @@ export function parseAdverbCompound(node: GrammarNode): GraphicalNode {
       ...node,
       drawUnit: horizontalMerge(
         [
-          ...validChildren.map((child) => {
-            if (isFragment(child.content!)) {
-              return (child as GraphicalNode).drawUnit;
-            }
+          ...validChildren
+            .map((child) => {
+              if (isFragment(child.content!)) {
+                return (child as GraphicalNode).drawUnit;
+              }
 
-            return drawModifier(child);
-          }),
+              return drawModifier(child, child.status);
+            })
+            .reverse(),
         ],
-        { align: 'start' }
+        { align: 'start' },
       ),
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'AdverbCompound has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'AdverbCompound has unexpected structure',
+  );
 }

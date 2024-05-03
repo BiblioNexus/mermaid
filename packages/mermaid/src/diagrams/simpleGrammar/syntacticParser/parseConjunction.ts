@@ -5,7 +5,11 @@ import { horizontalMerge, verticalMerge } from '../svgDrawer/utils.js';
 import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
 
 export function parseConjunction(node: GrammarNode): GraphicalNode {
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Conjunction') {
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Conjunction'
+  ) {
     throw new Error('Conjunction parser requires Conjunction Node');
   }
 
@@ -13,18 +17,29 @@ export function parseConjunction(node: GrammarNode): GraphicalNode {
     ...node,
     drawUnit: horizontalMerge(
       [
-        ...node.children.map((child) => {
-          if (child.content && isWord(child.content)) {
-            const drawUnit = (child as GraphicalNode).drawUnit;
-            return verticalMerge([drawUnit, drawEmptyLine(drawUnit.width)], {
-              align: 'center',
-            });
-          }
+        ...node.children
+          .map((child) => {
+            if (child.content && isWord(child.content)) {
+              const drawUnit = (child as GraphicalNode).drawUnit;
+              return verticalMerge(
+                [
+                  drawUnit,
+                  drawEmptyLine({
+                    lineWidth: drawUnit.width,
+                    status: node.status,
+                  }),
+                ],
+                {
+                  align: 'center',
+                },
+              );
+            }
 
-          return (child as GraphicalNode).drawUnit;
-        }),
+            return (child as GraphicalNode).drawUnit;
+          })
+          .reverse(),
       ],
-      { align: 'start' }
+      { align: 'start' },
     ),
   };
 }

@@ -11,8 +11,15 @@ import { getKeyFromNode, verbparticipleKey } from './keys.js';
 import { drawWord } from '../svgDrawer/drawWord.js';
 
 export function parseFragment(node: GrammarNode): GraphicalNode {
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Fragment') {
-    throw new GrammarError('InvalidParser', 'Fragment parser requires Fragment Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Fragment'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Fragment parser requires Fragment Node',
+    );
   }
 
   if (isGraphicalNode(node.children[0])) {
@@ -22,32 +29,45 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
       switch (node.children[0].content.fragment) {
         case 'PrepositionalPhrase': {
           node.children[0].drawUnit = verticalMerge(
-            [drawEmptyWord(), drawEmptyLine(70), drawUnit],
+            [
+              drawEmptyWord(node.status),
+              drawEmptyLine({ lineWidth: 70, status: node.status }),
+              drawUnit,
+            ],
             {
               align: 'end',
-            }
+            },
           );
           break;
         }
         case 'Adjectival': {
           node.children[0].drawUnit = verticalMerge(
             [
-              drawEmptyWord(),
-              drawEmptyLine(drawUnit.horizontalEnd - drawUnit.horizontalStart),
+              drawEmptyWord(node.status),
+              drawEmptyLine({
+                lineWidth: drawUnit.horizontalEnd - drawUnit.horizontalStart,
+                status: node.status,
+              }),
               drawUnit,
             ],
             {
               align: 'end',
-            }
+            },
           );
           break;
         }
         case 'Adverbial': {
           node.children[0].drawUnit = verticalMerge(
-            [drawEmptyLine(drawUnit.horizontalEnd - drawUnit.horizontalStart), drawUnit],
+            [
+              drawEmptyLine({
+                lineWidth: drawUnit.horizontalEnd - drawUnit.horizontalStart,
+                status: node.status,
+              }),
+              drawUnit,
+            ],
             {
               align: 'end',
-            }
+            },
           );
           break;
         }
@@ -59,7 +79,10 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
       if (getKeyFromNode(node.children[0]) !== verbparticipleKey) {
         return {
           ...node,
-          drawUnit: drawWord(node.children[0], true),
+          drawUnit: drawWord(node.children[0], {
+            withLine: true,
+            status: node.status,
+          }),
         };
       }
     }
@@ -70,7 +93,7 @@ export function parseFragment(node: GrammarNode): GraphicalNode {
         node,
         node.content.description,
         settings.descriptionColor,
-        settings.wordStrokeColor
+        settings.wordStrokeColor,
       ),
     };
   }

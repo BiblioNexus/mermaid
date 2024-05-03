@@ -1,22 +1,46 @@
 import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { GrammarNode, GraphicalNode, DrawUnit } from '../simpleGrammarTypes.js';
+import type {
+  GrammarNode,
+  GraphicalNode,
+  DrawUnit,
+} from '../simpleGrammarTypes.js';
 
-import { relativeParticleKey, clauseKey, clauseClusterKey, relativeKey } from './keys.js';
+import {
+  relativeParticleKey,
+  clauseKey,
+  clauseClusterKey,
+  relativeKey,
+} from './keys.js';
 
 import { getChildMap } from './utils.js';
 
 import { drawRelativeParticle } from '../svgDrawer/drawRelativeParticle.js';
 
 export function parseRelativeClause(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [relativeKey, relativeParticleKey, clauseKey, clauseClusterKey];
+  const validKeys: string[] = [
+    relativeKey,
+    relativeParticleKey,
+    clauseKey,
+    clauseClusterKey,
+  ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'RelativeClause') {
-    throw new GrammarError('InvalidParser', 'RelativeClause parser requires RelativeClause Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'RelativeClause'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'RelativeClause parser requires RelativeClause Node',
+    );
   }
 
   if (node.children.length === 0) {
-    throw new GrammarError('InvalidStructure', 'RelativeClause has no children');
+    throw new GrammarError(
+      'InvalidStructure',
+      'RelativeClause has no children',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -42,11 +66,14 @@ export function parseRelativeClause(node: GrammarNode): GraphicalNode {
   }
 
   if (drawUnit === undefined || particleNode === undefined) {
-    throw new GrammarError('InvalidStructure', 'RelativeClause has unexpected structure');
+    throw new GrammarError(
+      'InvalidStructure',
+      'RelativeClause has unexpected structure',
+    );
   }
 
   return {
     ...node,
-    drawUnit: drawRelativeParticle(particleNode, drawUnit),
+    drawUnit: drawRelativeParticle(particleNode, drawUnit, node.status),
   };
 }

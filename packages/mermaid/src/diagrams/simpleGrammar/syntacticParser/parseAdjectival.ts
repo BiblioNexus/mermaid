@@ -50,8 +50,15 @@ const specialKeys = [
 const validKeys: string[] = [...specialKeys, ...singleKeys];
 
 export function parseAdjectival(node: GrammarNode): GraphicalNode {
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Adjectival') {
-    throw new GrammarError('InvalidParser', 'Adjectival parser requires Adjectival Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Adjectival'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Adjectival parser requires Adjectival Node',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -68,7 +75,10 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
   if (childMap[clauseKey]) {
     return {
       ...node,
-      drawUnit: drawAdjectivalClauseDecorator(childMap[clauseKey].drawUnit),
+      drawUnit: drawAdjectivalClauseDecorator(
+        childMap[clauseKey].drawUnit,
+        node.status,
+      ),
     };
   }
 
@@ -78,9 +88,12 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
       drawUnit: horizontalMerge(
         [
           childMap[nominalKey].drawUnit,
-          drawAdjectivalDecorator(childMap[nominalKey].drawUnit.verticalCenter),
+          drawAdjectivalDecorator({
+            height: childMap[nominalKey].drawUnit.verticalCenter,
+            status: node.status,
+          }),
         ],
-        { align: ['center', 'end'] }
+        { align: ['center', 'end'] },
       ),
     };
   }
@@ -92,8 +105,11 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
       return {
         ...node,
         drawUnit: drawAdverbialDecorator({
-          adverbDrawUnit: adjectiveDrawUnit,
-          adverbialDrawUnit: childMap[articleKey].drawUnit,
+          props: {
+            adverbDrawUnit: adjectiveDrawUnit,
+            adverbialDrawUnit: childMap[articleKey].drawUnit,
+          },
+          status: node.status,
         }),
       };
     }
@@ -102,8 +118,11 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
       return {
         ...node,
         drawUnit: drawAdverbialDecorator({
-          adverbDrawUnit: adjectiveDrawUnit,
-          adverbialDrawUnit: childMap[adverbialKey].drawUnit,
+          props: {
+            adverbDrawUnit: adjectiveDrawUnit,
+            adverbialDrawUnit: childMap[adverbialKey].drawUnit,
+          },
+          status: node.status,
         }),
       };
     }
@@ -117,18 +136,27 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
   if (childMap[verbparticipleKey]) {
     const verbparticipleDrawUnit = horizontalMerge(
       [
-        drawWord(childMap[verbparticipleKey], true),
-        drawAdjectivalDecorator(childMap[verbparticipleKey].drawUnit.verticalCenter),
+        drawWord(childMap[verbparticipleKey], {
+          withLine: true,
+          status: node.status,
+        }),
+        drawAdjectivalDecorator({
+          height: childMap[verbparticipleKey].drawUnit.verticalCenter,
+          status: node.status,
+        }),
       ],
-      { align: ['center', 'end'] }
+      { align: ['center', 'end'] },
     );
 
     if (childMap[adverbialKey]) {
       return {
         ...node,
-        drawUnit: verticalMerge([verbparticipleDrawUnit, childMap[adverbialKey].drawUnit], {
-          align: 'center',
-        }),
+        drawUnit: verticalMerge(
+          [verbparticipleDrawUnit, childMap[adverbialKey].drawUnit],
+          {
+            align: 'center',
+          },
+        ),
       };
     }
 
@@ -138,12 +166,15 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
         drawUnit: verticalMerge(
           [
             verbparticipleDrawUnit,
-            drawEmptyLine(verbparticipleDrawUnit.width),
+            drawEmptyLine({
+              lineWidth: verbparticipleDrawUnit.width,
+              status: node.status,
+            }),
             childMap[adverbialGroupKey].drawUnit,
           ],
           {
             align: 'center',
-          }
+          },
         ),
       };
     }
@@ -159,10 +190,15 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
       ...node,
       drawUnit: horizontalMerge(
         [
-          drawWord(childMap[verbParticipleCompoundKey]),
-          drawAdjectivalDecorator(childMap[verbParticipleCompoundKey].drawUnit.verticalCenter),
+          drawWord(childMap[verbParticipleCompoundKey], {
+            status: node.status,
+          }),
+          drawAdjectivalDecorator({
+            height: childMap[verbParticipleCompoundKey].drawUnit.verticalCenter,
+            status: node.status,
+          }),
         ],
-        { align: ['center', 'end'] }
+        { align: ['center', 'end'] },
       ),
     };
   }
@@ -181,5 +217,8 @@ export function parseAdjectival(node: GrammarNode): GraphicalNode {
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'Adjectival parser requires Adjectival Node');
+  throw new GrammarError(
+    'InvalidStructure',
+    'Adjectival parser requires Adjectival Node',
+  );
 }

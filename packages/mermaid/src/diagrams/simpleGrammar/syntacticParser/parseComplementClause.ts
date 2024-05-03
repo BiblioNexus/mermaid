@@ -1,6 +1,10 @@
 import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
-import type { DrawUnit, GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
+import type {
+  DrawUnit,
+  GrammarNode,
+  GraphicalNode,
+} from '../simpleGrammarTypes.js';
 
 import {
   clauseClusterKey,
@@ -19,12 +23,20 @@ import { drawComplementClauseDecorator } from '../svgDrawer/drawComplementClause
 import { settings } from '../settings.js';
 
 export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [conjunctionFragmentKey, clauseKey, clauseClusterKey];
+  const validKeys: string[] = [
+    conjunctionFragmentKey,
+    clauseKey,
+    clauseClusterKey,
+  ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'ComplementClause') {
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'ComplementClause'
+  ) {
     throw new GrammarError(
       'InvalidParser',
-      'ComplementClause parser requires ComplementClause Node'
+      'ComplementClause parser requires ComplementClause Node',
     );
   }
 
@@ -35,17 +47,23 @@ export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
   if (childMap[conjunctionFragmentKey]) {
     const drawUnit = childMap[conjunctionFragmentKey].drawUnit;
 
-    conjunctionDrawUnit = verticalMerge([drawUnit, drawEmptyLine(drawUnit.width)], {
-      align: 'center',
-      verticalCenter: drawUnit.height,
-    });
+    conjunctionDrawUnit = verticalMerge(
+      [
+        drawUnit,
+        drawEmptyLine({ lineWidth: drawUnit.width, status: node.status }),
+      ],
+      {
+        align: 'center',
+        verticalCenter: drawUnit.height,
+      },
+    );
   } else {
-    conjunctionDrawUnit = drawEmptyLine();
+    conjunctionDrawUnit = drawEmptyLine({ status: node.status });
   }
 
   if (childMap[clauseKey]) {
     const subjectNode = childMap[clauseKey].children.find(
-      (child) => getKeyFromNode(child) === subjectKey
+      (child) => getKeyFromNode(child) === subjectKey,
     );
 
     return {
@@ -56,13 +74,14 @@ export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
             childMap[clauseKey].drawUnit,
             subjectNode
               ? (subjectNode as GraphicalNode).drawUnit.width - settings.padding
-              : settings.padding
+              : settings.padding,
+            node.status,
           ),
           conjunctionDrawUnit,
         ],
         {
           align: 'end',
-        }
+        },
       ),
     };
   }
@@ -72,13 +91,20 @@ export function parseComplementClauseClause(node: GrammarNode): GraphicalNode {
       ...node,
       drawUnit: horizontalMerge(
         [
-          drawComplementClauseDecorator(childMap[clauseClusterKey].drawUnit, 0),
+          drawComplementClauseDecorator(
+            childMap[clauseClusterKey].drawUnit,
+            0,
+            node.status,
+          ),
           conjunctionDrawUnit,
         ],
-        { align: 'end' }
+        { align: 'end' },
       ),
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'ComplementClause has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'ComplementClause has unexpected structure',
+  );
 }

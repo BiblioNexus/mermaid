@@ -15,7 +15,7 @@ export function parseObjectGroup(node: GrammarNode): GraphicalNode {
   }
 
   const validChildren = node.children.filter((child) =>
-    requiredKeys.includes(getKeyFromNode(child))
+    requiredKeys.includes(getKeyFromNode(child)),
   );
 
   const keysLen = validChildren.length;
@@ -25,18 +25,26 @@ export function parseObjectGroup(node: GrammarNode): GraphicalNode {
       ...node,
       drawUnit: horizontalMerge(
         [
-          ...validChildren.map((child) => {
-            if (isFragment(child.content!)) {
-              return (child as GraphicalNode).drawUnit;
-            }
+          ...validChildren
+            .map((child) => {
+              if (isFragment(child.content!)) {
+                return (child as GraphicalNode).drawUnit;
+              }
 
-            return drawWord(child, true);
-          }),
+              return drawWord(child, {
+                withLine: true,
+                status: node.status,
+              });
+            })
+            .reverse(),
         ],
-        { align: 'center' }
+        { align: 'center' },
       ),
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'ObjectGroup has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'ObjectGroup has unexpected structure',
+  );
 }

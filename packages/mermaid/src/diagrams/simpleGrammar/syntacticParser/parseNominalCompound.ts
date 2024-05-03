@@ -27,17 +27,28 @@ export function parseNominalCompound(node: GrammarNode): GraphicalNode {
   ];
 
   if (!node.content || !isFragment(node.content)) {
-    throw new GrammarError('InvalidParser', 'NominalCompound parser requires NominalCompound Node');
+    throw new GrammarError(
+      'InvalidParser',
+      'NominalCompound parser requires NominalCompound Node',
+    );
   }
 
   const allValid = allGivenKeys(node.children, validKeys);
 
   if (!allValid || node.children.length === 0) {
-    throw new GrammarError('InvalidStructure', 'NominalCompound has invalid length of children');
+    throw new GrammarError(
+      'InvalidStructure',
+      'NominalCompound has invalid length of children',
+    );
   }
 
   return {
     ...node,
-    drawUnit: drawCompound(node.children as GraphicalNode[], 'solid', true),
+    drawUnit: drawCompound(
+      node.children as GraphicalNode[],
+      'solid',
+      true,
+      node.status,
+    ),
   };
 }

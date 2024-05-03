@@ -2,7 +2,13 @@ import { isFragment } from '../utils.js';
 import { GrammarError } from '../error.js';
 import type { GrammarNode, GraphicalNode } from '../simpleGrammarTypes.js';
 
-import { getKeyFromNode, nominalKey, nounKey, pronounKey, suffixPronounKey } from './keys.js';
+import {
+  getKeyFromNode,
+  nominalKey,
+  nounKey,
+  pronounKey,
+  suffixPronounKey,
+} from './keys.js';
 
 import { getChildMap } from './utils.js';
 
@@ -12,10 +18,22 @@ import { drawEmptyLine } from '../svgDrawer/drawEmptyLine.js';
 import { drawSpacer } from '../svgDrawer/drawSpacer.js';
 
 export function parseCasusPendens(node: GrammarNode): GraphicalNode {
-  const validKeys: string[] = [nounKey, pronounKey, nominalKey, suffixPronounKey];
+  const validKeys: string[] = [
+    nounKey,
+    pronounKey,
+    nominalKey,
+    suffixPronounKey,
+  ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'CasusPendens') {
-    throw new GrammarError('InvalidParser', 'CasusPendens parser requires CasusPendens Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'CasusPendens'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'CasusPendens parser requires CasusPendens Node',
+    );
   }
 
   if (node.children.length === 0) {
@@ -33,28 +51,55 @@ export function parseCasusPendens(node: GrammarNode): GraphicalNode {
     let firstNodeDrawUnit = firstNode.drawUnit;
     let secondNodeDrawUnit = secondNode.drawUnit;
 
-    if ([nounKey, pronounKey, suffixPronounKey].includes(getKeyFromNode(firstNode))) {
+    if (
+      [nounKey, pronounKey, suffixPronounKey].includes(
+        getKeyFromNode(firstNode),
+      )
+    ) {
       firstNodeDrawUnit = verticalMerge(
-        [firstNode.drawUnit, drawEmptyLine(firstNode.drawUnit.width)],
-        { align: 'center', verticalCenter: firstNodeDrawUnit.verticalCenter }
+        [
+          firstNode.drawUnit,
+          drawEmptyLine({
+            lineWidth: firstNode.drawUnit.width,
+            status: node.status,
+          }),
+        ],
+        { align: 'center', verticalCenter: firstNodeDrawUnit.verticalCenter },
       );
     }
 
-    if ([nounKey, pronounKey, suffixPronounKey].includes(getKeyFromNode(secondNode))) {
+    if (
+      [nounKey, pronounKey, suffixPronounKey].includes(
+        getKeyFromNode(secondNode),
+      )
+    ) {
       secondNodeDrawUnit = verticalMerge(
-        [secondNode.drawUnit, drawEmptyLine(secondNode.drawUnit.width)],
-        { align: 'center', verticalCenter: firstNodeDrawUnit.verticalCenter }
+        [
+          secondNode.drawUnit,
+          drawEmptyLine({
+            lineWidth: secondNode.drawUnit.width,
+            status: node.status,
+          }),
+        ],
+        { align: 'center', verticalCenter: firstNodeDrawUnit.verticalCenter },
       );
     }
 
     return {
       ...node,
-      drawUnit: horizontalMerge([secondNodeDrawUnit, drawSpacer(), firstNodeDrawUnit], {
-        align: 'center',
-        horizontalCenter: (childMap[nounKey] as GraphicalNode).drawUnit.verticalCenter,
-      }),
+      drawUnit: horizontalMerge(
+        [secondNodeDrawUnit, drawSpacer(), firstNodeDrawUnit],
+        {
+          align: 'center',
+          horizontalCenter: (childMap[nounKey] as GraphicalNode).drawUnit
+            .verticalCenter,
+        },
+      ),
     };
   }
 
-  throw new GrammarError('InvalidStructure', 'CasusPendens has unexpected structure');
+  throw new GrammarError(
+    'InvalidStructure',
+    'CasusPendens has unexpected structure',
+  );
 }

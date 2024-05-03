@@ -56,8 +56,15 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
     nounKey,
   ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Complement') {
-    throw new GrammarError('InvalidParser', 'Complement parser requires Complement Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Complement'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Complement parser requires Complement Node',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -118,12 +125,18 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         adjectivalGroupKey,
         adjectivalKey,
         prepositionalPhraseKey,
-      ]
+      ],
     );
   } else if (childMap[verbKey] || childMap[verbparticipleKey]) {
     topKeys.push(...[verbKey, verbparticipleKey]);
     bottomKeys.push(
-      ...[adverbKey, adverbialKey, adverbialGroupKey, adverbialCompoundKey, prepositionalPhraseKey]
+      ...[
+        adverbKey,
+        adverbialKey,
+        adverbialGroupKey,
+        adverbialCompoundKey,
+        prepositionalPhraseKey,
+      ],
     );
   } else if (childMap[adjectiveKey]) {
     topKeys.push(adjectiveKey);
@@ -139,7 +152,7 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
         adjectiveCompoundKey,
         adjectivalGroupKey,
         prepositionalPhraseKey,
-      ]
+      ],
     );
   }
 
@@ -149,7 +162,8 @@ export function parseComplement(node: GrammarNode): GraphicalNode {
       topKeys,
       bottomKeys,
       children: node.children as GraphicalNode[],
-      isNominal: true,
+      isNominal: false,
+      status: node.status,
     }),
   };
 }

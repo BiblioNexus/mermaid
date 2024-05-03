@@ -102,7 +102,10 @@ function isCompound(compoundType: CompoundType, nodes: GrammarNode[]) {
 
   const hasRequiredKeys = havingGivenKeys(nodes, requiredKeys[compoundType]);
 
-  const hasValidKey = allGivenKeys(nodes, validKeys.filter((value) => !!value) as string[]);
+  const hasValidKey = allGivenKeys(
+    nodes,
+    validKeys.filter((value) => !!value) as string[],
+  );
 
   return hasRequiredKeys && hasValidKey;
 }
@@ -131,6 +134,7 @@ export function generateNewCompoundFragment(nodes: GrammarNode[]): GrammarNode {
         content: {
           fragment: compoundType,
           description: '',
+          arguments: '',
         },
       };
     }
@@ -142,6 +146,7 @@ export function generateNewCompoundFragment(nodes: GrammarNode[]): GrammarNode {
     content: {
       fragment: 'Error',
       description: 'Invalid structure',
+      arguments: '',
     },
   };
 }
@@ -155,7 +160,11 @@ export function shakingTreeForConjunction(node: GrammarNode): GrammarNode {
     return node;
   }
 
-  const skipKeys = [conjunctionFragmentKey, subordinateClauseKey, complementClauseKey];
+  const skipKeys = [
+    conjunctionFragmentKey,
+    subordinateClauseKey,
+    complementClauseKey,
+  ];
 
   if (skipKeys.includes(getKeyFromNode(node))) {
     return node;
@@ -189,7 +198,9 @@ export function shakingTreeForConjunction(node: GrammarNode): GrammarNode {
   for (let i = 0; i < node.children.length; i++) {
     if (flag[i] === -1) {
       if (groupNodes.length > 0) {
-        if (allGivenKeys(groupNodes, [conjunctionFragmentKey, conjunctionKey])) {
+        if (
+          allGivenKeys(groupNodes, [conjunctionFragmentKey, conjunctionKey])
+        ) {
           newChildren.push(...groupNodes);
         } else {
           newChildren.push(generateNewCompoundFragment(groupNodes));
@@ -263,30 +274,70 @@ export function shakingTreeForDuplication(node: GrammarNode): GrammarNode {
     NominalGroup: [nominalKey],
   };
 
-  const duplicatibleKeys = Object.values(keyMap).reduce((acc, item) => [...acc, ...item], []);
-
-  const newChildren: GrammarNode[] = node.children.filter(
-    (child) => !duplicatibleKeys.includes(getKeyFromNode(child))
+  const duplicatibleKeys = Object.values(keyMap).reduce(
+    (acc, item) => [...acc, ...item],
+    [],
   );
 
-  Object.keys(keyMap).forEach((groupType) => {
-    const children = node.children.filter((child) =>
-      keyMap[groupType as keyof typeof keyMap].includes(getKeyFromNode(child))
-    );
+  const newChildren: GrammarNode[] = [];
+  const flags: boolean[] = [];
 
-    if (children.length > 1) {
-      newChildren.push({
-        level: 0,
-        children,
-        content: {
-          fragment: groupType,
-          description: '',
-        },
-      });
-    } else if (children.length === 1) {
-      newChildren.push(children[0]);
+  for (let i = 0; i < node.children.length; i++) {
+    flags.push(false);
+  }
+
+  for (let i = 0; i < node.children.length; i++) {
+    const child = node.children[i];
+
+    if (flags[i] === true) {
+      continue;
     }
-  });
+
+    if (!duplicatibleKeys.includes(getKeyFromNode(child))) {
+      newChildren.push(child);
+      flags[i] = true;
+
+      continue;
+    }
+
+    Object.entries(keyMap).map(([groupType, groupKeys]) => {
+      if (!groupKeys.includes(getKeyFromNode(child))) {
+        return;
+      }
+
+      const tempChildren: GrammarNode[] = [];
+
+      for (let j = i; j < node.children.length; j++) {
+        const tempChild = node.children[j];
+
+        if (flags[j]) {
+          continue;
+        }
+
+        if (groupKeys.includes(getKeyFromNode(tempChild))) {
+          tempChildren.push(tempChild);
+          flags[j] = true;
+        }
+      }
+
+      if (tempChildren.length > 1) {
+        newChildren.push({
+          level: node.level + 1,
+          children: tempChildren,
+          content: {
+            fragment: groupType,
+            description: '',
+            arguments: '',
+          },
+          status: node.status,
+        });
+      } else if (tempChildren.length === 1) {
+        newChildren.push(tempChildren[0]);
+      }
+
+      flags[i] = true;
+    });
+  }
 
   return {
     ...node,
@@ -320,5 +371,7 @@ export function shakingTreeForEmptyFragment(node: GrammarNode): GrammarNode {
 }
 
 export function shakingTree(root: GrammarNode): GrammarNode {
-  return shakingTreeForDuplication(shakingTreeForConjunction(shakingTreeForEmptyFragment(root)));
+  return shakingTreeForDuplication(
+    shakingTreeForConjunction(shakingTreeForEmptyFragment(root)),
+  );
 }

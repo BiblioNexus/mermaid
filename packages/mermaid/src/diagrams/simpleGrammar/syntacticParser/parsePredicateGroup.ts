@@ -22,17 +22,32 @@ export function parsePredicateGroup(node: GrammarNode): GraphicalNode {
     conjunctionKey,
   ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'PredicateGroup') {
-    throw new GrammarError('InvalidParser', 'PredicateGroup parser requires PredicateGroup Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'PredicateGroup'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'PredicateGroup parser requires PredicateGroup Node',
+    );
   }
 
   const allValid = allGivenKeys(node.children, validKeys);
 
   if (!allValid || node.children.length === 0) {
-    throw new GrammarError('InvalidStructure', 'PredicateGroup has unexpected structure');
+    throw new GrammarError(
+      'InvalidStructure',
+      'PredicateGroup has unexpected structure',
+    );
   }
   return {
     ...node,
-    drawUnit: drawCompound(node.children as GraphicalNode[], 'solid', true),
+    drawUnit: drawCompound(
+      node.children as GraphicalNode[],
+      'solid',
+      true,
+      node.status,
+    ),
   };
 }

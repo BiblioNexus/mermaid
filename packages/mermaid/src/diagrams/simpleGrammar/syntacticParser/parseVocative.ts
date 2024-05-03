@@ -28,10 +28,22 @@ export function parseVocative(node: GrammarNode): GraphicalNode {
     relativeClauseKey,
     vocativeKey,
   ];
-  const validKeys: string[] = [...topKeys, ...bottomKeys, ...singleKeys, ...specialKeys];
+  const validKeys: string[] = [
+    ...topKeys,
+    ...bottomKeys,
+    ...singleKeys,
+    ...specialKeys,
+  ];
 
-  if (!node.content || !isFragment(node.content) || node.content.fragment !== 'Vocative') {
-    throw new GrammarError('InvalidParser', 'Vocative parser requires Vocative Node');
+  if (
+    !node.content ||
+    !isFragment(node.content) ||
+    node.content.fragment !== 'Vocative'
+  ) {
+    throw new GrammarError(
+      'InvalidParser',
+      'Vocative parser requires Vocative Node',
+    );
   }
 
   const childMap = getChildMap(node.children, validKeys);
@@ -56,7 +68,12 @@ export function parseVocative(node: GrammarNode): GraphicalNode {
     if (childMap[constructChainCompoundKey]) {
       return {
         ...node,
-        drawUnit: drawCompoundEnd(childMap[constructChainCompoundKey].drawUnit, 'solid', true),
+        drawUnit: drawCompoundEnd(
+          childMap[constructChainCompoundKey].drawUnit,
+          'solid',
+          true,
+          node.status,
+        ),
       };
     }
 
@@ -73,6 +90,7 @@ export function parseVocative(node: GrammarNode): GraphicalNode {
       bottomKeys,
       children: node.children as GraphicalNode[],
       isNominal: false,
+      status: node.status,
     }),
   };
 }
