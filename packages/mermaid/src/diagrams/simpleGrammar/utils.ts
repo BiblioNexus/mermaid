@@ -1,5 +1,4 @@
-import { settings } from './settings.js';
-import type { Word, GrammarNode, Fragment, GraphicalNode } from './simpleGrammarTypes.js';
+import type { Word, Fragment, GrammarNode, GraphicalNode } from './simpleGrammarTypes.js';
 
 export function isWord(word: Word | Fragment): word is Word {
   return (word as Word).pos !== undefined;
@@ -23,10 +22,6 @@ export function ruler(textContent: string) {
 
   const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
   text.textContent = textContent;
-  text.setAttribute('font-size', `${settings.fontSize}px`);
-  text.setAttribute('font-family', settings.fontFamily);
-  text.setAttribute('stroke', settings.wordStrokeColor);
-
   svg.appendChild(text);
 
   // Get the width and height of the text element

@@ -10,6 +10,7 @@ export const emptyWord: GrammarNode = {
     description: '',
     arguments: '',
   },
+  status: 'elided',
 };
 
 export const spaceWord: GrammarNode = {

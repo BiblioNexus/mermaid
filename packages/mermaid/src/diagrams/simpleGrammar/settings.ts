@@ -16,4 +16,8 @@ export const settings = {
   minWidth: 1024,
   errorColor: '#b91c1c',
   errorFillColor: '#fed7aa',
+  elidedColor: '#d1d5db',
+  alternativeColor: '#f472b6',
+  revocalizationColor: '#7c3aed',
+  emendationColor: '#93c5fd',
 };

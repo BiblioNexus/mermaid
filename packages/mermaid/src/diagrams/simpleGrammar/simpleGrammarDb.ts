@@ -1,6 +1,12 @@
 import { log } from '../../logger.js';
 
-import type { SimpleGrammarDB, Fragment, Word, GrammarNode } from './simpleGrammarTypes.js';
+import type {
+  SimpleGrammarDB,
+  Fragment,
+  Word,
+  GrammarNode,
+  StatusType,
+} from './simpleGrammarTypes.js';
 
 const keywords: Record<string, string> = {
   clausecluster: 'ClauseCluster',
@@ -170,6 +176,26 @@ export function isFragment(fragment: Word | Fragment): fragment is Fragment {
   return (fragment as Fragment).fragment !== undefined;
 }
 
+function parseArgumentsForStatus(argument: string): StatusType | undefined {
+  if (argument.trim() === '') {
+    return undefined;
+  }
+
+  if (!argument.startsWith('status=')) {
+    return undefined;
+  }
+
+  const statusList: StatusType[] = ['elided', 'revocalization', 'emendation', 'alternative'];
+
+  for (const status of statusList) {
+    if (argument.indexOf(status) !== -1) {
+      return status;
+    }
+  }
+
+  return undefined;
+}
+
 const addWord = (level: number, pos: string, str: string) => {
   words[pos] = pos;
 
@@ -192,6 +218,7 @@ const addWord = (level: number, pos: string, str: string) => {
       description,
       arguments: argumentsStr,
     },
+    status: parseArgumentsForStatus(argumentsStr) || parent.status,
   });
 
   lastAdded = parent.children[parent.children.length - 1];
@@ -217,6 +244,7 @@ const addFragment = (level: number, fragment: string, str: string) => {
       description,
       arguments: argumentsStr,
     },
+    status: parseArgumentsForStatus(argumentsStr) || parent.status,
   });
 
   lastAdded = parent.children[parent.children.length - 1];
@@ -251,7 +279,7 @@ const getSimpleGrammar = () => {
 
   dfs(rootNode);
 
-  console.log(rootNode);
+  // console.log(rootNode);
 };
 
 export const db: SimpleGrammarDB = {
